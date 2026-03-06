@@ -114,7 +114,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl w-full sm:w-auto"
+                  className="border-2 border-white/60 text-white bg-white/5 hover:bg-white/15 hover:border-white/80 text-base px-8 py-6 rounded-xl w-full sm:w-auto"
                 >
                   Learn More
                 </Button>
@@ -477,7 +477,7 @@ export default function HomePage() {
             className="text-center mt-12"
           >
             <Link href="/services">
-              <Button variant="outline" size="lg" className="rounded-xl border-[#2D2B7F]/20 text-[#2D2B7F] hover:bg-[#2D2B7F]/5">
+              <Button variant="outline" size="lg" className="rounded-xl border-2 border-[#2D2B7F]/50 text-[#2D2B7F] font-semibold hover:bg-[#2D2B7F]/8 hover:border-[#2D2B7F]/70">
                 View All Services
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>

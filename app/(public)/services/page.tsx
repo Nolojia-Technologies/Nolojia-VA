@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   Mail,
   CalendarDays,
-  Briefcase,
+
   Headphones,
   BarChart3,
   Users,
@@ -405,7 +405,7 @@ export default function ServicesPage() {
                 <button
                   key={p.id}
                   onClick={() => scrollTo(p.id)}
-                  className="px-5 py-2.5 rounded-full border border-white/20 text-white/80 text-sm font-medium hover:bg-white/10 hover:border-white/40 transition-all duration-300"
+                  className="px-5 py-2.5 rounded-full border border-white/50 text-white text-sm font-semibold bg-white/5 hover:bg-white/15 hover:border-white/70 transition-all duration-300"
                 >
                   {p.label}
                 </button>
@@ -420,7 +420,7 @@ export default function ServicesPage() {
               </Button>
               <Link href="/contact">
                 <Button size="lg" variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl w-full sm:w-auto">
+                  className="border-2 border-white/60 text-white bg-white/5 hover:bg-white/15 hover:border-white/80 text-base px-8 py-6 rounded-xl w-full sm:w-auto">
                   Contact Us
                 </Button>
               </Link>
@@ -635,7 +635,7 @@ export default function ServicesPage() {
                 <h3 className="font-bold text-gray-900 text-lg mb-1">What makes a Nolojia VA different?</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   Every VA goes through a rigorous selection process — only the top 1% of applicants join.
-                  They're equipped with AI tools, trained on your custom playbook within 4 weeks, and paired
+                  They&apos;re equipped with AI tools, trained on your custom playbook within 4 weeks, and paired
                   with a client success manager to ensure continuity and quality.
                 </p>
               </div>
@@ -832,7 +832,7 @@ export default function ServicesPage() {
                 <Button onClick={() => setBookingOpen(true)}
                   className={`w-full rounded-xl font-semibold ${highlight
                     ? "bg-[#2D2B7F] text-white hover:bg-[#232161]"
-                    : "bg-white/10 text-white hover:bg-white/20 border border-white/20"}`}>
+                    : "bg-white/10 text-white hover:bg-white/25 border-2 border-white/40 hover:border-white/60"}`}>
                   Book a Call
                 </Button>
               </motion.div>

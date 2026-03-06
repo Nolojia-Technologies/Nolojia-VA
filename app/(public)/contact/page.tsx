@@ -142,7 +142,7 @@ export default function ContactPage() {
                     Thanks for reaching out. A member of our team will be in touch within one business day.
                   </p>
                   <Button onClick={() => { setSubmitted(false); setForm({ name: "", email: "", company: "", subject: "", message: "" }) }}
-                    variant="outline" className="rounded-xl border-[#2D2B7F]/20 text-[#2D2B7F]">
+                    variant="outline" className="rounded-xl border-2 border-[#2D2B7F]/50 text-[#2D2B7F] font-semibold hover:bg-[#2D2B7F]/8 hover:border-[#2D2B7F]/70">
                     Send Another Message
                   </Button>
                 </div>

@@ -294,7 +294,7 @@ export default function CareersPage() {
               </Button>
               <a href="mailto:careers@nolojia.com">
                 <Button size="lg" variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl w-full sm:w-auto">
+                  className="border-2 border-white/60 text-white bg-white/5 hover:bg-white/15 hover:border-white/80 text-base px-8 py-6 rounded-xl w-full sm:w-auto">
                   Send a General Application
                 </Button>
               </a>

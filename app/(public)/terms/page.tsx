@@ -290,7 +290,7 @@ export default function TermsPage() {
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-7 py-3 bg-white/10 border border-white/20 text-white rounded-xl font-semibold text-sm hover:bg-white/20 transition-colors"
+                className="inline-flex items-center justify-center px-7 py-3 bg-white/10 border-2 border-white/50 text-white rounded-xl font-semibold text-sm hover:bg-white/20 hover:border-white/70 transition-colors"
               >
                 Contact Us
               </Link>

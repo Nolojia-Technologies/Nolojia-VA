@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { BookingPopup } from "@/components/ui/booking-popup"
+import { useBookingNudge } from "@/components/ui/booking-popup"
 import { ArrowRight, Clock, Calendar, Tag, CalendarDays } from "lucide-react"
 
 const fadeUp = {
@@ -83,7 +83,7 @@ const posts = [
 const categories = ["All", "Productivity", "AI & Automation", "Delegation", "Operations", "Hiring"]
 
 export default function BlogPage() {
-  const [bookingOpen, setBookingOpen] = useState(false)
+  const { openFullPopup } = useBookingNudge()
   const [activeCategory, setActiveCategory] = useState("All")
 
   const filtered = activeCategory === "All" ? posts : posts.filter(p => p.category === activeCategory)
@@ -262,7 +262,7 @@ export default function BlogPage() {
               className="text-center"
             >
               <p className="text-white/40 text-sm mb-4">Ready to stop reading and start delegating?</p>
-              <Button size="lg" onClick={() => setBookingOpen(true)}
+              <Button size="lg" onClick={openFullPopup}
                 className="bg-white text-[#2D2B7F] hover:bg-white/90 px-8 py-6 rounded-xl font-semibold group">
                 <CalendarDays className="w-5 h-5 mr-2" />
                 Book a Free Discovery Call
@@ -272,8 +272,6 @@ export default function BlogPage() {
           </div>
         </div>
       </section>
-
-      <BookingPopup isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
     </>
   )
 }
