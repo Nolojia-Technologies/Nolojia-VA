@@ -1,0 +1,134 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                  NOLOJIA PLATFORM - MIGRATION CHECKLIST                ║
+║                   Follow these steps in order                          ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+STEP 1: Open Supabase Dashboard
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Go to: https://supabase.com/dashboard
+2. Click on your project: fjlwduqbdtpbfxcqayav
+3. Click "SQL Editor" in left sidebar
+4. Click "New Query"
+
+MIGRATION 1 - Initial Schema (Tables)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Open file: supabase/migrations/001_initial_schema.sql
+☐ Copy ALL contents (Ctrl+A, Ctrl+C)
+☐ Paste into SQL Editor (Ctrl+V)
+☐ Click "Run" button (or press Ctrl+Enter)
+☐ Wait for "Success. No rows returned"
+☐ Verify: 14 tables should be created
+
+MIGRATION 2 - Row Level Security
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Click "New Query" (fresh editor)
+☐ Open file: supabase/migrations/002_rls_policies.sql
+☐ Copy ALL contents
+☐ Paste into SQL Editor
+☐ Click "Run"
+☐ Wait for "Success"
+☐ Verify: RLS enabled on all tables
+
+MIGRATION 3 - Storage Buckets
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Click "New Query"
+☐ Open file: supabase/migrations/003_storage_buckets.sql
+☐ Copy ALL contents
+☐ Paste into SQL Editor
+☐ Click "Run"
+☐ Wait for "Success"
+☐ Verify: Go to Storage tab → See 3 buckets (avatars, files, blog-images)
+
+MIGRATION 4 - Database Functions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Click "New Query"
+☐ Open file: supabase/migrations/004_functions.sql
+☐ Copy ALL contents
+☐ Paste into SQL Editor
+☐ Click "Run"
+☐ Wait for "Success"
+☐ Verify: Functions created (handle_new_user, etc.)
+
+STEP 2: Create Admin User
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Go to: Authentication → Users
+☐ Click "Add User"
+☐ Choose "Create new user"
+☐ Enter your email: _____________________________
+☐ Enter password: _______________________________
+☐ Check "Auto Confirm User" ✓
+☐ Click "Create user"
+☐ COPY the User ID (UUID): _____________________
+
+☐ Go back to SQL Editor
+☐ Run this query (replace with your email):
+
+    UPDATE profiles
+    SET role = 'admin'
+    WHERE email = 'your-email@example.com';
+
+☐ Verify: Shows "Success. 1 rows affected"
+
+STEP 3: Verify Setup
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Table Editor → See 14 tables
+   ☐ profiles
+   ☐ clients
+   ☐ assistants
+   ☐ tasks
+   ☐ task_activities
+   ☐ conversations
+   ☐ conversation_participants
+   ☐ messages
+   ☐ files
+   ☐ invoices
+   ☐ payments
+   ☐ bookings
+   ☐ blog_posts
+   ☐ blog_categories
+   ☐ blog_post_categories
+   ☐ notifications
+
+☐ Storage → See 3 buckets
+   ☐ avatars (public)
+   ☐ files (private)
+   ☐ blog-images (public)
+
+☐ Authentication → Users → See your admin user
+
+STEP 4: Test Application
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Open terminal in project folder
+☐ Run: npm run dev
+☐ Open browser to: http://localhost:3001
+☐ Verify homepage loads
+☐ Visit: http://localhost:3001/services
+☐ Visit: http://localhost:3001/pricing
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                           ALL DONE! ✓                                  ║
+║                                                                        ║
+║  Next Steps:                                                           ║
+║  1. Read NEXT_STEPS_CHECKLIST.md for Phase 2                         ║
+║  2. Start building authentication pages                               ║
+║  3. Implement login/signup forms                                      ║
+║                                                                        ║
+║  Your Supabase Project: fjlwduqbdtpbfxcqayav                          ║
+║  Dashboard: https://supabase.com/dashboard                            ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Problem: "relation already exists"
+Solution: Tables already created, skip to next migration
+
+Problem: Storage buckets not created
+Solution: Manually create them in Storage tab
+
+Problem: User can't be created
+Solution: Make sure migrations 1 and 4 completed successfully
+
+Problem: "permission denied"
+Solution: Ensure you're using the postgres role in SQL Editor
+
+For more help, see: RUN_MIGRATIONS.md
