@@ -4,10 +4,10 @@ import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { BookingPopup } from "@/components/ui/booking-popup"
+import { useBookingNudge } from "@/components/ui/booking-popup"
 import {
   ArrowRight, Mail, Phone, MapPin, Clock,
-  CalendarDays, MessageSquare, Send, CheckCircle2,
+  CalendarDays, MessageSquare, Send, CheckCircle2, Loader2, AlertCircle,
 } from "lucide-react"
 
 const fadeUp = {
@@ -19,14 +19,47 @@ const fadeUp = {
 }
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
 
-export default function ContactPage() {
-  const [bookingOpen, setBookingOpen] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ name: "", email: "", company: "", subject: "", message: "" })
+const EMPTY_FORM = { name: "", email: "", phone: "", company: "", subject: "", message: "", _hp: "" }
 
-  function handleSubmit(e: React.FormEvent) {
+export default function ContactPage() {
+  const { openFullPopup } = useBookingNudge()
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [errorMsg, setErrorMsg] = useState("")
+
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm(f => ({ ...f, [field]: e.target.value }))
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSubmitted(true)
+    setStatus("loading")
+    setErrorMsg("")
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorMsg(data.error ?? "Something went wrong. Please try again.")
+        setStatus("error")
+        return
+      }
+
+      setStatus("success")
+    } catch {
+      setErrorMsg("Network error. Please check your connection and try again.")
+      setStatus("error")
+    }
+  }
+
+  function resetForm() {
+    setForm(EMPTY_FORM)
+    setStatus("idle")
+    setErrorMsg("")
   }
 
   return (
@@ -76,7 +109,7 @@ export default function ContactPage() {
             >
               {/* Book a call card */}
               <motion.div variants={fadeUp} custom={0}
-                className="relative rounded-2xl overflow-hidden shadow-lg">
+                className="relative rounded-2xl overflow-hidden shadow-lg" style={{ minHeight: 200 }}>
                 <Image src="/images/team-collaboration.png" alt="" fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0F0E2E]/90 to-[#2D2B7F]/85" />
                 <div className="relative z-10 p-6">
@@ -85,7 +118,7 @@ export default function ContactPage() {
                   <p className="text-white/60 text-sm leading-relaxed mb-4">
                     The fastest way to find out if Nolojia is right for you. Free, 30 minutes, no obligation.
                   </p>
-                  <Button onClick={() => setBookingOpen(true)}
+                  <Button onClick={openFullPopup}
                     className="bg-white text-[#2D2B7F] hover:bg-white/90 rounded-xl font-semibold group w-full">
                     Book Now
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -132,17 +165,18 @@ export default function ContactPage() {
               transition={{ duration: 0.7 }}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8"
             >
-              {submitted ? (
+              {status === "success" ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                     <CheckCircle2 className="w-8 h-8 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                  <p className="text-muted-foreground mb-6 max-w-sm">
-                    Thanks for reaching out. A member of our team will be in touch within one business day.
+                  <p className="text-muted-foreground mb-2 max-w-sm">
+                    Your message has been sent successfully. We&apos;ll be in touch within one business day.
                   </p>
-                  <Button onClick={() => { setSubmitted(false); setForm({ name: "", email: "", company: "", subject: "", message: "" }) }}
-                    variant="outline" className="rounded-xl border-2 border-[#2D2B7F]/50 text-[#2D2B7F] font-semibold hover:bg-[#2D2B7F]/8 hover:border-[#2D2B7F]/70">
+                  <p className="text-sm text-gray-400 mb-6">Check your inbox — a confirmation email is on its way.</p>
+                  <Button onClick={resetForm}
+                    variant="outline" className="rounded-xl border-2 border-[#2D2B7F]/50 text-[#2D2B7F] font-semibold hover:bg-[#2D2B7F]/5">
                     Send Another Message
                   </Button>
                 </div>
@@ -152,7 +186,28 @@ export default function ContactPage() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-1">Send Us a Message</h2>
                     <p className="text-muted-foreground text-sm">Fill out the form and we&apos;ll be in touch shortly.</p>
                   </div>
+
+                  {/* Error banner */}
+                  {status === "error" && (
+                    <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+                      <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-700">{errorMsg}</p>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Honeypot — hidden from humans, filled by bots */}
+                    <input
+                      type="text"
+                      name="_hp"
+                      value={form._hp}
+                      onChange={set("_hp")}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}
+                    />
+
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Full Name *</label>
@@ -160,67 +215,90 @@ export default function ContactPage() {
                           required
                           type="text"
                           value={form.name}
-                          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                          onChange={set("name")}
                           placeholder="Jane Smith"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Work Email *</label>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email *</label>
                         <input
                           required
                           type="email"
                           value={form.email}
-                          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                          onChange={set("email")}
                           placeholder="jane@company.com"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
                         />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Company / Business Name</label>
-                      <input
-                        type="text"
-                        value={form.company}
-                        onChange={e => setForm(f => ({ ...f, company: e.target.value }))}
-                        placeholder="Acme Corp"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
-                      />
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Phone</label>
+                        <input
+                          type="tel"
+                          value={form.phone}
+                          onChange={set("phone")}
+                          placeholder="+1 555 000 0000"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Company</label>
+                        <input
+                          type="text"
+                          value={form.company}
+                          onChange={set("company")}
+                          placeholder="Acme Corp"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+                        />
+                      </div>
                     </div>
+
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Subject *</label>
                       <select
                         required
                         value={form.subject}
-                        onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                        onChange={set("subject")}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all bg-white"
                       >
                         <option value="">Select a topic...</option>
-                        <option value="general">General Inquiry</option>
-                        <option value="services">Services & Plans</option>
-                        <option value="pricing">Pricing Question</option>
-                        <option value="partnership">Partnership Opportunity</option>
-                        <option value="support">Support</option>
-                        <option value="other">Other</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Services & Plans">Services &amp; Plans</option>
+                        <option value="Pricing Question">Pricing Question</option>
+                        <option value="Partnership Opportunity">Partnership Opportunity</option>
+                        <option value="Support">Support</option>
+                        <option value="Other">Other</option>
                       </select>
                     </div>
+
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Message *</label>
                       <textarea
                         required
                         rows={5}
                         value={form.message}
-                        onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                        onChange={set("message")}
                         placeholder="Tell us what's on your mind..."
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all resize-none"
                       />
                     </div>
-                    <Button type="submit" size="lg"
-                      className="w-full bg-[#2D2B7F] hover:bg-[#232161] text-white rounded-xl font-semibold group">
-                      <Send className="w-4 h-4 mr-2" />
-                      Send Message
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={status === "loading"}
+                      className="w-full bg-[#2D2B7F] hover:bg-[#232161] text-white rounded-xl font-semibold group disabled:opacity-70"
+                    >
+                      {status === "loading" ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending...</>
+                      ) : (
+                        <><Send className="w-4 h-4 mr-2" />Send Message<ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" /></>
+                      )}
                     </Button>
+
                     <p className="text-xs text-muted-foreground text-center">
                       By submitting this form you agree to our{" "}
                       <a href="/privacy" className="text-[#2D2B7F] hover:underline">Privacy Policy</a>.
@@ -243,7 +321,7 @@ export default function ContactPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <h2 className="text-3xl font-bold text-white mb-3">Prefer to Talk?</h2>
             <p className="text-white/60 mb-8">Skip the form — book a call directly and let&apos;s have a real conversation.</p>
-            <Button size="lg" onClick={() => setBookingOpen(true)}
+            <Button size="lg" onClick={openFullPopup}
               className="bg-white text-[#2D2B7F] hover:bg-white/90 px-8 py-6 rounded-xl font-semibold group">
               <CalendarDays className="w-5 h-5 mr-2" />
               Book a Free Discovery Call
@@ -252,8 +330,6 @@ export default function ContactPage() {
           </motion.div>
         </div>
       </section>
-
-      <BookingPopup isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
     </>
   )
 }

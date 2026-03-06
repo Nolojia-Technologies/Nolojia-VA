@@ -2,52 +2,100 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Calendar, Clock, ArrowRight } from "lucide-react"
+import { X, Calendar, Clock, ArrowRight, CheckCircle2, Loader2, AlertCircle } from "lucide-react"
 
-const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
-
-function getNextDays(count: number) {
-  const days = []
-  const today = new Date()
-  for (let i = 0; i < count; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    days.push({
-      day: d.toLocaleDateString("en-US", { weekday: "short" }),
-      date: d.getDate(),
-      month: d.toLocaleDateString("en-US", { month: "short" }),
-      full: d.toISOString(),
-    })
-  }
-  return days
-}
+// ─── Booking Popup ─────────────────────────────────────────────────────────────
 
 interface BookingPopupProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
-  const [selectedDate, setSelectedDate] = useState(0)
-  const [selectedTime, setSelectedTime] = useState<number | null>(null)
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [step, setStep] = useState<"schedule" | "details" | "confirmed">("schedule")
-  const days = getNextDays(5)
+const SERVICE_OPTIONS = [
+  "Virtual Assistant Services",
+  "Executive / Personal Assistant",
+  "Administrative Assistant",
+  "E-commerce VA",
+  "Real Estate VA",
+  "Customer Support VA",
+  "Social Media Management",
+  "Content & Copywriting",
+  "Graphic Design",
+  "Lead Generation",
+  "CRM & Sales Support",
+  "AI & Automation Consulting",
+  "Other / Not Sure Yet",
+]
 
-  const handleBook = () => {
-    if (step === "schedule" && selectedTime !== null) {
-      setStep("details")
-    } else if (step === "details" && name && email) {
+const TIME_OPTIONS = [
+  "9:00 AM", "10:00 AM", "11:00 AM",
+  "12:00 PM", "1:00 PM", "2:00 PM",
+  "3:00 PM", "4:00 PM", "5:00 PM",
+]
+
+function getTodayStr() {
+  return new Date().toISOString().split("T")[0]
+}
+
+const EMPTY_DETAILS = {
+  name: "", email: "", phone: "", serviceType: "", notes: "", _hp: "",
+}
+
+export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
+  const [step, setStep] = useState<"schedule" | "details" | "confirmed" | "error">("schedule")
+  const [selectedDate, setSelectedDate] = useState(getTodayStr())
+  const [selectedTime, setSelectedTime] = useState("")
+  const [details, setDetails] = useState(EMPTY_DETAILS)
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState("")
+
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setDetails(d => ({ ...d, [field]: e.target.value }))
+
+  async function handleConfirm() {
+    if (!details.name || !details.email || !details.serviceType) return
+    setLoading(true)
+    setErrorMsg("")
+
+    try {
+      const res = await fetch("/api/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: details.name,
+          email: details.email,
+          phone: details.phone,
+          serviceType: details.serviceType,
+          preferredDate: new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+          preferredTime: selectedTime,
+          notes: details.notes,
+          _hp: details._hp,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorMsg(data.error ?? "Something went wrong. Please try again.")
+        setStep("error")
+        return
+      }
+
       setStep("confirmed")
+    } catch {
+      setErrorMsg("Network error. Please check your connection and try again.")
+      setStep("error")
+    } finally {
+      setLoading(false)
     }
   }
 
   const resetAndClose = () => {
     setStep("schedule")
-    setSelectedTime(null)
-    setName("")
-    setEmail("")
+    setSelectedDate(getTodayStr())
+    setSelectedTime("")
+    setDetails(EMPTY_DETAILS)
+    setErrorMsg("")
     onClose()
   }
 
@@ -55,7 +103,6 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Subtle backdrop — no blur, just a light dim */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -64,15 +111,15 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
             onClick={resetAndClose}
           />
 
-          {/* Popup */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-36 right-4 z-[101] w-[95vw] max-w-[400px] max-h-[calc(100vh-10rem)] overflow-y-auto"
+            className="fixed bottom-36 right-4 z-[101] w-[95vw] max-w-[420px] max-h-[calc(100vh-10rem)] overflow-y-auto"
           >
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+
               {/* Header */}
               <div className="relative bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] p-6 text-white">
                 <button
@@ -98,20 +145,17 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
 
               {/* Body */}
               <div className="p-6">
+
+                {/* STEP 1 — Schedule */}
                 {step === "schedule" && (
                   <>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Book now to see WHAT to hand off first and exactly HOW to hand it off without it failing.
-                    </p>
-
-                    {/* Urgency */}
                     <div className="flex items-center justify-between bg-red-50 rounded-lg px-4 py-2.5 mb-5">
                       <div className="flex items-center gap-2">
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
                         </span>
-                        <span className="text-sm font-medium text-red-700">Only few slots are left</span>
+                        <span className="text-sm font-medium text-red-700">Only a few slots left this week</span>
                       </div>
                       <div className="flex items-center gap-1 text-sm text-red-600 font-semibold">
                         <Clock className="w-3.5 h-3.5" />
@@ -119,103 +163,182 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
                       </div>
                     </div>
 
-                    {/* Date Selection */}
-                    <div className="flex gap-2 mb-5">
-                      {days.map((d, i) => (
-                        <button
-                          key={d.full}
-                          onClick={() => setSelectedDate(i)}
-                          className={`flex-1 flex flex-col items-center py-3 px-2 rounded-xl border-2 transition-all duration-200 ${selectedDate === i
-                              ? "border-[#2D2B7F] bg-[#2D2B7F]/5 text-[#2D2B7F]"
-                              : "border-gray-200 hover:border-gray-300 text-gray-600"
-                            }`}
-                        >
-                          <span className="text-xs font-medium">{d.day}</span>
-                          <span className="text-lg font-bold">{d.date}</span>
-                          <span className="text-[10px] uppercase">{d.month}</span>
-                        </button>
-                      ))}
+                    <div className="space-y-4 mb-5">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Preferred Date</label>
+                        <input
+                          type="date"
+                          value={selectedDate}
+                          min={getTodayStr()}
+                          onChange={e => setSelectedDate(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Preferred Time</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {TIME_OPTIONS.map((time) => (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => setSelectedTime(time)}
+                              className={`py-2.5 px-2 rounded-lg border text-xs font-medium transition-all duration-200 ${
+                                selectedTime === time
+                                  ? "border-[#2D2B7F] bg-[#2D2B7F] text-white shadow-md"
+                                  : "border-gray-200 hover:border-[#2D2B7F]/50 text-gray-600"
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Time Slots */}
-                    <div className="grid grid-cols-3 gap-2 mb-5">
-                      {timeSlots.map((time, i) => (
-                        <button
-                          key={time}
-                          onClick={() => setSelectedTime(i)}
-                          className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-all duration-200 ${selectedTime === i
-                              ? "border-[#2D2B7F] bg-[#2D2B7F] text-white shadow-md"
-                              : "border-gray-200 hover:border-[#2D2B7F]/50 text-gray-600"
-                            }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
+                    <button
+                      onClick={() => setStep("details")}
+                      disabled={!selectedDate || !selectedTime}
+                      className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] hover:from-[#232161] hover:to-[#3B39A6] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#2D2B7F]/25"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Continue
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   </>
                 )}
 
+                {/* STEP 2 — Details */}
                 {step === "details" && (
                   <>
                     <p className="text-sm text-gray-600 mb-4">
-                      You selected <strong>{days[selectedDate].day}, {days[selectedDate].month} {days[selectedDate].date}</strong> at <strong>{timeSlots[selectedTime!]}</strong>
+                      You selected <strong>{new Date(selectedDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</strong> at <strong>{selectedTime}</strong>
                     </p>
+
+                    {/* Honeypot */}
+                    <input
+                      type="text"
+                      name="_hp"
+                      value={details._hp}
+                      onChange={set("_hp")}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}
+                    />
+
                     <div className="space-y-3 mb-5">
                       <input
                         type="text"
-                        placeholder="Your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Your full name *"
+                        value={details.name}
+                        onChange={set("name")}
+                        required
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/20 outline-none transition-all text-sm"
                       />
                       <input
                         type="email"
-                        placeholder="Your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Your email *"
+                        value={details.email}
+                        onChange={set("email")}
+                        required
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/20 outline-none transition-all text-sm"
                       />
+                      <input
+                        type="tel"
+                        placeholder="Phone number (optional)"
+                        value={details.phone}
+                        onChange={set("phone")}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/20 outline-none transition-all text-sm"
+                      />
+                      <select
+                        value={details.serviceType}
+                        onChange={set("serviceType")}
+                        required
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/20 outline-none transition-all text-sm bg-white"
+                      >
+                        <option value="">Select service type *</option>
+                        {SERVICE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                      <textarea
+                        placeholder="Additional notes (optional)"
+                        value={details.notes}
+                        onChange={set("notes")}
+                        rows={3}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/20 outline-none transition-all text-sm resize-none"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 mb-2">
+                      <button
+                        type="button"
+                        onClick={() => setStep("schedule")}
+                        className="px-4 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all"
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={handleConfirm}
+                        disabled={loading || !details.name || !details.email || !details.serviceType}
+                        className="flex-1 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] hover:from-[#232161] hover:to-[#3B39A6] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#2D2B7F]/25"
+                      >
+                        {loading ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" />Booking...</>
+                        ) : (
+                          <><Calendar className="w-4 h-4" />Confirm Booking</>
+                        )}
+                      </button>
                     </div>
                   </>
                 )}
 
+                {/* STEP 3 — Confirmed */}
                 {step === "confirmed" && (
                   <div className="text-center py-6">
                     <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <CheckCircle2 className="w-8 h-8 text-green-500" />
                     </div>
                     <h4 className="text-xl font-bold text-gray-900 mb-2">You&apos;re Booked!</h4>
-                    <p className="text-sm text-gray-500">
-                      Check your email ({email}) for confirmation details. We&apos;ll see you on{" "}
-                      {days[selectedDate].day}, {days[selectedDate].month} {days[selectedDate].date} at{" "}
-                      {timeSlots[selectedTime!]}.
+                    <p className="text-sm text-gray-500 mb-1">
+                      Booking request confirmed for <strong>{new Date(selectedDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</strong> at <strong>{selectedTime}</strong>.
                     </p>
+                    <p className="text-sm text-gray-400 mb-6">
+                      Check <strong>{details.email}</strong> — a confirmation email is on its way.
+                    </p>
+                    <button
+                      onClick={resetAndClose}
+                      className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] transition-all duration-200"
+                    >
+                      Done
+                    </button>
                   </div>
                 )}
 
-                {/* CTA Button */}
-                {step !== "confirmed" ? (
-                  <button
-                    onClick={handleBook}
-                    disabled={step === "schedule" ? selectedTime === null : !name || !email}
-                    className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] hover:from-[#232161] hover:to-[#3B39A6] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#2D2B7F]/25"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    {step === "schedule" ? "Book Your 25-Min Call" : "Confirm Booking"}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={resetAndClose}
-                    className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] transition-all duration-200"
-                  >
-                    Done
-                  </button>
+                {/* Error state */}
+                {step === "error" && (
+                  <div className="text-center py-4">
+                    <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                      <AlertCircle className="w-7 h-7 text-red-500" />
+                    </div>
+                    <h4 className="font-bold text-gray-900 mb-2">Something went wrong</h4>
+                    <p className="text-sm text-gray-500 mb-5">{errorMsg}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setStep("details")}
+                        className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                      >
+                        Try Again
+                      </button>
+                      <a
+                        href="mailto:hello@nolojia.com"
+                        className="flex-1 py-3 rounded-xl bg-[#2D2B7F] text-white text-sm font-semibold text-center hover:bg-[#232161] transition-colors"
+                      >
+                        Email Us
+                      </a>
+                    </div>
+                  </div>
                 )}
 
-                {/* Footer */}
                 <p className="text-center text-xs text-gray-400 mt-4">
                   Powered by <span className="font-semibold text-[#2D2B7F]">Nolojia</span>
                 </p>
@@ -228,13 +351,13 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
   )
 }
 
-// ===== Subtle corner nudge popup (non-modal, non-blocking) =====
+// ─── Booking Nudge ─────────────────────────────────────────────────────────────
+
 export function BookingNudge({ isVisible, onClose, onBook }: { isVisible: boolean; onClose: () => void; onBook: () => void }) {
   return (
     <AnimatePresence>
       {isVisible && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -243,68 +366,62 @@ export function BookingNudge({ isVisible, onClose, onBook }: { isVisible: boolea
             onClick={onClose}
           />
           <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="fixed bottom-36 right-4 z-[101] w-[95vw] max-w-[400px] max-h-[calc(100vh-10rem)] overflow-y-auto"
-        >
-          <div className="bg-white rounded-2xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden">
-            {/* Mini header */}
-            <div className="bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] px-4 py-3 text-white flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <Calendar className="w-4 h-4" />
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-36 right-4 z-[101] w-[95vw] max-w-[400px] max-h-[calc(100vh-10rem)] overflow-y-auto"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl shadow-black/15 border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] px-4 py-3 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">Nolojia</p>
+                    <p className="text-[10px] text-white/70">AI Operations Partner</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-sm">Nolojia</p>
-                  <p className="text-[10px] text-white/70">AI Operations Partner</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors flex-shrink-0"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="p-4">
-              <p className="font-semibold text-sm text-gray-900 mb-1">
-                Book your 1:1 Discovery Session
-              </p>
-              <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                500+ founders save 20+ hours/week. See what you can hand off first.
-              </p>
-
-              {/* Urgency */}
-              <div className="flex items-center gap-1.5 mb-3">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-                </span>
-                <span className="text-xs font-medium text-red-600">Only few slots left</span>
+                <button
+                  onClick={onClose}
+                  className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors flex-shrink-0"
+                >
+                  <X className="w-3 h-3" />
+                </button>
               </div>
 
-              <button
-                onClick={onBook}
-                className="w-full py-2.5 rounded-xl font-semibold text-white text-sm bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] hover:from-[#232161] hover:to-[#3B39A6] transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-[#2D2B7F]/20"
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                Book Your 25-Min Call
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="p-4">
+                <p className="font-semibold text-sm text-gray-900 mb-1">Book your 1:1 Discovery Session</p>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                  500+ founders save 20+ hours/week. See what you can hand off first.
+                </p>
+                <div className="flex items-center gap-1.5 mb-3">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                  </span>
+                  <span className="text-xs font-medium text-red-600">Only few slots left</span>
+                </div>
+                <button
+                  onClick={onBook}
+                  className="w-full py-2.5 rounded-xl font-semibold text-white text-sm bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] hover:from-[#232161] hover:to-[#3B39A6] transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-[#2D2B7F]/20"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  Book Your 25-Min Call
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
         </>
       )}
     </AnimatePresence>
   )
 }
 
-// Floating trigger button for the popup — positioned higher
+// ─── Floating Trigger ─────────────────────────────────────────────────────────
+
 export function BookingTrigger({ onClick }: { onClick: () => void }) {
   return (
     <motion.button
@@ -321,33 +438,25 @@ export function BookingTrigger({ onClick }: { onClick: () => void }) {
   )
 }
 
-// ===== Hook to manage random nudge re-appearance =====
+// ─── Hook ────────────────────────────────────────────────────────────────────
+
 export function useBookingNudge() {
   const [nudgeVisible, setNudgeVisible] = useState(false)
   const [fullPopupOpen, setFullPopupOpen] = useState(false)
 
   const scheduleNextNudge = useCallback(() => {
-    // Random interval between 25-55 seconds
     const delay = (25 + Math.random() * 30) * 1000
     const timer = setTimeout(() => {
-      // Only show if full popup isn't open
-      if (!fullPopupOpen) {
-        setNudgeVisible(true)
-      }
+      if (!fullPopupOpen) setNudgeVisible(true)
     }, delay)
     return timer
   }, [fullPopupOpen])
 
   useEffect(() => {
-    // First nudge after 8 seconds
-    const initialTimer = setTimeout(() => {
-      setNudgeVisible(true)
-    }, 8000)
-
+    const initialTimer = setTimeout(() => setNudgeVisible(true), 8000)
     return () => clearTimeout(initialTimer)
   }, [])
 
-  // Schedule next nudge whenever the current one is dismissed (user closed it)
   useEffect(() => {
     if (!nudgeVisible && !fullPopupOpen) {
       const timer = scheduleNextNudge()
@@ -355,24 +464,9 @@ export function useBookingNudge() {
     }
   }, [nudgeVisible, fullPopupOpen, scheduleNextNudge])
 
-
-
   const dismissNudge = () => setNudgeVisible(false)
+  const openFullPopup = () => { setNudgeVisible(false); setFullPopupOpen(true) }
+  const closeFullPopup = () => setFullPopupOpen(false)
 
-  const openFullPopup = () => {
-    setNudgeVisible(false)
-    setFullPopupOpen(true)
-  }
-
-  const closeFullPopup = () => {
-    setFullPopupOpen(false)
-  }
-
-  return {
-    nudgeVisible,
-    fullPopupOpen,
-    dismissNudge,
-    openFullPopup,
-    closeFullPopup,
-  }
+  return { nudgeVisible, fullPopupOpen, dismissNudge, openFullPopup, closeFullPopup }
 }
