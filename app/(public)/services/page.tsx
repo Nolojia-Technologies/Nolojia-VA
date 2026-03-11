@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Mail,
   CalendarDays,
-
   Headphones,
   BarChart3,
   Users,
@@ -33,6 +32,12 @@ import {
   ShoppingBag,
   Home,
   ClipboardList,
+  Code2,
+  PieChart,
+  Search,
+  MousePointer2,
+  Briefcase,
+  Globe,
 } from "lucide-react"
 
 const fadeUp = {
@@ -253,6 +258,79 @@ const growthServices = [
   },
 ]
 
+const specialisedServices = [
+  {
+    icon: Code2,
+    title: "Web Design & Development",
+    desc: "Professional websites and web applications built to convert — combining great design with clean, scalable code.",
+    gradient: "from-sky-500/10 to-blue-500/10",
+    accent: "#0EA5E9",
+    features: [
+      "Custom website design and development (WordPress, Webflow, Next.js)",
+      "Landing page creation and conversion optimisation",
+      "E-commerce store setup and theme customisation",
+      "Website maintenance, updates, and performance audits",
+      "SEO-optimised code structure and Core Web Vitals improvement",
+    ],
+  },
+  {
+    icon: PieChart,
+    title: "Financial Analyst Support",
+    desc: "Expert financial support that keeps your numbers accurate, your reports timely, and your decisions data-driven.",
+    gradient: "from-emerald-500/10 to-teal-500/10",
+    accent: "#059669",
+    features: [
+      "Financial modelling, forecasting, and scenario planning",
+      "Budget tracking, variance analysis, and cash flow reporting",
+      "Bookkeeping support and expense categorisation",
+      "Investor-ready financial report preparation",
+      "KPI dashboard creation and monthly financial summaries",
+    ],
+  },
+  {
+    icon: Search,
+    title: "Digital Marketing Services",
+    desc: "Data-led digital marketing that grows your audience, drives qualified traffic, and converts visitors into customers.",
+    gradient: "from-orange-500/10 to-yellow-500/10",
+    accent: "#F97316",
+    features: [
+      "SEO strategy, keyword research, and on-page optimisation",
+      "Paid advertising management (Google Ads, Meta Ads)",
+      "Email marketing campaigns and automation setup",
+      "Analytics tracking, attribution, and performance reporting",
+      "Content marketing strategy and editorial planning",
+    ],
+  },
+  {
+    icon: MousePointer2,
+    title: "UI/UX Design",
+    desc: "User-centred design that makes digital products intuitive, beautiful, and built to retain users long-term.",
+    gradient: "from-violet-500/10 to-fuchsia-500/10",
+    accent: "#8B5CF6",
+    features: [
+      "User research, persona development, and journey mapping",
+      "Wireframing, prototyping, and interactive mockups",
+      "UI component libraries and design system creation",
+      "Usability testing and iterative design improvements",
+      "Handoff-ready Figma files for development teams",
+    ],
+  },
+  {
+    icon: Briefcase,
+    title: "Specialised Business Support",
+    desc: "Skilled professionals handling the complex, specialised tasks that keep your business compliant, efficient, and growing.",
+    gradient: "from-slate-500/10 to-gray-500/10",
+    accent: "#64748B",
+    features: [
+      "Legal document review, contract management, and compliance support",
+      "HR administration, recruitment coordination, and onboarding",
+      "Project management, timeline coordination, and delivery tracking",
+      "Procurement research, supplier management, and vendor relations",
+      "Strategic research, business plan drafting, and pitch support",
+    ],
+  },
+]
+
 // ─── Service Card Grid ────────────────────────────────────────────────────────
 
 function ServiceGrid({
@@ -391,8 +469,9 @@ export default function ServicesPage() {
             </motion.h1>
             <motion.p variants={fadeUp} custom={2}
               className="text-xl text-white/60 mb-8 max-w-xl leading-relaxed">
-              Nolojia provides skilled virtual assistants trained across three pillars —
-              VA services, creative support, and business growth. One partner, every function.
+              Nolojia provides skilled virtual assistants and remote professionals trained across
+              four pillars — VA services, creative support, business growth, and specialised digital
+              roles. One partner, every function.
             </motion.p>
 
             {/* Quick-nav pills */}
@@ -401,6 +480,7 @@ export default function ServicesPage() {
                 { id: "va", label: "Virtual Assistant" },
                 { id: "creative", label: "Creative Support" },
                 { id: "growth", label: "Growth Support" },
+                { id: "specialised", label: "Specialised Roles" },
               ].map((p) => (
                 <button
                   key={p.id}
@@ -441,14 +521,15 @@ export default function ServicesPage() {
           >
             <motion.span variants={fadeUp} custom={0}
               className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              Three Pillars of Support
+              Four Pillars of Support
             </motion.span>
             <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
               One Partner. Every Function.
             </motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Our virtual assistants are trained specialists — not generalists. Whether you need
-              dedicated VA support, a creative team, or a growth engine, we have someone for that.
+              Our virtual assistants and remote professionals are trained specialists — not generalists.
+              Whether you need dedicated VA support, a creative team, a growth engine, or specialised
+              digital expertise, we have someone for that.
             </motion.p>
           </motion.div>
 
@@ -457,7 +538,7 @@ export default function ServicesPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
             variants={stagger}
-            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
           >
             {[
               {
@@ -486,6 +567,15 @@ export default function ServicesPage() {
                 color: "from-emerald-500 to-teal-600",
                 count: "4 Services",
                 badge: null,
+              },
+              {
+                id: "specialised",
+                icon: Globe,
+                title: "Digital & Specialised Roles",
+                desc: "Web development, financial analysis, digital marketing, UI/UX design, and specialised business support.",
+                color: "from-sky-500 to-indigo-600",
+                count: "5 Services",
+                badge: "New",
               },
             ].map(({ id, icon: Icon, title, desc, color, count, badge }, i) => (
               <motion.div
@@ -727,6 +817,96 @@ export default function ServicesPage() {
           <ServiceGrid services={growthServices} onBook={() => setBookingOpen(true)} />
         </div>
       </section>
+
+      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+      {/* ── PILLAR 4: DIGITAL & SPECIALISED ROLES ─────────────────────────── */}
+      <section id="specialised" className="py-24 bg-gray-50 relative overflow-hidden scroll-mt-20">
+        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] opacity-[0.05] pointer-events-none hidden lg:block">
+          <Image src="/images/workspace-overhead.png" alt="" fill className="object-cover rounded-tl-[60px]" />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <PillarHeader
+            number="04"
+            eyebrow="Digital & Specialised Roles"
+            headline="Expert Professionals for Every Function"
+            subhead="From web development to financial analysis, UI/UX design to digital marketing — access highly skilled remote professionals powered by AI-augmented workflows."
+          />
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-6xl mx-auto mb-12"
+          >
+            <div className="bg-gradient-to-r from-[#2D2B7F]/5 to-[#4A47C4]/5 border border-[#2D2B7F]/10 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex-shrink-0 w-14 h-14 bg-[#2D2B7F] rounded-2xl flex items-center justify-center">
+                <Globe className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-gray-900 text-lg mb-1">AI-powered remote professionals at your service</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Every specialist in our network is equipped with AI-augmented workflows, trained on industry
+                  best practices, and integrated into your existing tech stack. Get expert-level output without
+                  the overhead of a full-time senior hire.
+                </p>
+              </div>
+              <div className="flex-shrink-0 flex flex-wrap gap-2">
+                {["AI-Equipped", "Remote-Ready", "Expert-Vetted", "Flexible Scope"].map((tag) => (
+                  <span key={tag} className="text-xs font-semibold text-[#2D2B7F] bg-[#2D2B7F]/10 px-3 py-1.5 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            variants={stagger}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+          >
+            {specialisedServices.map(({ icon: Icon, title, desc, features, gradient, accent }, i) => (
+              <motion.div
+                key={title}
+                variants={fadeUp}
+                custom={i}
+                className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-[#2D2B7F]/5 hover:-translate-y-1 transition-all duration-500"
+              >
+                <div className={`bg-gradient-to-br ${gradient} p-6`}>
+                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="w-6 h-6" style={{ color: accent }} />
+                  </div>
+                  <h3 className="font-bold text-xl text-gray-900 mb-2">{title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
+                </div>
+                <div className="p-6">
+                  <ul className="space-y-3">
+                    {features.map((f) => (
+                      <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: accent }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setBookingOpen(true)}
+                    className="mt-6 text-sm font-semibold flex items-center gap-1.5 group/btn"
+                    style={{ color: accent }}
+                  >
+                    Get started
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
       {/* ── PLANS ─────────────────────────────────────────────────────────── */}
       <section className="py-24 bg-[#0F0E2E] text-white relative overflow-hidden">

@@ -65,6 +65,11 @@ export const metadata: Metadata = {
       "Hire dedicated virtual assistants for admin, creative, and growth support. AI-equipped VAs. No contracts. Start this week.",
     images: [DEFAULT_OG_IMAGE],
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/images/nolojia-logo.png",
+  },
   alternates: {
     canonical: SITE_URL,
   },
@@ -85,9 +90,6 @@ export default function RootLayout({
         {/* Preconnect to key domains for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className={inter.variable}>
         {/* Sitewide JSON-LD: Organization + Website schemas */}
