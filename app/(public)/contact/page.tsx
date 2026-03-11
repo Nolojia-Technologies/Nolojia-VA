@@ -129,8 +129,8 @@ export default function ContactPage() {
               {/* Contact details */}
               <motion.div variants={fadeUp} custom={1} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-5">
                 {[
-                  { icon: Mail, label: "Email Us", value: "hello@nolojia.com", desc: "We reply within 24 hours" },
-                  { icon: Phone, label: "Call Us", value: "+1 (800) NOLOJIA", desc: "Mon–Fri, 9am–6pm EST" },
+                  { icon: Mail, label: "Email Us", value: "info@nolojia.com", desc: "We reply within 24 hours" },
+                  { icon: Phone, label: "Call Us", value: "+254 793 903930", desc: "Mon–Fri, 9am–6pm EST" },
                   { icon: MapPin, label: "Headquarters", value: "Global Operations", desc: "Serving clients in 6+ countries" },
                   { icon: Clock, label: "Response Time", value: "Under 24 hours", desc: "For all inquiries" },
                 ].map(({ icon: Icon, label, value, desc }) => (

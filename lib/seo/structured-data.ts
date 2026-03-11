@@ -15,12 +15,12 @@ export function organizationSchema() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
-      email: "hello@nolojia.com",
+      email: "info@nolojia.com",
       availableLanguage: "English",
     },
     sameAs: [
       "https://x.com/nolojia",
-      "https://linkedin.com/company/nolojia",
+      "https://www.linkedin.com/company/93209134/",
       "https://facebook.com/nolojia",
       "https://tiktok.com/@nolojia",
     ],

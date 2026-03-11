@@ -189,12 +189,12 @@ export const API_ROUTES = {
 // Social links (update with actual links)
 export const SOCIAL_LINKS = {
   TWITTER: 'https://twitter.com/nolojia',
-  LINKEDIN: 'https://linkedin.com/company/nolojia',
+  LINKEDIN: 'https://www.linkedin.com/company/93209134/',
   FACEBOOK: 'https://facebook.com/nolojia',
   INSTAGRAM: 'https://instagram.com/nolojia',
 } as const
 
 // Contact info
-export const CONTACT_EMAIL = 'hello@nolojia.com'
+export const CONTACT_EMAIL = 'info@nolojia.com'
 export const SUPPORT_EMAIL = 'support@nolojia.com'
 export const CONTACT_PHONE = '+1 (555) 123-4567'

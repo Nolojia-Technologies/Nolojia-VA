@@ -84,6 +84,18 @@ export async function POST(request: NextRequest) {
       }),
     ])
 
+    if (adminResult.error) {
+      console.error("[book] Admin email failed:", JSON.stringify(adminResult.error))
+      return NextResponse.json(
+        { error: "Failed to submit your booking. Please try again or email us directly at info@nolojia.com" },
+        { status: 500 }
+      )
+    }
+
+    if (replyResult.error) {
+      console.warn("[book] Reply email failed (non-fatal):", JSON.stringify(replyResult.error))
+    }
+
     console.log(`[book] Emails sent — admin: ${adminResult.data?.id}, reply: ${replyResult.data?.id}`)
     console.log(`[book] Booking from: ${fields.email} | Service: ${fields.serviceType} | ${fields.preferredDate} ${fields.preferredTime} | IP: ${ip}`)
 
@@ -91,7 +103,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("[book] Email send error:", err)
     return NextResponse.json(
-      { error: "Failed to submit your booking. Please try again or email us directly at hello@nolojia.com" },
+      { error: "Failed to submit your booking. Please try again or email us directly at info@nolojia.com" },
       { status: 500 }
     )
   }

@@ -330,7 +330,7 @@ export function BookingPopup({ isOpen, onClose }: BookingPopupProps) {
                         Try Again
                       </button>
                       <a
-                        href="mailto:hello@nolojia.com"
+                        href="mailto:info@nolojia.com"
                         className="flex-1 py-3 rounded-xl bg-[#2D2B7F] text-white text-sm font-semibold text-center hover:bg-[#232161] transition-colors"
                       >
                         Email Us

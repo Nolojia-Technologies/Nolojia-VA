@@ -19,6 +19,7 @@ import {
   Briefcase,
   Star,
   ChevronRight,
+  Linkedin,
 } from "lucide-react"
 
 const fadeUp = {
@@ -564,6 +565,91 @@ export default function HomePage() {
                 </div>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ===== FOUNDER SECTION ===== */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Decorative blobs */}
+        <div className="absolute top-10 left-[10%] w-64 h-64 bg-[#4A47C4]/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-10 right-[10%] w-48 h-48 bg-[#7773E7]/5 rounded-full blur-[80px]" />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.span
+              variants={fadeUp}
+              custom={0}
+              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4"
+            >
+              Our Founder
+            </motion.span>
+            <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
+              Meet the Visionary Behind Nolojia
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Driven by a passion for empowering businesses through smarter operations.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="max-w-3xl mx-auto"
+          >
+            <motion.div
+              variants={fadeUp}
+              custom={0}
+              className="flex flex-col md:flex-row items-center gap-10 bg-white rounded-3xl p-8 md:p-10 border border-gray-100 shadow-xl shadow-[#2D2B7F]/5"
+            >
+              {/* Founder Image */}
+              <div className="relative flex-shrink-0">
+                <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-lg relative">
+                  <Image
+                    src="/images/founder-shaun.jpg"
+                    alt="Shaun Daniel Machua - Founder of Nolojia"
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+                {/* Decorative accent */}
+                <div className="absolute -bottom-3 -right-3 w-20 h-20 bg-gradient-to-br from-[#4A47C4]/20 to-[#7773E7]/10 rounded-xl -z-10" />
+                <div className="absolute -top-3 -left-3 w-16 h-16 bg-gradient-to-br from-[#9996ED]/15 to-transparent rounded-xl -z-10" />
+              </div>
+
+              {/* Founder Info */}
+              <div className="text-center md:text-left flex-1">
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                  Shaun Daniel Machua
+                </h3>
+                <p className="text-[#2D2B7F] font-semibold text-base mb-4">
+                  Founder &amp; CEO
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Shaun founded Nolojia with a clear mission: to help entrepreneurs and growing
+                  businesses achieve more by offloading operations to expert assistants and
+                  AI-powered workflows — so they can focus on what truly matters.
+                </p>
+                <a
+                  href="https://www.linkedin.com/in/shaun-daniel-machua-44a528216"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#0A66C2] text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#004182] transition-all duration-300 hover:shadow-lg hover:shadow-[#0A66C2]/25 hover:-translate-y-0.5 group"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  Connect on LinkedIn
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </a>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>

@@ -137,7 +137,7 @@ export function contactReplyEmail(name: string, userEmail: string): { subject: s
 
     <p style="font-size:13px;color:#999;margin:28px 0 0;line-height:1.6;">
       If you have an urgent matter, email us directly at
-      <a href="mailto:hello@nolojia.com" style="color:${brand.primary};">hello@nolojia.com</a>
+      <a href="mailto:info@nolojia.com" style="color:${brand.primary};">info@nolojia.com</a>
     </p>
   `)
 
@@ -231,7 +231,7 @@ export function bookingReplyEmail(data: BookingAdminData): { subject: string; ht
 
     <p style="font-size:13px;color:#999;margin:28px 0 0;line-height:1.6;">
       Questions? Email us at
-      <a href="mailto:hello@nolojia.com" style="color:${brand.primary};">hello@nolojia.com</a>
+      <a href="mailto:info@nolojia.com" style="color:${brand.primary};">info@nolojia.com</a>
     </p>
   `)
 

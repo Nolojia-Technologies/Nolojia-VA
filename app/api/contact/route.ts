@@ -85,6 +85,18 @@ export async function POST(request: NextRequest) {
       }),
     ])
 
+    if (adminResult.error) {
+      console.error("[contact] Admin email failed:", JSON.stringify(adminResult.error))
+      return NextResponse.json(
+        { error: "Failed to send your message. Please try again or email us directly at info@nolojia.com" },
+        { status: 500 }
+      )
+    }
+
+    if (replyResult.error) {
+      console.warn("[contact] Reply email failed (non-fatal):", JSON.stringify(replyResult.error))
+    }
+
     console.log(`[contact] Emails sent — admin: ${adminResult.data?.id}, reply: ${replyResult.data?.id}`)
     console.log(`[contact] Submission from: ${fields.email} | Subject: ${fields.subject} | IP: ${ip}`)
 
@@ -92,7 +104,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("[contact] Email send error:", err)
     return NextResponse.json(
-      { error: "Failed to send your message. Please try again or email us directly at hello@nolojia.com" },
+      { error: "Failed to send your message. Please try again or email us directly at info@nolojia.com" },
       { status: 500 }
     )
   }
