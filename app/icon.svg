@@ -1,9 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1a1a6e"/>
-  <g transform="translate(5, 5)">
-    <rect x="1" y="4" width="3.8" height="17" rx="1.9" fill="white"/>
-    <path d="M2.9 12 C2.9 6.5, 6 4, 11 4 C16 4, 19.1 6.5, 19.1 12"
-      stroke="white" stroke-width="3.8" stroke-linecap="round" fill="none"/>
-    <rect x="17.2" y="10" width="3.8" height="11" rx="1.9" fill="white"/>
-  </g>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F0E2E"/>
+      <stop offset="100%" stop-color="#2D2B7F"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#BBB9F3" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+  <!-- Subtle inner glow -->
+  <rect width="32" height="32" rx="7" fill="none" stroke="#4A47C4" stroke-width="1" stroke-opacity="0.4"/>
+  <!-- Letter N: left vertical bar -->
+  <rect x="7" y="8" width="3.5" height="16" rx="1.75" fill="url(#accent)"/>
+  <!-- Letter N: diagonal stroke -->
+  <line x1="7" y1="8" x2="21.5" y2="24" stroke="url(#accent)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Letter N: right vertical bar -->
+  <rect x="21.5" y="8" width="3.5" height="16" rx="1.75" fill="url(#accent)"/>
 </svg>
