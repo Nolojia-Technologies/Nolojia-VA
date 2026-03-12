@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { SITE_URL } from "@/lib/seo/config"
+import { SITE_URL, SITE_NAME } from "@/lib/seo/config"
 
 export const metadata: Metadata = {
   title: "Virtual Assistant FAQ – Pricing, Onboarding & How It Works | Nolojia",
