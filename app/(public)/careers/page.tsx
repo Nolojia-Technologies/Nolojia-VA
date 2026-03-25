@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +20,8 @@ import {
   CheckCircle2,
   Star,
 } from "lucide-react"
+import { jobs } from "@/lib/careers/jobs"
+import type { Job } from "@/lib/careers/jobs"
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -31,138 +34,15 @@ const fadeUp = {
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }
 
-const openRoles = [
-  {
-    title: "Executive Virtual Assistant",
-    department: "VA Services",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Support high-growth founders and executives with inbox management, calendar ownership, travel coordination, and day-to-day task execution. You'll be the right hand of a busy leader.",
-    requirements: [
-      "3+ years of experience as a VA or executive assistant",
-      "Exceptional written and verbal communication in English",
-      "Proficiency with tools like Google Workspace, Notion, Slack, and Zoom",
-      "Strong organizational skills and attention to detail",
-      "Ability to work independently and manage competing priorities",
-    ],
-    niceToHave: [
-      "Experience with CRM tools (HubSpot, Salesforce, etc.)",
-      "Familiarity with AI productivity tools",
-      "Background supporting startup founders or C-suite executives",
-    ],
-  },
-  {
-    title: "E-commerce Virtual Assistant",
-    department: "VA Services",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Manage day-to-day e-commerce operations for clients — from product listings and order processing to customer service and inventory tracking across platforms like Shopify, Amazon, and Etsy.",
-    requirements: [
-      "2+ years of experience in e-commerce operations",
-      "Hands-on experience with Shopify, Amazon Seller Central, or similar platforms",
-      "Strong customer service skills and attention to order accuracy",
-      "Ability to manage multiple client stores simultaneously",
-      "Comfortable with data entry and inventory management",
-    ],
-    niceToHave: [
-      "Experience with e-commerce analytics and reporting",
-      "Knowledge of SEO for product listings",
-      "Familiarity with fulfilment tools like ShipStation or Linnworks",
-    ],
-  },
-  {
-    title: "Social Media Virtual Assistant",
-    department: "Creative Support",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Plan, create, and schedule content across multiple social platforms for our clients. You'll manage community engagement, track performance, and help brands grow their presence consistently.",
-    requirements: [
-      "2+ years managing social media for brands or businesses",
-      "Strong copywriting skills and a keen eye for aesthetics",
-      "Experience with scheduling tools like Buffer, Later, or Hootsuite",
-      "Understanding of platform algorithms and content best practices",
-      "Ability to maintain a consistent brand voice across channels",
-    ],
-    niceToHave: [
-      "Graphic design skills (Canva or Adobe tools)",
-      "Experience with paid social advertising",
-      "Video editing or short-form video production experience",
-    ],
-  },
-  {
-    title: "Content Writer & Copywriter",
-    department: "Creative Support",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Write compelling blog posts, website copy, email sequences, and marketing content for a range of clients. You'll work closely with client briefs to produce content that converts and connects.",
-    requirements: [
-      "3+ years of professional copywriting or content writing experience",
-      "Exceptional command of English grammar, tone, and style",
-      "Ability to adapt writing voice for different brands and audiences",
-      "Experience with SEO fundamentals and keyword integration",
-      "Strong research skills to produce accurate, authoritative content",
-    ],
-    niceToHave: [
-      "Experience writing for B2B SaaS, e-commerce, or professional services",
-      "Familiarity with tools like Surfer SEO, Grammarly, or Hemingway",
-      "Email marketing experience (Mailchimp, Klaviyo, ActiveCampaign)",
-    ],
-  },
-  {
-    title: "Lead Generation Specialist",
-    department: "Growth Support",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Research, identify, and qualify prospects for our clients' sales pipelines. You'll build targeted lists, craft outreach messages, and manage sequences that generate real conversations.",
-    requirements: [
-      "2+ years of experience in lead generation or sales development",
-      "Proficiency with LinkedIn Sales Navigator and prospecting tools",
-      "Experience writing cold outreach emails and follow-up sequences",
-      "Strong data hygiene practices and CRM management skills",
-      "Ability to qualify leads based on client-defined ICP criteria",
-    ],
-    niceToHave: [
-      "Experience with tools like Apollo, Hunter.io, or Instantly",
-      "Background in B2B sales or business development",
-      "Familiarity with CRM platforms like HubSpot or Pipedrive",
-    ],
-  },
-  {
-    title: "Client Success Manager",
-    department: "Operations",
-    type: "Full-Time",
-    location: "Remote — Worldwide",
-    description:
-      "Own the client relationship from onboarding through retention. You'll ensure every client has a seamless experience, their VA is performing at the highest level, and any issues are resolved proactively.",
-    requirements: [
-      "3+ years in customer success, account management, or client services",
-      "Outstanding communication and relationship-building skills",
-      "Experience managing multiple accounts simultaneously",
-      "Proactive problem-solving approach and a bias for action",
-      "Comfort working in a fast-paced, remote environment",
-    ],
-    niceToHave: [
-      "Experience at a VA agency, BPO, or outsourcing company",
-      "Familiarity with CRM and helpdesk tools",
-      "Background in operations or project management",
-    ],
-  },
-]
+const deptColor: Record<string, string> = {
+  "VA Services": "bg-blue-100 text-blue-700",
+  "Creative Support": "bg-purple-100 text-purple-700",
+  "Growth Support": "bg-emerald-100 text-emerald-700",
+  "Operations": "bg-amber-100 text-amber-700",
+}
 
-function RoleCard({ role }: { role: typeof openRoles[0] }) {
+function RoleCard({ role }: { role: Job }) {
   const [open, setOpen] = useState(false)
-
-  const deptColor: Record<string, string> = {
-    "VA Services": "bg-blue-100 text-blue-700",
-    "Creative Support": "bg-purple-100 text-purple-700",
-    "Growth Support": "bg-emerald-100 text-emerald-700",
-    "Operations": "bg-amber-100 text-amber-700",
-  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
@@ -187,7 +67,7 @@ function RoleCard({ role }: { role: typeof openRoles[0] }) {
             {role.title}
           </h3>
           <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
-            {role.description}
+            {role.shortDescription}
           </p>
         </div>
         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-[#2D2B7F]/10 flex items-center justify-center transition-colors mt-1">
@@ -229,13 +109,13 @@ function RoleCard({ role }: { role: typeof openRoles[0] }) {
             </div>
           </div>
 
-          <a
-            href={`mailto:careers@nolojia.com?subject=Application: ${encodeURIComponent(role.title)}`}
+          <Link
+            href={`/careers/${role.slug}`}
             className="inline-flex items-center gap-2 bg-[#2D2B7F] hover:bg-[#232161] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-md shadow-[#2D2B7F]/20 group"
           >
             Apply for this role
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
         </div>
       )}
     </div>
@@ -245,7 +125,7 @@ function RoleCard({ role }: { role: typeof openRoles[0] }) {
 export default function CareersPage() {
   const [filter, setFilter] = useState("All")
   const departments = ["All", "VA Services", "Creative Support", "Growth Support", "Operations"]
-  const filtered = filter === "All" ? openRoles : openRoles.filter((r) => r.department === filter)
+  const filtered = filter === "All" ? jobs : jobs.filter((r) => r.department === filter)
 
   return (
     <>
@@ -273,17 +153,21 @@ export default function CareersPage() {
             </motion.span>
             <motion.h1 variants={fadeUp} custom={1}
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.05]">
-              Join the Team Behind{" "}
+              Join{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9996ED] to-[#BBB9F3]">
-                500+ Businesses
+                Nolojia
               </span>
             </motion.h1>
             <motion.p variants={fadeUp} custom={2}
-              className="text-xl text-white/60 mb-10 max-w-xl leading-relaxed">
+              className="text-xl text-white/60 mb-3 max-w-xl leading-relaxed">
+              Build the future of AI-powered digital operations with us.
+            </motion.p>
+            <motion.p variants={fadeUp} custom={3}
+              className="text-base text-white/40 mb-10 max-w-2xl leading-relaxed">
               We&apos;re building the world&apos;s most reliable virtual assistant company — and we need
               exceptional people who take ownership, move fast, and genuinely care about client results.
             </motion.p>
-            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
+            <motion.div variants={fadeUp} custom={4} className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
                 onClick={() => document.getElementById("open-roles")?.scrollIntoView({ behavior: "smooth" })}
@@ -438,7 +322,7 @@ export default function CareersPage() {
               Find Your Role
             </motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              All roles are fully remote and open to candidates worldwide. Click any role to see full details and apply.
+              All roles are fully remote and open to candidates worldwide. Expand any role to see full details and apply directly.
             </motion.p>
           </motion.div>
 
@@ -462,7 +346,7 @@ export default function CareersPage() {
           <div className="max-w-4xl mx-auto space-y-4">
             {filtered.map((role, i) => (
               <motion.div
-                key={role.title}
+                key={role.slug}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, duration: 0.4 }}
@@ -504,7 +388,7 @@ export default function CareersPage() {
             className="grid md:grid-cols-4 gap-6"
           >
             {[
-              { step: "01", icon: Briefcase, title: "Application", desc: "Submit your application via email or the role form. We review every application personally." },
+              { step: "01", icon: Briefcase, title: "Application", desc: "Submit your application directly on the role page. We review every application personally — no bots." },
               { step: "02", icon: Users, title: "Intro Call", desc: "A 20-minute video call to get to know you, your experience, and what you're looking for." },
               { step: "03", icon: Zap, title: "Skills Assessment", desc: "A short, paid practical task relevant to the role. We respect your time — it takes under 2 hours." },
               { step: "04", icon: CheckCircle2, title: "Offer & Onboarding", desc: "If it's a match, we move fast. Offer within 48 hours, onboarding within the week." },

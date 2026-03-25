@@ -241,6 +241,123 @@ export function bookingReplyEmail(data: BookingAdminData): { subject: string; ht
   }
 }
 
+// ─── Careers application — admin notification ────────────────────────────────
+
+export interface ApplicationAdminData {
+  jobSlug: string
+  jobTitle: string
+  fullName: string
+  email: string
+  phone: string
+  location: string
+  linkedin: string
+  portfolio: string
+  coverLetter: string
+  yearsExperience: string
+  expectedSalary: string
+  resumeUrl: string | null
+  submittedAt: string
+}
+
+export function applicationAdminEmail(data: ApplicationAdminData): { subject: string; html: string } {
+  const html = baseLayout(`
+    <h2 style="margin:0 0 4px;font-size:22px;font-weight:700;color:${brand.dark};">New Job Application Received</h2>
+    <p style="margin:0 0 6px;font-size:14px;color:#666;">Role: <strong>${escapeHtml(data.jobTitle)}</strong></p>
+    <p style="margin:0 0 24px;font-size:13px;color:#999;">Submitted on ${data.submittedAt}</p>
+
+    <div style="background:#f0f0fa;border:1px solid #d8d8f0;border-radius:10px;padding:14px 20px;margin-bottom:20px;">
+      <span style="font-size:13px;font-weight:600;color:${brand.primary};">⚡ Review this application in Supabase or reply directly to the applicant.</span>
+    </div>
+
+    <div style="background:#f8f8fc;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+      <table style="width:100%;border-collapse:collapse;">
+        ${row("Name", data.fullName)}
+        ${row("Email", `<a href="mailto:${data.email}" style="color:${brand.primary};">${data.email}</a>`)}
+        ${row("Phone", data.phone || "Not provided")}
+        ${row("Location", data.location || "Not provided")}
+        ${data.linkedin ? row("LinkedIn", `<a href="${escapeHtml(data.linkedin)}" style="color:${brand.primary};">${escapeHtml(data.linkedin)}</a>`) : ""}
+        ${data.portfolio ? row("Portfolio", `<a href="${escapeHtml(data.portfolio)}" style="color:${brand.primary};">${escapeHtml(data.portfolio)}</a>`) : ""}
+        ${data.yearsExperience ? row("Experience", data.yearsExperience) : ""}
+        ${data.expectedSalary ? row("Exp. Salary", data.expectedSalary) : ""}
+        ${data.resumeUrl ? row("Resume", `<span style="color:#2e7d32;font-weight:600;">✓ Uploaded</span> <span style="color:#999;font-size:12px;">(${escapeHtml(data.resumeUrl)})</span>`) : row("Resume", "Not provided")}
+      </table>
+    </div>
+
+    <div style="margin-bottom:28px;">
+      <p style="margin:0 0 8px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Cover Letter</p>
+      <div style="background:#fff;border:1px solid #e8e8f0;border-left:4px solid ${brand.primary};border-radius:8px;padding:16px 20px;">
+        <p style="margin:0;font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;">${escapeHtml(data.coverLetter)}</p>
+      </div>
+    </div>
+
+    <a href="mailto:${data.email}?subject=Re: Your application for ${encodeURIComponent(data.jobTitle)} at Nolojia"
+       style="display:inline-block;background:${brand.primary};color:#fff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;margin-right:12px;">
+      Reply to ${escapeHtml(data.fullName.split(" ")[0])}
+    </a>
+  `)
+
+  return {
+    subject: `New Application: ${data.jobTitle} — ${data.fullName}`,
+    html,
+  }
+}
+
+// ─── Careers application — applicant confirmation ─────────────────────────────
+
+export function applicationConfirmEmail(
+  name: string,
+  userEmail: string,
+  jobTitle: string
+): { subject: string; html: string } {
+  const firstName = name.split(" ")[0]
+
+  const html = baseLayout(`
+    <h2 style="margin:0 0 16px;font-size:22px;font-weight:700;color:${brand.dark};">Application received, ${escapeHtml(firstName)}!</h2>
+
+    <p style="font-size:15px;color:#444;line-height:1.7;margin:0 0 12px;">
+      Thank you for applying to the <strong>${escapeHtml(jobTitle)}</strong> role at Nolojia.
+      We've received your application and our team will review it personally.
+    </p>
+
+    <p style="font-size:15px;color:#444;line-height:1.7;margin:0 0 28px;">
+      We'll get back to you at <strong>${userEmail}</strong> within <strong>5 business days</strong>.
+    </p>
+
+    <div style="background:#f8f8fc;border-radius:10px;padding:20px 24px;margin-bottom:28px;">
+      <p style="margin:0 0 14px;font-weight:700;color:${brand.dark};font-size:14px;">What happens next?</p>
+      <ol style="margin:0;padding-left:18px;color:#555;font-size:14px;line-height:2.2;">
+        <li>Our team personally reviews every application — no bots here</li>
+        <li>If there's a match, we'll invite you to a <strong>20-minute intro call</strong></li>
+        <li>You'll complete a short, <strong>paid skills assessment</strong> (under 2 hours)</li>
+        <li>If it's a great fit, we move to an offer — <strong>within 48 hours</strong></li>
+      </ol>
+    </div>
+
+    <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 28px;">
+      In the meantime, feel free to explore how we operate and what our team looks like:
+    </p>
+
+    <a href="https://www.nolojia.com/about"
+       style="display:inline-block;background:${brand.primary};color:#fff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;margin-right:12px;">
+      About Nolojia
+    </a>
+    <a href="https://www.nolojia.com/careers"
+       style="display:inline-block;background:#fff;color:${brand.primary};text-decoration:none;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;border:2px solid ${brand.primary};">
+      View All Roles
+    </a>
+
+    <p style="font-size:13px;color:#999;margin:28px 0 0;line-height:1.6;">
+      Questions? Email us at
+      <a href="mailto:info@nolojia.com" style="color:${brand.primary};">info@nolojia.com</a>
+    </p>
+  `)
+
+  return {
+    subject: `Application received — ${jobTitle} at Nolojia`,
+    html,
+  }
+}
+
 // ─── Utility ──────────────────────────────────────────────────────────────────
 
 function escapeHtml(text: string): string {

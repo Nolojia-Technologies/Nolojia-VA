@@ -6,6 +6,10 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+export type AdminRole = 'super_admin' | 'hr_manager' | 'operations_manager' | 'finance_manager' | 'marketing_manager'
+export type ApplicationStatus = 'new' | 'reviewed' | 'shortlisted' | 'hired' | 'rejected'
+export type JobStatus = 'open' | 'closed' | 'draft'
+
 export interface Database {
   public: {
     Tables: {
@@ -16,6 +20,7 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           role: 'client' | 'assistant' | 'admin'
+          admin_role: AdminRole | null
           created_at: string
           updated_at: string
         }
@@ -25,6 +30,7 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           role?: 'client' | 'assistant' | 'admin'
+          admin_role?: AdminRole | null
           created_at?: string
           updated_at?: string
         }
@@ -34,6 +40,7 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           role?: 'client' | 'assistant' | 'admin'
+          admin_role?: AdminRole | null
           created_at?: string
           updated_at?: string
         }
@@ -482,6 +489,129 @@ export interface Database {
           message?: string
           type?: string
           read?: boolean
+          created_at?: string
+        }
+      }
+      jobs: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          department: string
+          type: string
+          location: string
+          description: string | null
+          requirements: Json
+          benefits: Json
+          status: JobStatus
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          title: string
+          department: string
+          type?: string
+          location?: string
+          description?: string | null
+          requirements?: Json
+          benefits?: Json
+          status?: JobStatus
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          department?: string
+          type?: string
+          location?: string
+          description?: string | null
+          requirements?: Json
+          benefits?: Json
+          status?: JobStatus
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      applications: {
+        Row: {
+          id: string
+          job_slug: string
+          job_title: string
+          full_name: string
+          email: string
+          phone: string | null
+          location: string | null
+          linkedin: string | null
+          portfolio: string | null
+          resume_url: string | null
+          cover_letter: string | null
+          years_experience: string | null
+          expected_salary: string | null
+          status: ApplicationStatus
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          job_slug: string
+          job_title: string
+          full_name: string
+          email: string
+          phone?: string | null
+          location?: string | null
+          linkedin?: string | null
+          portfolio?: string | null
+          resume_url?: string | null
+          cover_letter?: string | null
+          years_experience?: string | null
+          expected_salary?: string | null
+          status?: ApplicationStatus
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          job_slug?: string
+          job_title?: string
+          full_name?: string
+          email?: string
+          phone?: string | null
+          location?: string | null
+          linkedin?: string | null
+          portfolio?: string | null
+          resume_url?: string | null
+          cover_letter?: string | null
+          years_experience?: string | null
+          expected_salary?: string | null
+          status?: ApplicationStatus
+          notes?: string | null
+          created_at?: string
+        }
+      }
+      application_notes: {
+        Row: {
+          id: string
+          application_id: string
+          author_id: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          application_id: string
+          author_id: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          application_id?: string
+          author_id?: string
+          content?: string
           created_at?: string
         }
       }

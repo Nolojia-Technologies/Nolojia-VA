@@ -2,44 +2,56 @@ import type { Metadata } from "next"
 import { SITE_URL, SITE_NAME } from "@/lib/seo/config"
 
 export const metadata: Metadata = {
-  title: "Virtual Assistant & Remote Team Services – Admin, Creative, Growth & Digital | Nolojia",
+  title: "AI-Powered Remote Business Services – Virtual Assistants, Creative, Web, Marketing & Financial Support | Nolojia",
   description:
-    "Hire dedicated virtual assistants and remote professionals for admin support, creative content, business growth, web development, digital marketing, UI/UX, and financial analysis. AI-powered teams for founders and executives. Start this week — no contracts.",
+    "Nolojia helps businesses scale operations through AI-powered virtual teams and specialized remote professionals. Virtual assistants, creative design, web development, digital marketing, financial analysis, and specialized business support — all under one roof. No contracts. Start this week.",
   keywords: [
+    // Primary keywords
     "virtual assistant services",
-    "hire virtual assistant",
+    "AI-powered operations",
+    "remote business support",
+    "outsourced business services",
     "remote teams",
-    "AI assistants",
-    "business operations support",
-    "customer support outsourcing",
-    "digital operations",
-    "admin support services",
-    "creative support services",
-    "business growth support",
+    "hire virtual assistant",
+    // Service category keywords
+    "creative design services",
+    "motion graphics services",
+    "UI UX design services",
+    "web development services",
+    "digital marketing support",
+    "financial analysis services",
+    "business intelligence services",
+    // Secondary keywords
+    "social media management",
+    "graphic design services",
+    "content creation services",
+    "SEO services",
+    "paid advertising management",
+    "CRM management",
+    "project management support",
+    "operations support",
+    // Positioning keywords
     "AI virtual assistant",
     "executive assistant services",
     "remote assistant",
-    "web design and development",
-    "digital marketing services",
-    "UI UX design services",
-    "financial analyst support",
-    "social media management",
-    "graphic design services",
-    "specialised business support",
+    "outsourced operations",
+    "remote professional services",
+    "scalable business support",
+    "global virtual teams",
   ],
   alternates: { canonical: `${SITE_URL}/services` },
   openGraph: {
-    title: `Virtual Assistant & Remote Team Services – Admin, Creative, Growth & Digital | ${SITE_NAME}`,
+    title: `AI-Powered Remote Business Services – Virtual Assistants, Creative, Web, Marketing & More | ${SITE_NAME}`,
     description:
-      "Hire dedicated virtual assistants and remote professionals for admin support, creative content, business growth, web development, digital marketing, and more. AI-powered teams for founders and executives.",
+      "Scale your business with Nolojia's AI-powered remote teams. Virtual assistants, creative design, web development, digital marketing, financial analysis, and specialized support — 6 service categories, one trusted partner.",
     url: `${SITE_URL}/services`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `Virtual Assistant & Remote Team Services | ${SITE_NAME}`,
+    title: `AI-Powered Remote Business Operations | ${SITE_NAME}`,
     description:
-      "AI-powered virtual assistants and remote professionals for every business function. Hire VAs, designers, developers, marketers, and more — no contracts.",
+      "Virtual assistants, creative design, web development, digital marketing, financial analysis, and specialized business support. AI-powered teams, no contracts, start this week.",
   },
 }
 

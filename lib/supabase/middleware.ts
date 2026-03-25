@@ -79,7 +79,15 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthPage) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Check if user is admin and redirect accordingly
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const dest = profile?.role === 'admin' ? '/admin/dashboard' : '/dashboard'
+    return NextResponse.redirect(new URL(dest, request.url))
   }
 
   // Check admin role for admin routes
