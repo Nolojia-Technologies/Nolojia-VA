@@ -45,21 +45,21 @@ export default async function ReportsPage() {
       title: 'This Month\'s Applications',
       description: `${format(now, 'MMMM yyyy')} — ${thisMonthApps ?? 0} applications received`,
       icon: FileText,
-      color: 'text-indigo-600 bg-indigo-50',
+      color: 'text-brand bg-brand-soft',
       href: '/admin/applicants',
     },
     {
       title: 'Hired Candidates',
       description: `${thisMonthHired ?? 0} total hires`,
       icon: TrendingUp,
-      color: 'text-emerald-600 bg-emerald-50',
+      color: 'text-success bg-success-soft',
       href: '/admin/applicants?status=hired',
     },
     {
       title: 'Pipeline Analytics',
       description: `Across ${totalJobs ?? 0} job listings`,
       icon: Calendar,
-      color: 'text-amber-600 bg-amber-50',
+      color: 'text-warning bg-warning-soft',
       href: '/admin/analytics',
     },
   ]
@@ -71,26 +71,26 @@ export default async function ReportsPage() {
       <div className="p-6 space-y-6 max-w-4xl">
         {/* Summary */}
         <div className="grid sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-3xl font-bold text-gray-900">{thisMonthApps ?? 0}</p>
-            <p className="text-sm text-gray-500 mt-1">Applications this month</p>
+          <div className="bg-card rounded-2xl border border-border shadow-sm p-5 text-center">
+            <p className="text-3xl font-bold text-foreground">{thisMonthApps ?? 0}</p>
+            <p className="text-sm text-muted-foreground mt-1">Applications this month</p>
             {growthPct !== null && (
-              <p className={`text-xs mt-1 font-medium ${Number(growthPct) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <p className={`text-xs mt-1 font-medium ${Number(growthPct) >= 0 ? 'text-success' : 'text-destructive'}`}>
                 {Number(growthPct) >= 0 ? '+' : ''}{growthPct}% vs last month
               </p>
             )}
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-3xl font-bold text-gray-900">{thisMonthHired ?? 0}</p>
-            <p className="text-sm text-gray-500 mt-1">Total hires</p>
+          <div className="bg-card rounded-2xl border border-border shadow-sm p-5 text-center">
+            <p className="text-3xl font-bold text-foreground">{thisMonthHired ?? 0}</p>
+            <p className="text-sm text-muted-foreground mt-1">Total hires</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
-            <p className="text-3xl font-bold text-gray-900">{lastMonthApps ?? 0}</p>
-            <p className="text-sm text-gray-500 mt-1">Last month applications</p>
+          <div className="bg-card rounded-2xl border border-border shadow-sm p-5 text-center">
+            <p className="text-3xl font-bold text-foreground">{lastMonthApps ?? 0}</p>
+            <p className="text-sm text-muted-foreground mt-1">Last month applications</p>
           </div>
         </div>
 
-        {/* Report links */}
+        <h2 className="sr-only">Reports</h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {reportCards.map((card) => {
             const Icon = card.icon
@@ -98,41 +98,41 @@ export default async function ReportsPage() {
               <Link
                 key={card.title}
                 href={card.href}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow group"
+                className="bg-card rounded-2xl border border-border shadow-sm p-5 hover:shadow-md transition-shadow group"
               >
                 <div className={`w-10 h-10 rounded-xl ${card.color} flex items-center justify-center mb-3`}>
-                  <Icon size={20} />
+                  <Icon aria-hidden="true" size={20} />
                 </div>
-                <h3 className="font-semibold text-gray-900 text-sm mb-1">{card.title}</h3>
-                <p className="text-xs text-gray-500">{card.description}</p>
-                <p className="text-xs text-indigo-600 mt-2 group-hover:underline">View →</p>
+                <h3 className="font-semibold text-foreground text-sm mb-1">{card.title}</h3>
+                <p className="text-xs text-muted-foreground">{card.description}</p>
+                <p className="text-xs text-brand mt-2 group-hover:underline">View →</p>
               </Link>
             )
           })}
         </div>
 
         {/* Recent hires */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Recent Hires</h2>
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-border">
+            <h2 className="font-semibold text-foreground">Recent Hires</h2>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {recentHires && recentHires.length > 0 ? (
-              recentHires.map((hire: any) => (
+              recentHires.map((hire) => (
                 <div key={hire.email + hire.created_at} className="flex items-center gap-4 px-5 py-3.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-success to-success flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                     {hire.full_name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{hire.full_name}</p>
-                    <p className="text-xs text-gray-400">{hire.job_title}</p>
+                    <p className="text-sm font-medium text-foreground">{hire.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{hire.job_title}</p>
                   </div>
-                  <span className="text-xs text-gray-400">{format(new Date(hire.created_at), 'MMM d, yyyy')}</span>
+                  <span className="text-xs text-muted-foreground">{format(new Date(hire.created_at), 'MMM d, yyyy')}</span>
                 </div>
               ))
             ) : (
               <div className="py-10 text-center">
-                <p className="text-sm text-gray-400">No hires yet</p>
+                <p className="text-sm text-muted-foreground">No hires yet</p>
               </div>
             )}
           </div>

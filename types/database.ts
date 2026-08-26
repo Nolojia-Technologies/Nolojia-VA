@@ -673,3 +673,17 @@ export interface Database {
     }
   }
 }
+
+/**
+ * Row helpers. Prefer these over hand-written shapes or `any` — they track the
+ * schema, so a migration that changes a column becomes a type error rather than
+ * a runtime surprise.
+ */
+export type Tables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Row']
+
+export type ProfileRow = Tables<'profiles'>
+export type JobRow = Tables<'jobs'>
+export type ApplicationRow = Tables<'applications'>
+export type ApplicationNoteRow = Tables<'application_notes'>
+export type NotificationRow = Tables<'notifications'>

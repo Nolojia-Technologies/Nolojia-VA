@@ -3,22 +3,56 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft, Loader2, Trash2 } from 'lucide-react'
+
+import {
+  AdminField,
+  ListEditor,
+  adminFieldClass,
+} from '@/components/admin/job-form-fields'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, Loader2, Trash2, Plus, X } from 'lucide-react'
+import { cn } from '@/lib/utils/cn'
+import type { JobRow, JobStatus } from '@/types/database'
 
 const departments = [
-  'VA Services', 'Creative Support', 'Growth Support', 'Operations',
-  'Finance', 'Marketing', 'Engineering', 'General',
+  'VA Services',
+  'Creative Support',
+  'Growth Support',
+  'Operations',
+  'Finance',
+  'Marketing',
+  'Engineering',
+  'General',
 ]
+
 const jobTypes = ['Full-Time', 'Part-Time', 'Contract', 'Internship']
 
+const STATUS_TONE: Record<JobStatus, string> = {
+  open: 'bg-success-soft border-success/40 text-success',
+  closed: 'bg-muted border-input text-foreground',
+  draft: 'bg-warning-soft border-warning/40 text-warning',
+}
+
 interface JobEditFormProps {
-  job: any
+  job: JobRow
+}
+
+/**
+ * jobs.requirements and jobs.benefits are Json columns, so the database can
+ * legitimately hand back numbers, nulls or nested objects. Keep only the
+ * strings the form can edit, and fall back to a single empty row.
+ */
+function toStringList(value: unknown): string[] {
+  const list = Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : []
+  return list.length > 0 ? list : ['']
 }
 
 export function JobEditForm({ job }: JobEditFormProps) {
   const router = useRouter()
   const supabase = createClient()
+
   const [form, setForm] = useState({
     title: job.title,
     department: job.department,
@@ -27,22 +61,12 @@ export function JobEditForm({ job }: JobEditFormProps) {
     description: job.description ?? '',
     status: job.status,
   })
-  const [requirements, setRequirements] = useState<string[]>(
-    Array.isArray(job.requirements) && job.requirements.length > 0
-      ? job.requirements
-      : ['']
-  )
-  const [benefits, setBenefits] = useState<string[]>(
-    Array.isArray(job.benefits) && job.benefits.length > 0
-      ? job.benefits
-      : ['']
-  )
+  const [requirements, setRequirements] = useState<string[]>(() => toStringList(job.requirements))
+  const [benefits, setBenefits] = useState<string[]>(() => toStringList(job.benefits))
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-
-  const inputClass = "w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,8 +77,8 @@ export function JobEditForm({ job }: JobEditFormProps) {
       .from('jobs')
       .update({
         ...form,
-        requirements: requirements.filter(r => r.trim()),
-        benefits: benefits.filter(b => b.trim()),
+        requirements: requirements.filter((r) => r.trim()),
+        benefits: benefits.filter((b) => b.trim()),
       })
       .eq('slug', job.slug)
 
@@ -70,10 +94,7 @@ export function JobEditForm({ job }: JobEditFormProps) {
 
   const handleDelete = async () => {
     setDeleting(true)
-    const { error: deleteError } = await supabase
-      .from('jobs')
-      .delete()
-      .eq('slug', job.slug)
+    const { error: deleteError } = await supabase.from('jobs').delete().eq('slug', job.slug)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -85,177 +106,196 @@ export function JobEditForm({ job }: JobEditFormProps) {
     router.refresh()
   }
 
-  const ListEditor = ({
-    label,
-    items,
-    onChange,
-    placeholder,
-  }: {
-    label: string
-    items: string[]
-    onChange: (items: string[]) => void
-    placeholder: string
-  }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="space-y-2">
-        {items.map((item, i) => (
-          <div key={i} className="flex gap-2">
-            <input
-              type="text"
-              value={item}
-              onChange={e => {
-                const next = [...items]
-                next[i] = e.target.value
-                onChange(next)
-              }}
-              placeholder={placeholder}
-              className={inputClass}
-            />
-            <button
-              type="button"
-              onClick={() => onChange(items.filter((_, idx) => idx !== i))}
-              className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:text-rose-500 hover:border-rose-300 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => onChange([...items, ''])}
-          className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 font-medium"
-        >
-          <Plus size={13} />
-          Add item
-        </button>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="p-6 max-w-3xl">
-      <Link href="/admin/jobs" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6">
-        <ArrowLeft size={15} />
-        Back to Jobs
+    <div className="max-w-3xl p-6">
+      <Link
+        href="/admin/jobs"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft aria-hidden="true" size={15} />
+        Back to jobs
       </Link>
 
-      <form onSubmit={handleSave} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-        {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 text-sm text-rose-700">{error}</div>
-        )}
+      <form
+        onSubmit={handleSave}
+        className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm"
+      >
+        <div aria-live="polite">
+          {error ? (
+            <p
+              role="alert"
+              className="rounded-xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
+              {error}
+            </p>
+          ) : null}
+        </div>
 
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Title <span className="text-rose-500">*</span></label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AdminField
+            id="job-title"
+            label="Job title"
+            required
+            className="sm:col-span-2"
+            hint={`Slug: ${job.slug} (fixed after creation)`}
+          >
             <input
+              id="job-title"
+              name="title"
               type="text"
               required
               value={form.title}
-              onChange={e => setForm({ ...form, title: e.target.value })}
-              className={inputClass}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className={adminFieldClass}
             />
-            <p className="text-xs text-gray-400 mt-1">Slug: {job.slug} (fixed after creation)</p>
-          </div>
+          </AdminField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Department</label>
-            <select value={form.department} onChange={e => setForm({ ...form, department: e.target.value })} className={inputClass}>
-              {departments.map(d => <option key={d} value={d}>{d}</option>)}
+          <AdminField id="job-department" label="Department">
+            <select
+              id="job-department"
+              name="department"
+              value={form.department}
+              onChange={(e) => setForm({ ...form, department: e.target.value })}
+              className={adminFieldClass}
+            >
+              {departments.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
-          </div>
+          </AdminField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Type</label>
-            <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className={inputClass}>
-              {jobTypes.map(t => <option key={t} value={t}>{t}</option>)}
+          <AdminField id="job-type" label="Job type">
+            <select
+              id="job-type"
+              name="type"
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+              className={adminFieldClass}
+            >
+              {jobTypes.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
-          </div>
+          </AdminField>
 
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
-            <input type="text" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputClass} />
-          </div>
+          <AdminField id="job-location" label="Location" className="sm:col-span-2">
+            <input
+              id="job-location"
+              name="location"
+              type="text"
+              value={form.location}
+              onChange={(e) => setForm({ ...form, location: e.target.value })}
+              className={adminFieldClass}
+            />
+          </AdminField>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Description</label>
+        <AdminField id="job-description" label="Job description">
           <textarea
+            id="job-description"
+            name="description"
             rows={5}
             value={form.description}
-            onChange={e => setForm({ ...form, description: e.target.value })}
-            className={`${inputClass} resize-none`}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className={`${adminFieldClass} resize-y`}
           />
-        </div>
+        </AdminField>
 
-        <ListEditor label="Requirements" items={requirements} onChange={setRequirements} placeholder="e.g. 3+ years of experience" />
-        <ListEditor label="Benefits" items={benefits} onChange={setBenefits} placeholder="e.g. 100% remote" />
+        <ListEditor
+          idPrefix="job-requirement"
+          legend="Requirements"
+          items={requirements}
+          onChange={setRequirements}
+          placeholder="e.g. 3+ years of experience"
+        />
+        <ListEditor
+          idPrefix="job-benefit"
+          legend="Benefits"
+          items={benefits}
+          onChange={setBenefits}
+          placeholder="e.g. 100% remote"
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <div className="flex items-center gap-3">
-            {(['open', 'closed', 'draft'] as const).map(s => (
-              <button
+        <fieldset>
+          <legend className="mb-2 text-sm font-medium text-foreground">Status</legend>
+          <div className="flex flex-wrap items-center gap-3">
+            {(['open', 'closed', 'draft'] as const).map((s) => (
+              <label
                 key={s}
-                type="button"
-                onClick={() => setForm({ ...form, status: s })}
-                className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
+                className={cn(
+                  'cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
+                  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-card',
                   form.status === s
-                    ? s === 'open'
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                      : s === 'closed'
-                      ? 'bg-gray-100 border-gray-300 text-gray-700'
-                      : 'bg-amber-50 border-amber-300 text-amber-700'
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                    ? STATUS_TONE[s]
+                    : 'border-border bg-card text-muted-foreground hover:bg-surface-2'
+                )}
               >
+                <input
+                  type="radio"
+                  name="status"
+                  value={s}
+                  checked={form.status === s}
+                  onChange={() => setForm({ ...form, status: s })}
+                  className="sr-only"
+                />
                 {s.charAt(0).toUpperCase() + s.slice(1)}
-              </button>
+              </label>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
           <div className="flex items-center gap-3">
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-brand px-6 py-2.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover disabled:opacity-60"
             >
-              {loading && <Loader2 size={15} className="animate-spin" />}
-              Save Changes
+              {loading ? <Loader2 aria-hidden="true" size={15} className="animate-spin" /> : null}
+              Save changes
             </button>
-            <Link href="/admin/jobs" className="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-800 font-medium">Cancel</Link>
+            <Link
+              href="/admin/jobs"
+              className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Cancel
+            </Link>
           </div>
 
-          {!showDeleteConfirm ? (
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors"
-            >
-              <Trash2 size={14} />
-              Delete
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-rose-600 font-medium">Delete this job?</span>
+          {showDeleteConfirm ? (
+            <div className="flex items-center gap-2" role="group" aria-label="Confirm deletion">
+              <span className="text-xs font-medium text-destructive">
+                Delete &ldquo;{job.title}&rdquo; and its listing?
+              </span>
               <button
                 type="button"
                 disabled={deleting}
                 onClick={handleDelete}
-                className="px-3 py-1.5 bg-rose-600 text-white text-xs rounded-lg hover:bg-rose-700 transition-colors"
+                className="rounded-lg bg-destructive px-3 py-1.5 text-xs text-destructive-foreground transition-colors hover:bg-destructive/90 disabled:opacity-60"
               >
-                {deleting ? 'Deleting...' : 'Yes, delete'}
+                {deleting ? 'Deleting…' : 'Yes, delete'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+                className="rounded-lg bg-muted px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-border"
               >
                 Cancel
               </button>
             </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+            >
+              <Trash2 aria-hidden="true" size={14} />
+              Delete
+            </button>
           )}
         </div>
       </form>

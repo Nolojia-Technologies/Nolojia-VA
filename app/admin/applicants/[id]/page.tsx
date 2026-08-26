@@ -53,8 +53,8 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
       <AdminHeader title={app.full_name} subtitle={`Applied for ${app.job_title}`} />
 
       <div className="p-6 space-y-5 max-w-5xl">
-        <Link href="/admin/applicants" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
-          <ArrowLeft size={15} />
+        <Link href="/admin/applicants" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft aria-hidden="true" size={15} />
           Back to Applicants
         </Link>
 
@@ -62,14 +62,14 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
           {/* Left: Profile */}
           <div className="lg:col-span-1 space-y-4">
             {/* Candidate card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
               <div className="flex flex-col items-center text-center mb-5">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-2xl font-bold mb-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand to-brand-strong flex items-center justify-center text-white text-2xl font-bold mb-3">
                   {app.full_name.charAt(0)}
                 </div>
-                <h2 className="font-bold text-gray-900 text-lg">{app.full_name}</h2>
+                <h2 className="font-bold text-foreground text-lg">{app.full_name}</h2>
                 {app.years_experience && (
-                  <p className="text-sm text-gray-500 mt-0.5">{app.years_experience} years experience</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{app.years_experience} years experience</p>
                 )}
                 <div className="mt-3">
                   <ApplicationStatusBadge status={app.status} />
@@ -77,53 +77,53 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
               </div>
 
               <div className="space-y-2.5">
-                <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                  <Mail size={14} className="text-gray-400 flex-shrink-0" />
-                  <a href={`mailto:${app.email}`} className="hover:text-indigo-600 truncate">{app.email}</a>
+                <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <Mail aria-hidden="true" size={14} className="text-muted-foreground flex-shrink-0" />
+                  <a href={`mailto:${app.email}`} className="hover:text-brand-hover truncate">{app.email}</a>
                 </div>
                 {app.phone && (
-                  <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <Phone size={14} className="text-gray-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                    <Phone aria-hidden="true" size={14} className="text-muted-foreground flex-shrink-0" />
                     <span>{app.phone}</span>
                   </div>
                 )}
                 {app.location && (
-                  <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <MapPin size={14} className="text-gray-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                    <MapPin aria-hidden="true" size={14} className="text-muted-foreground flex-shrink-0" />
                     <span>{app.location}</span>
                   </div>
                 )}
                 {app.expected_salary && (
-                  <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <DollarSign size={14} className="text-gray-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                    <DollarSign aria-hidden="true" size={14} className="text-muted-foreground flex-shrink-0" />
                     <span>Expected: {app.expected_salary}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                  <Calendar size={14} className="text-gray-400 flex-shrink-0" />
+                <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <Calendar aria-hidden="true" size={14} className="text-muted-foreground flex-shrink-0" />
                   <span>Applied {format(new Date(app.created_at), 'MMM d, yyyy')}</span>
                 </div>
               </div>
 
               {/* Links */}
               {(app.linkedin || app.portfolio || app.resume_url) && (
-                <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                <div className="mt-4 pt-4 border-t border-border space-y-2">
                   {app.linkedin && (
                     <a href={app.linkedin} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700">
-                      <ExternalLink size={14} />LinkedIn Profile
+                       className="flex items-center gap-2 text-sm text-brand hover:text-brand-hover">
+                      <ExternalLink aria-hidden="true" size={14} />LinkedIn Profile
                     </a>
                   )}
                   {app.portfolio && (
                     <a href={app.portfolio} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700">
-                      <ExternalLink size={14} />Portfolio
+                       className="flex items-center gap-2 text-sm text-brand hover:text-brand-hover">
+                      <ExternalLink aria-hidden="true" size={14} />Portfolio
                     </a>
                   )}
                   {app.resume_url && (
                     <a href={app.resume_url} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700">
-                      <FileText size={14} />Download Resume
+                       className="flex items-center gap-2 text-sm text-brand hover:text-brand-hover">
+                      <FileText aria-hidden="true" size={14} />Download Resume
                     </a>
                   )}
                 </div>
@@ -131,21 +131,21 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
             </div>
 
             {/* Job info */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Position Applied</h3>
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
+              <h3 className="font-semibold text-foreground mb-3 text-sm">Position Applied</h3>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                  <Briefcase size={15} className="text-indigo-600" />
+                <div className="w-8 h-8 rounded-lg bg-brand-soft flex items-center justify-center flex-shrink-0">
+                  <Briefcase aria-hidden="true" size={15} className="text-brand" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">{app.job_title}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="font-medium text-foreground text-sm">{app.job_title}</p>
+                  <p className="text-xs text-muted-foreground">
                     {job?.department ?? ''}
                     {job?.type && ` · ${job.type}`}
                     {job?.location && ` · ${job.location}`}
                   </p>
                   {job && (
-                    <Link href={`/admin/jobs/${job.slug}/edit`} className="text-xs text-indigo-600 hover:text-indigo-700 mt-1 inline-block">
+                    <Link href={`/admin/jobs/${job.slug}/edit`} className="text-xs text-brand hover:text-brand-hover mt-1 inline-block">
                       View job listing →
                     </Link>
                   )}
@@ -165,9 +165,9 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
           <div className="lg:col-span-2 space-y-5">
             {/* Cover letter */}
             {app.cover_letter && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="font-semibold text-gray-900 mb-3">Cover Letter</h3>
-                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
+                <h3 className="font-semibold text-foreground mb-3">Cover Letter</h3>
+                <div className="text-sm text-foreground/85 leading-relaxed whitespace-pre-wrap">
                   {app.cover_letter}
                 </div>
               </div>
@@ -175,9 +175,9 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
 
             {/* Quick notes (from notes column) */}
             {app.notes && (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-                <h3 className="font-semibold text-amber-900 mb-2 text-sm">Quick Note</h3>
-                <p className="text-sm text-amber-800">{app.notes}</p>
+              <div className="bg-warning-soft border border-warning/25 rounded-2xl p-5">
+                <h3 className="font-semibold text-warning mb-2 text-sm">Quick Note</h3>
+                <p className="text-sm text-warning">{app.notes}</p>
               </div>
             )}
 

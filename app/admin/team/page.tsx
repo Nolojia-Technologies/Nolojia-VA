@@ -16,11 +16,11 @@ const roleLabels: Record<string, string> = {
 }
 
 const roleBadgeColors: Record<string, string> = {
-  super_admin: 'bg-indigo-50 text-indigo-700 ring-indigo-600/20',
-  hr_manager: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-  operations_manager: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-  finance_manager: 'bg-cyan-50 text-cyan-700 ring-cyan-600/20',
-  marketing_manager: 'bg-purple-50 text-purple-700 ring-purple-600/20',
+  super_admin: 'bg-brand-soft text-brand ring-brand/20',
+  hr_manager: 'bg-success-soft text-success ring-success/25',
+  operations_manager: 'bg-warning-soft text-warning ring-warning/25',
+  finance_manager: 'bg-muted text-muted-foreground ring-border',
+  marketing_manager: 'bg-brand-soft text-brand ring-brand/20',
 }
 
 export default async function TeamPage() {
@@ -53,20 +53,20 @@ export default async function TeamPage() {
 
       <div className="p-6 space-y-6 max-w-5xl">
         {/* Role overview */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Shield size={18} className="text-indigo-600" />
-            <h2 className="font-semibold text-gray-900">Access Levels</h2>
+            <Shield aria-hidden="true" size={18} className="text-brand" />
+            <h2 className="font-semibold text-foreground">Access Levels</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {Object.entries(roleLabels).map(([role, label]) => (
-              <div key={role} className="rounded-xl border border-gray-100 p-3.5">
+              <div key={role} className="rounded-xl border border-border p-3.5">
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${roleBadgeColors[role]}`}>
                     {label}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {role === 'super_admin' && 'Full access to all features and team management'}
                   {role === 'hr_manager' && 'Manage all applicants, jobs, and analytics'}
                   {role === 'operations_manager' && 'View operational & VA department candidates'}
@@ -82,15 +82,15 @@ export default async function TeamPage() {
         <InviteForm />
 
         {/* Team members */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
-            <Users size={18} className="text-gray-600" />
-            <h2 className="font-semibold text-gray-900">Admin Members</h2>
-            <span className="ml-auto text-xs text-gray-400">{adminUsers?.length ?? 0} members</span>
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
+            <Users aria-hidden="true" size={18} className="text-muted-foreground" />
+            <h2 className="font-semibold text-foreground">Admin Members</h2>
+            <span className="ml-auto text-xs text-muted-foreground">{adminUsers?.length ?? 0} members</span>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-border">
             {adminUsers && adminUsers.length > 0 ? (
-              adminUsers.map((member: any) => (
+              adminUsers.map((member) => (
                 <TeamMemberCard
                   key={member.id}
                   member={member}
@@ -101,8 +101,8 @@ export default async function TeamPage() {
               ))
             ) : (
               <div className="py-12 text-center">
-                <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No admin members yet</p>
+                <Users aria-hidden="true" className="w-8 h-8 text-muted-foreground/60 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No admin members yet</p>
               </div>
             )}
           </div>

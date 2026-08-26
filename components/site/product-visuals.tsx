@@ -54,7 +54,7 @@ export function PageMarksVisual({ className }: { className?: string }) {
         <div className="pointer-events-none absolute bottom-4 right-3 w-40 rounded-xl border border-warning/40 bg-warning-soft/85 p-3 shadow-md backdrop-blur-[1px] sm:right-6 sm:w-48">
           <div className="flex items-center gap-1.5">
             <StickyNote className="h-3 w-3 shrink-0 text-warning" />
-            <span className="text-[0.625rem] font-semibold uppercase tracking-wider text-warning">
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-warning">
               Note
             </span>
             <Bell className="ml-auto h-3 w-3 shrink-0 text-warning" />

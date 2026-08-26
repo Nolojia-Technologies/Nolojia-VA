@@ -44,17 +44,15 @@ export default async function AdminLayout({
     .eq('read', false)
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-surface">
       <AdminSidebar
         adminRole={profile.admin_role as AdminRole | null}
         userName={profile.full_name || profile.email}
         userEmail={profile.email}
         unreadCount={unreadCount ?? 0}
       />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <main id="admin-main" className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   )

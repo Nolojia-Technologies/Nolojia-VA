@@ -14,10 +14,10 @@ interface ApplicantActionsProps {
 }
 
 const statusActions: { status: ApplicationStatus; label: string; icon: React.ElementType; className: string }[] = [
-  { status: 'reviewed', label: 'Mark Reviewed', icon: CheckCircle, className: 'bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200' },
-  { status: 'shortlisted', label: 'Shortlist', icon: Star, className: 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200' },
-  { status: 'hired', label: 'Mark Hired', icon: UserCheck, className: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200' },
-  { status: 'rejected', label: 'Reject', icon: XCircle, className: 'bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200' },
+  { status: 'reviewed', label: 'Mark Reviewed', icon: CheckCircle, className: 'bg-brand-soft text-brand hover:bg-brand-soft border-brand/25' },
+  { status: 'shortlisted', label: 'Shortlist', icon: Star, className: 'bg-warning-soft text-warning hover:bg-warning-soft border-warning/25' },
+  { status: 'hired', label: 'Mark Hired', icon: UserCheck, className: 'bg-success-soft text-success hover:bg-success-soft border-success/25' },
+  { status: 'rejected', label: 'Reject', icon: XCircle, className: 'bg-destructive/10 text-destructive hover:bg-destructive/10 border-destructive/25' },
 ]
 
 export function ApplicantActions({ applicationId, currentStatus }: ApplicantActionsProps) {
@@ -46,29 +46,36 @@ export function ApplicantActions({ applicationId, currentStatus }: ApplicantActi
   const availableActions = statusActions.filter(a => a.status !== currentStatus)
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-      <h3 className="font-semibold text-gray-900 mb-3 text-sm">Update Status</h3>
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
+      <h3 className="font-semibold text-foreground mb-3 text-sm">Update Status</h3>
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xs text-gray-500">Current:</span>
+        <span className="text-xs text-muted-foreground">Current:</span>
         <ApplicationStatusBadge status={currentStatus} />
       </div>
 
-      {error && <p className="text-xs text-rose-600 mb-3">{error}</p>}
+      <div aria-live="polite">
+        {error ? (
+          <p role="alert" className="mb-3 text-xs text-destructive">
+            {error}
+          </p>
+        ) : null}
+      </div>
 
       <div className="space-y-2">
         {availableActions.map((action) => {
           const Icon = action.icon
           return (
             <button
+              type="button"
               key={action.status}
               onClick={() => updateStatus(action.status)}
               disabled={loading !== null}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium border transition-colors disabled:opacity-60 ${action.className}`}
             >
               {loading === action.status ? (
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 aria-hidden="true" size={14} className="animate-spin" />
               ) : (
-                <Icon size={14} />
+                <Icon aria-hidden="true" size={14} />
               )}
               {action.label}
             </button>

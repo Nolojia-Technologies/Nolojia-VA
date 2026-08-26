@@ -68,38 +68,54 @@ export function InviteForm() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
       <div className="flex items-center gap-2 mb-4">
-        <UserPlus size={18} className="text-indigo-600" />
-        <h2 className="font-semibold text-gray-900">Invite Admin Member</h2>
+        <UserPlus aria-hidden="true" size={18} className="text-brand" />
+        <h2 className="font-semibold text-foreground">Invite Admin Member</h2>
       </div>
 
-      {success && (
-        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-700 mb-4">
-          <Check size={15} />
-          Invitation sent! The user will receive an email to set up their account.
-        </div>
-      )}
+      <div aria-live="polite">
+        {success ? (
+          <p className="mb-4 flex items-center gap-2 rounded-xl border border-success/25 bg-success-soft px-4 py-3 text-sm text-success">
+            <Check aria-hidden="true" size={15} className="shrink-0" />
+            Invitation sent. The user will receive an email to set up their account.
+          </p>
+        ) : null}
 
-      {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 text-sm text-rose-700 mb-4">
-          {error}
-        </div>
-      )}
+        {error ? (
+          <p
+            role="alert"
+            className="mb-4 rounded-xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {error}
+          </p>
+        ) : null}
+      </div>
 
       <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-3">
+        <label htmlFor="invite-email" className="sr-only">
+          Email address to invite
+        </label>
         <input
+          id="invite-email"
+          name="email"
           type="email"
+          autoComplete="email"
           required
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="colleague@example.com"
-          className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="flex-1 px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
         />
+        <label htmlFor="invite-role" className="sr-only">
+          Role for the invited user
+        </label>
         <select
+          id="invite-role"
+          name="adminRole"
           value={adminRole}
           onChange={e => setAdminRole(e.target.value as AdminRole)}
-          className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+          className="px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent bg-card"
         >
           {adminRoles.map(r => (
             <option key={r.value} value={r.value}>{r.label}</option>
@@ -108,9 +124,9 @@ export function InviteForm() {
         <button
           type="submit"
           disabled={loading || !email.trim()}
-          className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap"
+          className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-hover disabled:opacity-60 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap"
         >
-          {loading ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
+          {loading ? <Loader2 aria-hidden="true" size={15} className="animate-spin" /> : <UserPlus aria-hidden="true" size={15} />}
           Send Invite
         </button>
       </form>

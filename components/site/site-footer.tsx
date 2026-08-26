@@ -48,7 +48,7 @@ export function SiteFooter() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Nolojia on ${social.name}`}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/12 bg-white/5 text-white/60 transition-colors hover:border-white/25 hover:bg-white/10 hover:text-white"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors hover:border-white/25 hover:bg-white/10 hover:text-white"
                   >
                     <Linkedin aria-hidden="true" className="h-4 w-4" />
                   </a>
