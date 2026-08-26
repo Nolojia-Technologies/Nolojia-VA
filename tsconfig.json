@@ -10,6 +10,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // D1Database, R2Bucket and friends. Without this the data layer has no types.
+    "types": ["@cloudflare/workers-types"],
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,

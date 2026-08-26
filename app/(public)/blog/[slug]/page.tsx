@@ -13,6 +13,10 @@ import { Container, Pill, Section } from "@/components/site/primitives"
 import { Breadcrumbs } from "@/components/site/breadcrumbs"
 import { CtaSection } from "@/components/site/sections"
 
+// Slugs are unknown at build time — D1 is not reachable from the build host, so
+// generateStaticParams returns nothing and posts render on demand, then cache.
+export const revalidate = 600
+
 export async function generateStaticParams() {
   const slugs = await getAllPublishedSlugs()
   return slugs.map((slug) => ({ slug }))

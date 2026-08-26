@@ -1,9 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { AdminHeader } from '@/components/admin/header'
-import { ApplicationStatusBadge } from '@/components/admin/status-badge'
-import { ApplicantActions } from './applicant-actions'
-import { NotesSection } from './notes-section'
 import Link from 'next/link'
 import {
   ArrowLeft, Mail, Phone, MapPin, Briefcase,
@@ -11,42 +6,33 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 
+import { AdminHeader } from '@/components/admin/header'
+import { ApplicationStatusBadge } from '@/components/admin/status-badge'
+import { requireAdmin } from '@/lib/auth/access'
+import { getApplication, listNotes } from '@/lib/db/applications'
+import { getJobBySlugForAdmin } from '@/lib/db/jobs'
+import { ApplicantActions } from './applicant-actions'
+import { NotesSection } from './notes-section'
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  const { data } = await supabase.from('applications').select('full_name').eq('id', params.id).single()
-  return { title: data?.full_name ?? 'Applicant' }
+  // Metadata renders before the page body, so it needs its own authorization
+  // check — otherwise an unauthorised request still leaks a candidate's name
+  // through the document title.
+  await requireAdmin()
+  const application = await getApplication(params.id)
+  return { title: application?.full_name ?? 'Applicant' }
 }
 
 export default async function ApplicantDetailPage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const profile = await requireAdmin()
 
-  const { data: app } = await supabase
-    .from('applications')
-    .select('*')
-    .eq('id', params.id)
-    .single()
-
+  const app = await getApplication(params.id)
   if (!app) notFound()
 
-  // Get job details from the jobs table
-  const { data: job } = await supabase
-    .from('jobs')
-    .select('slug, title, department, type, location')
-    .eq('slug', app.job_slug)
-    .single()
-
-  const { data: notes } = await supabase
-    .from('application_notes')
-    .select('id, content, created_at, author_id, author_name')
-    .eq('application_id', params.id)
-    .order('created_at', { ascending: true })
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, admin_role')
-    .eq('id', user!.id)
-    .single()
+  const [job, notes] = await Promise.all([
+    getJobBySlugForAdmin(app.job_slug),
+    listNotes(params.id),
+  ])
 
   return (
     <div>
@@ -106,7 +92,7 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
               </div>
 
               {/* Links */}
-              {(app.linkedin || app.portfolio || app.resume_url) && (
+              {(app.linkedin || app.portfolio || app.resume_key) && (
                 <div className="mt-4 pt-4 border-t border-border space-y-2">
                   {app.linkedin && (
                     <a href={app.linkedin} target="_blank" rel="noopener noreferrer"
@@ -120,8 +106,8 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
                       <ExternalLink aria-hidden="true" size={14} />Portfolio
                     </a>
                   )}
-                  {app.resume_url && (
-                    <a href={app.resume_url} target="_blank" rel="noopener noreferrer"
+                  {app.resume_key && (
+                    <a href={`/admin/applicants/${app.id}/resume`}
                        className="flex items-center gap-2 text-sm text-brand hover:text-brand-hover">
                       <FileText aria-hidden="true" size={14} />Download Resume
                     </a>
@@ -157,7 +143,7 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
             <ApplicantActions
               applicationId={app.id}
               currentStatus={app.status}
-              adminRole={profile?.admin_role ?? null}
+              adminRole={profile.admin_role}
             />
           </div>
 
@@ -184,9 +170,8 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
             {/* Internal notes thread */}
             <NotesSection
               applicationId={app.id}
-              notes={notes ?? []}
-              currentUserId={user!.id}
-              currentUserName={profile?.full_name ?? 'Admin'}
+              notes={notes}
+              currentUserId={profile.id}
             />
           </div>
         </div>

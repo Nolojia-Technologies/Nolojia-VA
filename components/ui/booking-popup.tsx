@@ -178,7 +178,7 @@ export function BookingPopup({ isOpen, onClose }: { isOpen: boolean; onClose: ()
           _hp: form._hp,
         }),
       })
-      const data = await res.json().catch(() => ({}))
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
 
       if (!res.ok) {
         setError(data.error ?? "Something went wrong. Please try again.")

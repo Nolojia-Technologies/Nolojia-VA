@@ -1,4 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/access'
+import { countApplications, listRecentApplications } from '@/lib/db/applications'
+import { countJobs, listJobsForAdmin } from '@/lib/db/jobs'
+import { countUnread, listNotifications } from '@/lib/db/notifications'
 import { AdminHeader } from '@/components/admin/header'
 import { StatsCard } from '@/components/admin/stats-card'
 import { ApplicationStatusBadge } from '@/components/admin/status-badge'
@@ -9,47 +12,32 @@ import { formatDistanceToNow } from 'date-fns'
 export const metadata = { title: 'Dashboard' }
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const profile = await requireAdmin()
 
   const [
-    { count: totalApplications },
-    { count: activeJobs },
-    { count: newApplicants },
-    { count: hiredCount },
-    { data: recentApplications },
-    { data: recentNotifications },
-    { data: openJobs },
+    totalApplications,
+    activeJobs,
+    newApplicants,
+    hiredCount,
+    recentApplications,
+    recentNotifications,
+    allOpenJobs,
+    unreadCount,
   ] = await Promise.all([
-    supabase.from('applications').select('*', { count: 'exact', head: true }),
-    supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'open'),
-    supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'new'),
-    supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'hired'),
-    supabase.from('applications')
-      .select('id, full_name, email, job_title, job_slug, status, created_at')
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase.from('notifications')
-      .select('*')
-      .eq('user_id', user!.id)
-      .order('created_at', { ascending: false })
-      .limit(5),
-    supabase.from('jobs')
-      .select('id, slug, title, department, status')
-      .eq('status', 'open')
-      .order('created_at', { ascending: false })
-      .limit(5),
+    countApplications(),
+    countJobs('open'),
+    countApplications('new'),
+    countApplications('hired'),
+    listRecentApplications(8),
+    listNotifications(profile.id, 5),
+    listJobsForAdmin('open'),
+    countUnread(profile.id),
   ])
 
-  const { count: unreadCount } = await supabase
-    .from('notifications')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user!.id)
-    .eq('read', false)
+  const openJobs = allOpenJobs.slice(0, 5)
 
-  const conversionRate = totalApplications && hiredCount
-    ? ((hiredCount / totalApplications) * 100).toFixed(1)
-    : '0'
+  const conversionRate =
+    totalApplications > 0 ? ((hiredCount / totalApplications) * 100).toFixed(1) : '0'
 
   return (
     <div>

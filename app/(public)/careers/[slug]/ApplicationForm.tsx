@@ -199,7 +199,7 @@ export default function ApplicationForm({ jobTitle, jobSlug }: Props) {
 
     try {
       const res = await fetch("/api/careers/apply", { method: "POST", body })
-      const data = await res.json().catch(() => ({}))
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
 
       if (!res.ok) {
         setStatus("error")

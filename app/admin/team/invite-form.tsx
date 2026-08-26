@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { grantAdminAction } from '@/app/admin/actions'
 import { useRouter } from 'next/navigation'
 import { UserPlus, Loader2, Check } from 'lucide-react'
 import type { AdminRole } from '@/types/database'
@@ -16,7 +16,6 @@ const adminRoles: { value: AdminRole; label: string }[] = [
 
 export function InviteForm() {
   const router = useRouter()
-  const supabase = createClient()
   const [email, setEmail] = useState('')
   const [adminRole, setAdminRole] = useState<AdminRole>('hr_manager')
   const [loading, setLoading] = useState(false)
@@ -30,38 +29,13 @@ export function InviteForm() {
     setError('')
     setSuccess(false)
 
-    // Invite via Supabase Auth
-    const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-      data: { role: 'admin', admin_role: adminRole },
-    })
-
-    if (inviteError) {
-      // Fallback: Check if user exists and update their role
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email.trim())
-        .single()
-
-      if (existingProfile) {
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ role: 'admin', admin_role: adminRole })
-          .eq('id', existingProfile.id)
-
-        if (updateError) {
-          setError(updateError.message)
-        } else {
-          setSuccess(true)
-          setEmail('')
-          router.refresh()
-        }
-      } else {
-        setError(inviteError.message)
-      }
-    } else {
+    const result = await grantAdminAction(email, adminRole)
+    if (result.ok) {
       setSuccess(true)
       setEmail('')
+      router.refresh()
+    } else {
+      setError(result.error)
     }
 
     setLoading(false)
@@ -71,14 +45,14 @@ export function InviteForm() {
     <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
       <div className="flex items-center gap-2 mb-4">
         <UserPlus aria-hidden="true" size={18} className="text-brand" />
-        <h2 className="font-semibold text-foreground">Invite Admin Member</h2>
+        <h2 className="font-semibold text-foreground">Grant admin access</h2>
       </div>
 
       <div aria-live="polite">
         {success ? (
           <p className="mb-4 flex items-center gap-2 rounded-xl border border-success/25 bg-success-soft px-4 py-3 text-sm text-success">
             <Check aria-hidden="true" size={15} className="shrink-0" />
-            Invitation sent. The user will receive an email to set up their account.
+            Access granted. They also need adding to the Cloudflare Access policy before they can sign in.
           </p>
         ) : null}
 

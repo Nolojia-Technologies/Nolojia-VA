@@ -170,10 +170,8 @@ export const ALLOWED_FILE_TYPES = [
 export const DEFAULT_PAGE_SIZE = 20
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
 
-// Routes
-export const PUBLIC_ROUTES = ['/', '/services', '/pricing', '/blog', '/book', '/about', '/contact']
-export const AUTH_ROUTES = ['/login', '/signup', '/reset-password']
-export const PROTECTED_ROUTES = ['/dashboard', '/admin']
+// Routes. Admin sign-in is handled by Cloudflare Access, not by a route here.
+export const PROTECTED_ROUTES = ['/admin']
 
 // API endpoints
 export const API_ROUTES = {

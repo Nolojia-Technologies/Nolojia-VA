@@ -3,17 +3,15 @@ import { Resend } from "resend"
 import { checkRateLimit, pruneStore } from "@/lib/email/rate-limit"
 import { sanitize, isValidEmail, isValidPhone, isHoneypotFilled } from "@/lib/email/validate"
 import { applicationAdminEmail, applicationConfirmEmail } from "@/lib/email/templates"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createApplication } from "@/lib/db/applications"
+import { notifyAllAdmins } from "@/lib/db/notifications"
+import { uploadResume } from "@/lib/storage/resumes"
+import { SITE_URL } from "@/lib/seo/config"
 
 const EMAIL_FROM    = process.env.EMAIL_FROM    ?? "notifications@nolojia.com"
 const CAREERS_EMAIL = process.env.CAREERS_EMAIL ?? "info@nolojia.com"
 
-const ALLOWED_MIME = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-]
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
+// File type and size limits live in lib/storage/resumes.ts, next to the upload.
 
 export async function POST(request: NextRequest) {
   pruneStore()
@@ -77,59 +75,60 @@ export async function POST(request: NextRequest) {
   if (!f.jobSlug || !f.jobTitle)
     return NextResponse.json({ error: "Invalid application target." }, { status: 422 })
 
-  // ── File upload ────────────────────────────────────────────────────────────
-  const resumeFile = formData.get("resume") as File | null
-  let resumeUrl: string | null = null
+  // ── File upload (R2) ───────────────────────────────────────────────────────
+  const resumeFile = formData.get("resume")
+  let resumeKey: string | null = null
 
-  if (resumeFile && resumeFile instanceof File && resumeFile.size > 0) {
-    if (!ALLOWED_MIME.includes(resumeFile.type))
-      return NextResponse.json({ error: "Resume must be a PDF, DOC, or DOCX file." }, { status: 422 })
-    if (resumeFile.size > MAX_FILE_SIZE)
-      return NextResponse.json({ error: "Resume must be smaller than 5 MB." }, { status: 422 })
-
-    const supabase = createAdminClient()
-    if (supabase) {
-      const ext      = resumeFile.name.split(".").pop()?.toLowerCase() ?? "pdf"
-      const safeName = f.fullName.replace(/[^a-z0-9]/gi, "-").toLowerCase()
-      const path     = `applications/${f.jobSlug}/${Date.now()}-${safeName}.${ext}`
-      const bytes    = await resumeFile.arrayBuffer()
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("resumes")
-        .upload(path, bytes, { contentType: resumeFile.type, upsert: false })
-
-      if (uploadError) {
-        console.error("[careers] Storage upload failed:", uploadError.message)
-      } else {
-        resumeUrl = uploadData.path
-        console.log(`[careers] Resume uploaded: ${resumeUrl}`)
-      }
+  if (resumeFile instanceof File && resumeFile.size > 0) {
+    const upload = await uploadResume(resumeFile, f.email)
+    if (!upload.ok) {
+      return NextResponse.json({ error: upload.error }, { status: 422 })
     }
+    resumeKey = upload.key
   }
 
-  // ── Save to database ───────────────────────────────────────────────────────
-  const supabase = createAdminClient()
-  if (supabase) {
-    const { error: dbError } = await supabase.from("applications").insert({
-      job_slug:         f.jobSlug,
-      job_title:        f.jobTitle,
-      full_name:        f.fullName,
-      email:            f.email,
-      phone:            f.phone || null,
-      location:         f.location || null,
-      linkedin:         f.linkedin || null,
-      portfolio:        f.portfolio || null,
-      resume_url:       resumeUrl,
-      cover_letter:     f.coverLetter,
-      years_experience: f.yearsExperience || null,
-      expected_salary:  f.expectedSalary || null,
-      status:           "new",
+  // ── Save to database (D1) ──────────────────────────────────────────────────
+  // A failed write used to be logged and swallowed, and the applicant was told
+  // their application had gone through. Losing someone's job application
+  // silently is worse than asking them to try again.
+  let applicationId: string
+  try {
+    const created = await createApplication({
+      jobSlug: f.jobSlug,
+      jobTitle: f.jobTitle,
+      fullName: f.fullName,
+      email: f.email,
+      phone: f.phone || undefined,
+      location: f.location || undefined,
+      linkedin: f.linkedin || undefined,
+      portfolio: f.portfolio || undefined,
+      resumeKey,
+      coverLetter: f.coverLetter,
+      yearsExperience: f.yearsExperience || undefined,
+      expectedSalary: f.expectedSalary || undefined,
     })
-    if (dbError) {
-      console.error("[careers] DB insert failed:", dbError.message)
-    } else {
-      console.log(`[careers] Application saved — ${f.email} → ${f.jobTitle}`)
-    }
+    applicationId = created.id
+    console.log(`[careers] Application saved — ${f.email} → ${f.jobTitle}`)
+  } catch (error) {
+    console.error("[careers] DB insert failed:", (error as Error).message)
+    return NextResponse.json(
+      {
+        error:
+          "We could not record your application. Please try again, or email careers@nolojia.com directly.",
+      },
+      { status: 503 }
+    )
+  }
+
+  // Best-effort: an in-app notification should never fail the submission.
+  try {
+    await notifyAllAdmins({
+      title: "New application",
+      message: `${f.fullName} applied for ${f.jobTitle}`,
+      type: "application",
+    })
+  } catch (error) {
+    console.warn("[careers] notification fan-out failed:", (error as Error).message)
   }
 
   // ── Send emails ────────────────────────────────────────────────────────────
@@ -149,7 +148,13 @@ export async function POST(request: NextRequest) {
       timeStyle: "short",
     }) + " UTC"
 
-  const adminTpl   = applicationAdminEmail({ ...f, resumeUrl, submittedAt })
+  // The CV is no longer a public URL, so the email links into the console
+  // where the reader is authenticated, rather than quoting a storage path.
+  const adminTpl   = applicationAdminEmail({
+    ...f,
+    resumeUrl: resumeKey ? `${SITE_URL}/admin/applicants/${applicationId}` : null,
+    submittedAt,
+  })
   const confirmTpl = applicationConfirmEmail(f.fullName, f.email, f.jobTitle)
 
   // Send both emails; treat admin email as critical, confirm as best-effort

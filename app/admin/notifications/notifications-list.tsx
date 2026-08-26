@@ -1,24 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { markAllNotificationsReadAction, markNotificationReadAction } from '@/app/admin/actions'
 import { useRouter } from 'next/navigation'
 import { Bell, CheckCheck, Info, AlertCircle, UserPlus, Briefcase } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils/cn'
-
-interface Notification {
-  id: string
-  title: string
-  message: string
-  type: string
-  read: boolean
-  created_at: string
-}
+import type { Notification } from '@/types/database'
 
 interface NotificationsListProps {
   notifications: Notification[]
-  userId: string
 }
 
 const typeIcon: Record<string, React.ElementType> = {
@@ -35,32 +26,31 @@ const typeColor: Record<string, string> = {
   info: 'text-brand bg-brand-soft',
 }
 
-export function NotificationsList({ notifications: initial, userId }: NotificationsListProps) {
+/**
+ * Marking read is a server action: D1 is not reachable from the browser, and
+ * the action scopes the update to the signed-in user so an id from elsewhere
+ * cannot clear someone else's notification.
+ */
+export function NotificationsList({ notifications: initial }: NotificationsListProps) {
   const router = useRouter()
-  const supabase = createClient()
   const [notifications, setNotifications] = useState(initial)
   const [marking, setMarking] = useState(false)
 
   const markAllRead = async () => {
     setMarking(true)
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', userId)
-      .eq('read', false)
-
-    setNotifications(notifications.map(n => ({ ...n, read: true })))
+    // Optimistic: the list is already on screen and the action is idempotent.
+    setNotifications((current) => current.map((n) => ({ ...n, read: true })))
+    await markAllNotificationsReadAction()
     setMarking(false)
     router.refresh()
   }
 
   const markRead = async (id: string) => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', id)
-
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n))
+    setNotifications((current) =>
+      current.map((n) => (n.id === id ? { ...n, read: true } : n))
+    )
+    await markNotificationReadAction(id)
+    router.refresh()
   }
 
   const unreadCount = notifications.filter(n => !n.read).length

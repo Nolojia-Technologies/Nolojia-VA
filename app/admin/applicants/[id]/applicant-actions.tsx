@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { updateApplicationStatusAction } from '@/app/admin/actions'
 import { ApplicationStatusBadge } from '@/components/admin/status-badge'
 import { Loader2, CheckCircle, Star, XCircle, UserCheck } from 'lucide-react'
 import type { ApplicationStatus } from '@/types/database'
@@ -22,7 +22,6 @@ const statusActions: { status: ApplicationStatus; label: string; icon: React.Ele
 
 export function ApplicantActions({ applicationId, currentStatus }: ApplicantActionsProps) {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState<ApplicationStatus | null>(null)
   const [error, setError] = useState('')
 
@@ -30,15 +29,11 @@ export function ApplicantActions({ applicationId, currentStatus }: ApplicantActi
     setLoading(newStatus)
     setError('')
 
-    const { error: updateError } = await supabase
-      .from('applications')
-      .update({ status: newStatus })
-      .eq('id', applicationId)
-
-    if (updateError) {
-      setError(updateError.message)
-    } else {
+    const result = await updateApplicationStatusAction(applicationId, newStatus)
+    if (result.ok) {
       router.refresh()
+    } else {
+      setError(result.error)
     }
     setLoading(null)
   }

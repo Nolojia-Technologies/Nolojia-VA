@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
-import { AdminHeader } from '@/components/admin/header'
-import { JobStatusBadge } from '@/components/admin/status-badge'
 import Link from 'next/link'
 import { Plus, Briefcase, Users, Edit } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import type { JobStatus } from '@/types/database'
 
-const jobStatuses: JobStatus[] = ['open', 'closed', 'draft']
+import { AdminHeader } from '@/components/admin/header'
+import { JobStatusBadge } from '@/components/admin/status-badge'
+import { requireAdminRole } from '@/lib/auth/access'
+import { countApplicationsByJob, listJobsForAdmin } from '@/lib/db/jobs'
+import { JOB_STATUSES, type JobStatus } from '@/types/database'
 
 export const metadata = { title: 'Job Listings' }
 
@@ -15,35 +15,19 @@ export default async function JobsPage({
 }: {
   searchParams: { status?: string; department?: string }
 }) {
-  const supabase = await createClient()
+  await requireAdminRole(['super_admin', 'hr_manager'])
 
-  let query = supabase
-    .from('jobs')
-    .select('*')
-    .order('created_at', { ascending: false })
+  const status =
+    searchParams.status && (JOB_STATUSES as readonly string[]).includes(searchParams.status)
+      ? (searchParams.status as JobStatus)
+      : undefined
 
-  if (searchParams.status) {
-    if ((jobStatuses as string[]).includes(searchParams.status)) {
-      query = query.eq('status', searchParams.status as JobStatus)
-    }
-  }
-  if (searchParams.department) {
-    query = query.eq('department', searchParams.department)
-  }
+  const all = await listJobsForAdmin(status)
+  const jobs = searchParams.department
+    ? all.filter((job) => job.department === searchParams.department)
+    : all
 
-  const { data: jobs } = await query
-
-  // Get application counts per job slug
-  const jobSlugs = jobs?.map((j) => j.slug) ?? []
-  const { data: appCounts } = await supabase
-    .from('applications')
-    .select('job_slug')
-    .in('job_slug', jobSlugs)
-
-  const countMap: Record<string, number> = {}
-  appCounts?.forEach((a) => {
-    countMap[a.job_slug] = (countMap[a.job_slug] || 0) + 1
-  })
+  const countMap = await countApplicationsByJob(jobs.map((job) => job.slug))
 
   const statusFilters = ['all', 'open', 'closed', 'draft']
 

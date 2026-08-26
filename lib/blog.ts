@@ -1,4 +1,20 @@
-import { createClient } from "@/lib/supabase/server"
+import "server-only"
+
+import { getDb } from "@/lib/cloudflare/env"
+import { toBool, toStringArray } from "@/lib/db/util"
+import type { BlogPostRow } from "@/types/database"
+
+/**
+ * Blog reads, backed by D1.
+ *
+ * Every query fails soft and returns an empty result. The blog is public
+ * content on a marketing site: an unavailable database should render "no posts
+ * yet", not a 500. This also keeps the public pages building before the
+ * Cloudflare bindings are wired up.
+ *
+ * Only published posts are ever returned, which is what the
+ * "Public can read published posts" RLS policy used to guarantee.
+ */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,79 +55,98 @@ export interface BlogPostCard {
 const CARD_FIELDS =
   "id, slug, title, excerpt, cover_image, category, tags, author_name, author_avatar, published_at, read_time_minutes, featured"
 
+type CardRow = Pick<
+  BlogPostRow,
+  | "id"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "cover_image"
+  | "category"
+  | "tags"
+  | "author_name"
+  | "author_avatar"
+  | "published_at"
+  | "read_time_minutes"
+  | "featured"
+>
+
+const toCard = (row: CardRow): BlogPostCard => ({
+  ...row,
+  tags: toStringArray(row.tags),
+  featured: toBool(row.featured),
+})
+
+const toPost = (row: BlogPostRow): BlogPost => ({
+  ...row,
+  tags: toStringArray(row.tags),
+  featured: toBool(row.featured),
+})
+
+/** Every read goes through here so one missing-binding check covers them all. */
+async function safely<T>(run: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await run()
+  } catch (error) {
+    console.error("[blog]", (error as Error).message)
+    return fallback
+  }
+}
+
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
 export async function getAllPostCards(limit = 50): Promise<BlogPostCard[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(CARD_FIELDS)
-      .eq("published", true)
-      .order("published_at", { ascending: false })
-      .limit(limit)
-
-    if (error) {
-      console.error("Error fetching blog posts:", error)
-      return []
-    }
-    return (data ?? []) as BlogPostCard[]
-  } catch {
-    return []
-  }
+  return safely(async () => {
+    const { results } = await getDb()
+      .prepare(
+        `SELECT ${CARD_FIELDS} FROM blog_posts
+         WHERE published = 1 ORDER BY published_at DESC LIMIT ?1`
+      )
+      .bind(limit)
+      .all<CardRow>()
+    return results.map(toCard)
+  }, [])
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("slug", slug)
-      .eq("published", true)
-      .single()
-
-    if (error) return null
-    return data as BlogPost
-  } catch {
-    return null
-  }
+  return safely(async () => {
+    const row = await getDb()
+      .prepare("SELECT * FROM blog_posts WHERE slug = ?1 AND published = 1")
+      .bind(slug)
+      .first<BlogPostRow>()
+    return row ? toPost(row) : null
+  }, null)
 }
 
-export async function getPostsByCategory(category: string, limit = 20): Promise<BlogPostCard[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(CARD_FIELDS)
-      .eq("published", true)
-      .eq("category", category)
-      .order("published_at", { ascending: false })
-      .limit(limit)
-
-    if (error) return []
-    return (data ?? []) as BlogPostCard[]
-  } catch {
-    return []
-  }
+export async function getPostsByCategory(
+  category: string,
+  limit = 20
+): Promise<BlogPostCard[]> {
+  return safely(async () => {
+    const { results } = await getDb()
+      .prepare(
+        `SELECT ${CARD_FIELDS} FROM blog_posts
+         WHERE published = 1 AND category = ?1
+         ORDER BY published_at DESC LIMIT ?2`
+      )
+      .bind(category, limit)
+      .all<CardRow>()
+    return results.map(toCard)
+  }, [])
 }
 
 export async function getFeaturedPosts(limit = 3): Promise<BlogPostCard[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(CARD_FIELDS)
-      .eq("published", true)
-      .eq("featured", true)
-      .order("published_at", { ascending: false })
-      .limit(limit)
-
-    if (error) return []
-    return (data ?? []) as BlogPostCard[]
-  } catch {
-    return []
-  }
+  return safely(async () => {
+    const { results } = await getDb()
+      .prepare(
+        `SELECT ${CARD_FIELDS} FROM blog_posts
+         WHERE published = 1 AND featured = 1
+         ORDER BY published_at DESC LIMIT ?1`
+      )
+      .bind(limit)
+      .all<CardRow>()
+    return results.map(toCard)
+  }, [])
 }
 
 export async function getRelatedPosts(
@@ -119,35 +154,24 @@ export async function getRelatedPosts(
   category: string,
   limit = 3
 ): Promise<BlogPostCard[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(CARD_FIELDS)
-      .eq("published", true)
-      .eq("category", category)
-      .neq("slug", currentSlug)
-      .order("published_at", { ascending: false })
-      .limit(limit)
-
-    if (error) return []
-    return (data ?? []) as BlogPostCard[]
-  } catch {
-    return []
-  }
+  return safely(async () => {
+    const { results } = await getDb()
+      .prepare(
+        `SELECT ${CARD_FIELDS} FROM blog_posts
+         WHERE published = 1 AND category = ?1 AND slug != ?2
+         ORDER BY published_at DESC LIMIT ?3`
+      )
+      .bind(category, currentSlug, limit)
+      .all<CardRow>()
+    return results.map(toCard)
+  }, [])
 }
 
 export async function getAllPublishedSlugs(): Promise<string[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select("slug")
-      .eq("published", true)
-
-    if (error) return []
-    return (data ?? []).map((row: { slug: string }) => row.slug)
-  } catch {
-    return []
-  }
+  return safely(async () => {
+    const { results } = await getDb()
+      .prepare("SELECT slug FROM blog_posts WHERE published = 1")
+      .all<{ slug: string }>()
+    return results.map((row) => row.slug)
+  }, [])
 }

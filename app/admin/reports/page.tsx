@@ -1,13 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
-import { AdminHeader } from '@/components/admin/header'
-import { FileText, TrendingUp, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { FileText, TrendingUp, Calendar } from 'lucide-react'
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
+
+import { AdminHeader } from '@/components/admin/header'
+import { requireAdminRole } from '@/lib/auth/access'
+import {
+  countApplications,
+  countApplicationsBetween,
+  listRecentHires,
+} from '@/lib/db/applications'
+import { countJobs } from '@/lib/db/jobs'
 
 export const metadata = { title: 'Reports' }
 
 export default async function ReportsPage() {
-  const supabase = await createClient()
+  await requireAdminRole(['super_admin', 'hr_manager', 'finance_manager'])
 
   const now = new Date()
   const thisMonthStart = startOfMonth(now).toISOString()
@@ -15,26 +22,14 @@ export default async function ReportsPage() {
   const lastMonthStart = startOfMonth(subMonths(now, 1)).toISOString()
   const lastMonthEnd = endOfMonth(subMonths(now, 1)).toISOString()
 
-  const [
-    { count: thisMonthApps },
-    { count: lastMonthApps },
-    { count: thisMonthHired },
-    { count: totalJobs },
-    { data: recentHires },
-  ] = await Promise.all([
-    supabase.from('applications').select('*', { count: 'exact', head: true })
-      .gte('created_at', thisMonthStart).lte('created_at', thisMonthEnd),
-    supabase.from('applications').select('*', { count: 'exact', head: true })
-      .gte('created_at', lastMonthStart).lte('created_at', lastMonthEnd),
-    supabase.from('applications').select('*', { count: 'exact', head: true })
-      .eq('status', 'hired'),
-    supabase.from('jobs').select('*', { count: 'exact', head: true }),
-    supabase.from('applications')
-      .select('full_name, email, job_title, job_slug, created_at')
-      .eq('status', 'hired')
-      .order('created_at', { ascending: false })
-      .limit(10),
-  ])
+  const [thisMonthApps, lastMonthApps, thisMonthHired, totalJobs, recentHires] =
+    await Promise.all([
+      countApplicationsBetween(thisMonthStart, thisMonthEnd),
+      countApplicationsBetween(lastMonthStart, lastMonthEnd),
+      countApplications('hired'),
+      countJobs(),
+      listRecentHires(10),
+    ])
 
   const growthPct = lastMonthApps
     ? (((thisMonthApps ?? 0) - (lastMonthApps ?? 0)) / lastMonthApps * 100).toFixed(0)

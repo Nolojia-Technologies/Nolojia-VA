@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nolojia",
+  "compatibility_date": "2026-08-26",
+
+  // nodejs_compat is required by `jose` (Cloudflare Access JWT verification)
+  // and by the Resend SDK.
+  "compatibility_flags": ["nodejs_compat"],
+
+  "observability": {
+    "enabled": true
+  },
+
+  // ── D1 ─────────────────────────────────────────────────────────────────────
+  // database_id is filled in by `wrangler d1 create nolojia` — see README.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nolojia",
+      "database_id": "REPLACE_WITH_ID_FROM_WRANGLER_D1_CREATE",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // ── R2 ─────────────────────────────────────────────────────────────────────
+  // CVs uploaded through the careers form. Private bucket: files are served
+  // back only through an authenticated admin route, never by public URL.
+  "r2_buckets": [
+    {
+      "binding": "RESUMES",
+      "bucket_name": "nolojia-resumes"
+    }
+  ],
+
+  "vars": {
+    // Your Zero Trust team domain, e.g. "https://nolojia.cloudflareaccess.com".
+    // Public (not a secret) — it only identifies which certs endpoint to trust.
+    "CF_ACCESS_TEAM_DOMAIN": "",
+    // Application Audience tag from the Access application. Also not a secret,
+    // but it must match exactly or every token is rejected.
+    "CF_ACCESS_AUD": ""
+  }
+
+  // ── Hosting ────────────────────────────────────────────────────────────────
+  // `main` and `assets` are deliberately absent until the Next.js adapter is
+  // chosen. Neither Cloudflare adapter supports Next 14:
+  //   @opennextjs/cloudflare  requires next >=15.5.24 <16 || >=16.3.3
+  //   vinext                  requires next 16.x (currently 1.0.0-beta)
+  // Adding them before the upgrade would produce a config that cannot build.
+}

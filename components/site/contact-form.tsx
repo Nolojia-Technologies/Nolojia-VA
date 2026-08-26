@@ -156,7 +156,7 @@ export function ContactForm() {
           _hp: form._hp,
         }),
       })
-      const data = await res.json().catch(() => ({}))
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
 
       if (!res.ok) {
         setServerError(data.error ?? "Something went wrong. Please try again.")

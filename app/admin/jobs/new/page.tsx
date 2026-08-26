@@ -12,7 +12,7 @@ import {
   StatusChoice,
   adminFieldClass,
 } from '@/components/admin/job-form-fields'
-import { createClient } from '@/lib/supabase/client'
+import { createJobAction } from '@/app/admin/actions'
 
 const departments = [
   'VA Services',
@@ -36,7 +36,6 @@ const slugify = (text: string) =>
 
 export default function NewJobPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [form, setForm] = useState({
     title: '',
@@ -56,15 +55,12 @@ export default function NewJobPage() {
     setLoading(true)
     setError('')
 
-    const { error: insertError } = await supabase.from('jobs').insert({
-      slug: slugify(form.title),
-      ...form,
-      requirements: requirements.filter((r) => r.trim()),
-      benefits: benefits.filter((b) => b.trim()),
-    })
+    // The slug is derived on the server, so two people creating the same role
+    // cannot race each other into a duplicate.
+    const result = await createJobAction({ ...form, requirements, benefits })
 
-    if (insertError) {
-      setError(insertError.message)
+    if (!result.ok) {
+      setError(result.error)
       setLoading(false)
       return
     }

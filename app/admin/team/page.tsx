@@ -1,9 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { Shield, Users } from 'lucide-react'
+
 import { AdminHeader } from '@/components/admin/header'
+import { requireAdminRole } from '@/lib/auth/access'
+import { listAdmins } from '@/lib/db/profiles'
 import { TeamMemberCard } from './team-member-card'
 import { InviteForm } from './invite-form'
-import { Shield, Users } from 'lucide-react'
 
 export const metadata = { title: 'Team Management' }
 
@@ -24,25 +25,8 @@ const roleBadgeColors: Record<string, string> = {
 }
 
 export default async function TeamPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('admin_role')
-    .eq('id', user!.id)
-    .single()
-
-  // Only super_admin can access team management
-  if (profile?.admin_role !== 'super_admin') {
-    redirect('/admin/dashboard')
-  }
-
-  const { data: adminUsers } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'admin')
-    .order('created_at', { ascending: true })
+  const profile = await requireAdminRole(['super_admin'])
+  const adminUsers = await listAdmins()
 
   return (
     <div>
@@ -86,15 +70,15 @@ export default async function TeamPage() {
           <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
             <Users aria-hidden="true" size={18} className="text-muted-foreground" />
             <h2 className="font-semibold text-foreground">Admin Members</h2>
-            <span className="ml-auto text-xs text-muted-foreground">{adminUsers?.length ?? 0} members</span>
+            <span className="ml-auto text-xs text-muted-foreground">{adminUsers.length} members</span>
           </div>
           <div className="divide-y divide-border">
-            {adminUsers && adminUsers.length > 0 ? (
+            {adminUsers.length > 0 ? (
               adminUsers.map((member) => (
                 <TeamMemberCard
                   key={member.id}
                   member={member}
-                  currentUserId={user!.id}
+                  currentUserId={profile.id}
                   roleLabels={roleLabels}
                   roleBadgeColors={roleBadgeColors}
                 />

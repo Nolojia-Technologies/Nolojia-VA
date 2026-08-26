@@ -1,68 +1,58 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { MessageSquarePlus, Loader2, Trash2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
-interface Note {
-  id: string
-  content: string
-  created_at: string
-  author_id: string
-  author_name: string | null
-}
+import { addNoteAction, deleteNoteAction } from '@/app/admin/actions'
+import type { ApplicationNote } from '@/types/database'
 
 interface NotesSectionProps {
   applicationId: string
-  notes: Note[]
+  notes: ApplicationNote[]
   currentUserId: string
-  currentUserName: string
 }
 
-export function NotesSection({ applicationId, notes: initialNotes, currentUserId, currentUserName }: NotesSectionProps) {
-  const supabase = createClient()
-  const [notes, setNotes] = useState(initialNotes)
+/**
+ * Writes go through server actions rather than a database client. D1 is not
+ * reachable from the browser, and authorship is decided on the server from the
+ * Access token — currentUserId is only used to decide which delete buttons to
+ * show, never to prove who is asking.
+ */
+export function NotesSection({ applicationId, notes, currentUserId }: NotesSectionProps) {
+  const router = useRouter()
   const [newNote, setNewNote] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [pending, startTransition] = useTransition()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const saving = pending && deletingId === null
 
-  const addNote = async () => {
-    if (!newNote.trim()) return
-    setSaving(true)
-
-    const { data, error } = await supabase
-      .from('application_notes')
-      .insert({
-        application_id: applicationId,
-        author_id: currentUserId,
-        author_name: currentUserName,
-        content: newNote.trim(),
-      })
-      .select()
-      .single()
-
-    if (!error && data) {
-      setNotes([...notes, data as Note])
-      setNewNote('')
-    }
-    setSaving(false)
+  const addNote = () => {
+    const content = newNote.trim()
+    if (!content) return
+    setError('')
+    startTransition(async () => {
+      const result = await addNoteAction(applicationId, content)
+      if (result.ok) {
+        setNewNote('')
+        router.refresh()
+      } else {
+        setError(result.error)
+      }
+    })
   }
 
-  const deleteNote = async (noteId: string) => {
+  const deleteNote = (noteId: string) => {
     setDeletingId(noteId)
-    const { error } = await supabase
-      .from('application_notes')
-      .delete()
-      .eq('id', noteId)
-      .eq('author_id', currentUserId)
-
-    if (!error) {
-      setNotes(notes.filter(n => n.id !== noteId))
-    }
-    setDeletingId(null)
+    setError('')
+    startTransition(async () => {
+      const result = await deleteNoteAction(noteId, applicationId)
+      if (!result.ok) setError(result.error)
+      setDeletingId(null)
+      router.refresh()
+    })
   }
-
   return (
     <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
       <div className="flex items-center gap-2 mb-4">
@@ -128,6 +118,14 @@ export function NotesSection({ applicationId, notes: initialNotes, currentUserId
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addNote()
           }}
         />
+        <div aria-live="polite">
+          {error ? (
+            <p role="alert" className="mt-2 text-xs text-destructive">
+              {error}
+            </p>
+          ) : null}
+        </div>
+
         <div className="flex items-center justify-between mt-2">
           <p className="text-xs text-muted-foreground">Ctrl+Enter to submit</p>
           <button

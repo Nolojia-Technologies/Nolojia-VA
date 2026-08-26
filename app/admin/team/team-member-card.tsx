@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { setAdminRoleAction } from '@/app/admin/actions'
 import { Loader2, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import type { AdminRole, ProfileRow } from '@/types/database'
@@ -19,18 +19,19 @@ const adminRoles: AdminRole[] = ['super_admin', 'hr_manager', 'operations_manage
 
 export function TeamMemberCard({ member, currentUserId, roleLabels, roleBadgeColors }: TeamMemberCardProps) {
   const router = useRouter()
-  const supabase = createClient()
   const [open, setOpen] = useState(false)
   const [updating, setUpdating] = useState(false)
+  const [error, setError] = useState('')
   const isCurrentUser = member.id === currentUserId
 
   const updateRole = async (newRole: AdminRole) => {
     setUpdating(true)
     setOpen(false)
-    await supabase
-      .from('profiles')
-      .update({ admin_role: newRole })
-      .eq('id', member.id)
+    setError('')
+
+    const result = await setAdminRoleAction(member.id, newRole)
+    if (!result.ok) setError(result.error)
+
     router.refresh()
     setUpdating(false)
   }
@@ -59,6 +60,13 @@ export function TeamMemberCard({ member, currentUserId, roleLabels, roleBadgeCol
 
       {/* Role badge + editor */}
       <div className="flex items-center gap-3">
+        <span aria-live="polite">
+          {error ? (
+            <span role="alert" className="text-xs text-destructive">
+              {error}
+            </span>
+          ) : null}
+        </span>
         <span className="hidden sm:block text-xs text-muted-foreground">
           Joined {format(new Date(member.created_at), 'MMM d, yyyy')}
         </span>

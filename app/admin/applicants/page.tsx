@@ -1,14 +1,23 @@
-import { createClient } from '@/lib/supabase/server'
-import { AdminHeader } from '@/components/admin/header'
-import { ApplicationStatusBadge } from '@/components/admin/status-badge'
 import Link from 'next/link'
 import { Users, Search, Filter, Calendar, MapPin } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import type { AdminRole, ApplicationStatus } from '@/types/database'
+
+import { AdminHeader } from '@/components/admin/header'
+import { ApplicationStatusBadge } from '@/components/admin/status-badge'
+import { requireAdmin } from '@/lib/auth/access'
+import { countFilteredApplications, listApplications } from '@/lib/db/applications'
+import { listJobSummaries } from '@/lib/db/jobs'
+import { APPLICATION_STATUSES, type AdminRole, type ApplicationStatus } from '@/types/database'
 
 export const metadata = { title: 'Applicants' }
 
-// Department access by admin role (match actual department names used in jobs table)
+/**
+ * Which departments each admin role may see applicants for. null means "all".
+ *
+ * In Postgres this was an RLS policy. Here it is a filter pushed into the SQL —
+ * not a filter applied to rows already fetched, which would mean the database
+ * had already handed over records the caller is not allowed to read.
+ */
 const roleAllowedDepartments: Record<AdminRole, string[] | null> = {
   super_admin: null,
   hr_manager: null,
@@ -17,79 +26,49 @@ const roleAllowedDepartments: Record<AdminRole, string[] | null> = {
   marketing_manager: ['Marketing', 'Creative Support', 'General'],
 }
 
-const statusOptions: ApplicationStatus[] = ['new', 'reviewed', 'shortlisted', 'hired', 'rejected']
+const statusOptions = APPLICATION_STATUSES
 
 export default async function ApplicantsPage({
   searchParams,
 }: {
   searchParams: { status?: string; job?: string; q?: string; page?: string }
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const profile = await requireAdmin()
+  const allowedDepts = profile.admin_role
+    ? roleAllowedDepartments[profile.admin_role]
+    : []
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('admin_role')
-    .eq('id', user!.id)
-    .single()
-
-  const adminRole = profile?.admin_role as AdminRole | null
-  const allowedDepts = adminRole ? roleAllowedDepartments[adminRole] : null
-
-  const page = parseInt(searchParams.page ?? '1')
+  const page = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1)
   const pageSize = 25
   const offset = (page - 1) * pageSize
 
-  let query = supabase
-    .from('applications')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + pageSize - 1)
+  const status =
+    searchParams.status && (statusOptions as readonly string[]).includes(searchParams.status)
+      ? (searchParams.status as ApplicationStatus)
+      : undefined
 
-  if (searchParams.status && (statusOptions as string[]).includes(searchParams.status)) {
-    query = query.eq('status', searchParams.status as ApplicationStatus)
-  }
-  if (searchParams.job) query = query.eq('job_slug', searchParams.job)
-
-  const { data: applications, count } = await query
-
-  // Role-based department filter — look up each app's job department
-  let filtered = applications ?? []
-  const departmentMap: Record<string, string> = {}
-
-  if (allowedDepts || filtered.length > 0) {
-    const slugs = [...new Set(filtered.map((a) => a.job_slug))]
-    if (slugs.length > 0) {
-      const { data: jobsData } = await supabase
-        .from('jobs')
-        .select('slug, department')
-        .in('slug', slugs)
-      jobsData?.forEach((j) => { departmentMap[j.slug] = j.department })
-    }
-
-    if (allowedDepts) {
-      filtered = filtered.filter((a) =>
-        allowedDepts.includes(departmentMap[a.job_slug] ?? '')
-      )
-    }
+  // Every constraint — role scope, status, job, search — is applied by the
+  // query. The previous version paginated first and filtered the page in JS,
+  // which silently dropped rows a scoped role should have been able to reach.
+  const filters = {
+    status,
+    jobSlug: searchParams.job,
+    search: searchParams.q,
+    departments: allowedDepts ?? undefined,
   }
 
-  // Search filter
-  if (searchParams.q) {
-    const q = searchParams.q.toLowerCase()
-    filtered = filtered.filter((a) =>
-      a.full_name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q)
-    )
-  }
+  const [filtered, count, jobs] = await Promise.all([
+    listApplications(filters, { limit: pageSize, offset }),
+    countFilteredApplications(filters),
+    listJobSummaries(),
+  ])
 
-  // Jobs for filter dropdown
-  const { data: jobs } = await supabase
-    .from('jobs')
-    .select('slug, title, department')
-    .order('title')
+  const departmentMap: Record<string, string> = Object.fromEntries(
+    jobs.map((job) => [job.slug, job.department])
+  )
 
   const filteredJobs = allowedDepts
-    ? jobs?.filter((j) => allowedDepts.includes(j.department))
+    ? jobs.filter((job) => allowedDepts.includes(job.department))
     : jobs
 
   return (

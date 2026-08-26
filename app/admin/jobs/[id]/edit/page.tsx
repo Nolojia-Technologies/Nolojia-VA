@@ -1,35 +1,31 @@
-import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { JobEditForm } from './job-edit-form'
+
 import { AdminHeader } from '@/components/admin/header'
+import { requireAdminRole } from '@/lib/auth/access'
+import { countFilteredApplications } from '@/lib/db/applications'
+import { getJobBySlugForAdmin } from '@/lib/db/jobs'
+import { JobEditForm } from './job-edit-form'
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  const { data } = await supabase.from('jobs').select('title').eq('slug', params.id).single()
-  return { title: data?.title ? `Edit: ${data.title}` : 'Edit Job' }
+  await requireAdminRole(['super_admin', 'hr_manager'])
+  const job = await getJobBySlugForAdmin(params.id)
+  return { title: job?.title ? `Edit: ${job.title}` : 'Edit Job' }
 }
 
 export default async function EditJobPage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  // `id` param is actually the slug
-  const { data: job } = await supabase
-    .from('jobs')
-    .select('*')
-    .eq('slug', params.id)
-    .single()
+  await requireAdminRole(['super_admin', 'hr_manager'])
 
+  // The `id` route param is actually the slug.
+  const job = await getJobBySlugForAdmin(params.id)
   if (!job) notFound()
 
-  const { count: applicationCount } = await supabase
-    .from('applications')
-    .select('*', { count: 'exact', head: true })
-    .eq('job_slug', params.id)
+  const applicationCount = await countFilteredApplications({ jobSlug: params.id })
 
   return (
     <div>
       <AdminHeader
         title="Edit Job Listing"
-        subtitle={`${applicationCount ?? 0} application${(applicationCount ?? 0) !== 1 ? 's' : ''} received`}
+        subtitle={`${applicationCount} application${applicationCount !== 1 ? 's' : ''} received`}
       />
       <JobEditForm job={job} />
     </div>

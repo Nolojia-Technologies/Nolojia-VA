@@ -10,9 +10,9 @@ import {
   ListEditor,
   adminFieldClass,
 } from '@/components/admin/job-form-fields'
-import { createClient } from '@/lib/supabase/client'
+import { deleteJobAction, updateJobAction } from '@/app/admin/actions'
 import { cn } from '@/lib/utils/cn'
-import type { JobRow, JobStatus } from '@/types/database'
+import type { Job, JobStatus } from '@/types/database'
 
 const departments = [
   'VA Services',
@@ -34,24 +34,11 @@ const STATUS_TONE: Record<JobStatus, string> = {
 }
 
 interface JobEditFormProps {
-  job: JobRow
-}
-
-/**
- * jobs.requirements and jobs.benefits are Json columns, so the database can
- * legitimately hand back numbers, nulls or nested objects. Keep only the
- * strings the form can edit, and fall back to a single empty row.
- */
-function toStringList(value: unknown): string[] {
-  const list = Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : []
-  return list.length > 0 ? list : ['']
+  job: Job
 }
 
 export function JobEditForm({ job }: JobEditFormProps) {
   const router = useRouter()
-  const supabase = createClient()
 
   const [form, setForm] = useState({
     title: job.title,
@@ -61,8 +48,8 @@ export function JobEditForm({ job }: JobEditFormProps) {
     description: job.description ?? '',
     status: job.status,
   })
-  const [requirements, setRequirements] = useState<string[]>(() => toStringList(job.requirements))
-  const [benefits, setBenefits] = useState<string[]>(() => toStringList(job.benefits))
+  const [requirements, setRequirements] = useState<string[]>(() => (job.requirements.length ? job.requirements : ['']))
+  const [benefits, setBenefits] = useState<string[]>(() => (job.benefits.length ? job.benefits : ['']))
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
@@ -73,17 +60,14 @@ export function JobEditForm({ job }: JobEditFormProps) {
     setLoading(true)
     setError('')
 
-    const { error: updateError } = await supabase
-      .from('jobs')
-      .update({
-        ...form,
-        requirements: requirements.filter((r) => r.trim()),
-        benefits: benefits.filter((b) => b.trim()),
-      })
-      .eq('slug', job.slug)
+    const result = await updateJobAction(job.slug, {
+      ...form,
+      requirements,
+      benefits,
+    })
 
-    if (updateError) {
-      setError(updateError.message)
+    if (!result.ok) {
+      setError(result.error)
       setLoading(false)
       return
     }
@@ -94,10 +78,11 @@ export function JobEditForm({ job }: JobEditFormProps) {
 
   const handleDelete = async () => {
     setDeleting(true)
-    const { error: deleteError } = await supabase.from('jobs').delete().eq('slug', job.slug)
+    setError('')
 
-    if (deleteError) {
-      setError(deleteError.message)
+    const result = await deleteJobAction(job.slug)
+    if (!result.ok) {
+      setError(result.error)
       setDeleting(false)
       return
     }

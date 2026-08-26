@@ -1,4 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireAdminRole } from '@/lib/auth/access'
+import { countApplications, listApplications } from '@/lib/db/applications'
+import { countJobs, listJobsForAdmin } from '@/lib/db/jobs'
 import { AdminHeader } from '@/components/admin/header'
 import { StatsCard } from '@/components/admin/stats-card'
 import { TrendingUp, Users, UserCheck, Briefcase, BarChart2, PieChart } from 'lucide-react'
@@ -22,39 +24,33 @@ const statusLabels: Record<string, string> = {
 }
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient()
+  await requireAdminRole(['super_admin', 'hr_manager'])
 
-  const [
-    { data: allApplications },
-    { data: allJobs },
-    { count: totalApps },
-    { count: hiredCount },
-    { count: openJobs },
-  ] = await Promise.all([
-    supabase.from('applications').select('status, job_slug, created_at'),
-    supabase.from('jobs').select('id, slug, title, department, status'),
-    supabase.from('applications').select('*', { count: 'exact', head: true }),
-    supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'hired'),
-    supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+  const [allApplications, allJobs, totalApps, hiredCount, openJobs] = await Promise.all([
+    listApplications(),
+    listJobsForAdmin(),
+    countApplications(),
+    countApplications('hired'),
+    countJobs('open'),
   ])
 
   // Applications per status
   const statusBreakdown: Record<string, number> = {}
-  allApplications?.forEach((a) => {
+  allApplications.forEach((a) => {
     statusBreakdown[a.status] = (statusBreakdown[a.status] || 0) + 1
   })
 
   // Applications per job
   const jobBreakdown: Record<string, number> = {}
-  allApplications?.forEach((a) => {
+  allApplications.forEach((a) => {
     jobBreakdown[a.job_slug] = (jobBreakdown[a.job_slug] || 0) + 1
   })
 
   // Applications per department (need to join with jobs)
   const slugToDept: Record<string, string> = {}
-  allJobs?.forEach((j) => { slugToDept[j.slug] = j.department })
+  allJobs.forEach((j) => { slugToDept[j.slug] = j.department })
   const deptBreakdown: Record<string, number> = {}
-  allApplications?.forEach((a) => {
+  allApplications.forEach((a) => {
     const dept = slugToDept[a.job_slug] ?? 'General'
     deptBreakdown[dept] = (deptBreakdown[dept] || 0) + 1
   })
@@ -67,7 +63,7 @@ export default async function AnalyticsPage() {
     const key = d.toLocaleString('default', { month: 'short', year: '2-digit' })
     monthlyData[key] = 0
   }
-  allApplications?.forEach((a) => {
+  allApplications.forEach((a) => {
     const d = new Date(a.created_at)
     const key = d.toLocaleString('default', { month: 'short', year: '2-digit' })
     if (Object.prototype.hasOwnProperty.call(monthlyData, key)) {
@@ -84,7 +80,7 @@ export default async function AnalyticsPage() {
   const maxStatus = Math.max(...Object.values(statusBreakdown), 1)
 
   const topJobs = allJobs
-    ?.map((j) => ({ ...j, count: jobBreakdown[j.slug] ?? 0 }))
+    .map((j) => ({ ...j, count: jobBreakdown[j.slug] ?? 0 }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
