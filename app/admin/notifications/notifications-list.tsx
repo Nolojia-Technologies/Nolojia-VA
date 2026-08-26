@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { Bell, CheckCheck, Dot, Info, AlertCircle, UserPlus, Briefcase } from 'lucide-react'
+import { Bell, CheckCheck, Info, AlertCircle, UserPlus, Briefcase } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils/cn'
 

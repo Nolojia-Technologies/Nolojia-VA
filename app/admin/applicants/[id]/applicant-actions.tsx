@@ -20,7 +20,7 @@ const statusActions: { status: ApplicationStatus; label: string; icon: React.Ele
   { status: 'rejected', label: 'Reject', icon: XCircle, className: 'bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200' },
 ]
 
-export function ApplicantActions({ applicationId, currentStatus, adminRole }: ApplicantActionsProps) {
+export function ApplicantActions({ applicationId, currentStatus }: ApplicantActionsProps) {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState<ApplicationStatus | null>(null)

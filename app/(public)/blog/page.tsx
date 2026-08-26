@@ -1,277 +1,180 @@
-"use client"
-
-import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { useBookingNudge } from "@/components/ui/booking-popup"
-import { ArrowRight, Clock, Calendar, Tag, CalendarDays } from "lucide-react"
+import { Clock, PenSquare } from "lucide-react"
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
-  }),
-}
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
+import { Container, Eyebrow, Pill, Section } from "@/components/site/primitives"
+import { CtaLink } from "@/components/site/cta"
+import { CtaSection, PageHero } from "@/components/site/sections"
+import JsonLd from "@/components/seo/JsonLd"
 
-const posts = [
-  {
-    slug: "#",
-    category: "Productivity",
-    title: "The Founder's Guide to Inbox Zero (And Why It's Not What You Think)",
-    excerpt: "Inbox zero isn't about obsessively deleting emails. It's about building a system that means you never have to think about your inbox again. Here's how our clients do it.",
-    readTime: "6 min read",
-    date: "Feb 28, 2025",
-    featured: true,
-    image: "/images/workspace-overhead.png",
-  },
-  {
-    slug: "#",
-    category: "AI & Automation",
-    title: "5 AI Workflows Every Founder Should Have Running By Next Week",
-    excerpt: "The assistants on our platform use these exact workflows every day. We're sharing them so you can either implement them yourself — or hand them off to someone who will.",
-    readTime: "8 min read",
-    date: "Feb 14, 2025",
-    featured: false,
-    image: "/images/team-collaboration.png",
-  },
-  {
-    slug: "#",
-    category: "Delegation",
-    title: "How to Delegate Without Losing Control: A Framework for First-Time Delegators",
-    excerpt: "The biggest fear around hiring an assistant is that things will fall through the cracks. This playbook eliminates that fear with a simple system that keeps you informed without keeping you involved.",
-    readTime: "10 min read",
-    date: "Feb 3, 2025",
-    featured: false,
-    image: "/images/hero-assistant.png",
-  },
-  {
-    slug: "#",
-    category: "Operations",
-    title: "Why Your Calendar Is the Real Problem (And How to Fix It in 48 Hours)",
-    excerpt: "Most founders treat their calendar like a to-do list. The best operators treat it like a strategy document. Here's the difference — and how to cross over.",
-    readTime: "5 min read",
-    date: "Jan 22, 2025",
-    featured: false,
-    image: "/images/workspace-overhead.png",
-  },
-  {
-    slug: "#",
-    category: "Hiring",
-    title: "Virtual Assistant vs. Executive Assistant: Which Does Your Business Actually Need?",
-    excerpt: "The terms get used interchangeably, but they're meaningfully different. Understanding the distinction could save you thousands — and a lot of frustration.",
-    readTime: "7 min read",
-    date: "Jan 10, 2025",
-    featured: false,
-    image: "/images/team-collaboration.png",
-  },
-  {
-    slug: "#",
-    category: "AI & Automation",
-    title: "The Hidden Cost of Doing It Yourself: How to Calculate What Your Time Is Actually Worth",
-    excerpt: "Before you dismiss the cost of an assistant, run this calculation. Most founders are shocked to discover they're doing $3,000/week worth of work that costs $500/month to offload.",
-    readTime: "4 min read",
-    date: "Dec 19, 2024",
-    featured: false,
-    image: "/images/hero-assistant.png",
-  },
+import { getAllPostCards, type BlogPostCard } from "@/lib/blog"
+import { CTA } from "@/lib/content/site"
+import { pageMetadata } from "@/lib/seo/metadata"
+import { breadcrumbSchema } from "@/lib/seo/structured-data"
+
+export const revalidate = 600
+
+export const metadata = pageMetadata({
+  title: "Insights",
+  description:
+    "Writing from Nolojia on AI automation, AI agents, business operations and the systems that let small teams run like larger ones.",
+  path: "/blog",
+})
+
+const CRUMBS = [
+  { name: "Home", href: "/" },
+  { name: "Insights", href: "/blog" },
 ]
 
-const categories = ["All", "Productivity", "AI & Automation", "Delegation", "Operations", "Hiring"]
+/** Topics we publish under. Shown as intent, not as fake article counts. */
+const TOPICS = [
+  "AI Automation",
+  "AI Agents",
+  "Business Operations",
+  "Productivity",
+  "Executive Operations",
+  "AI Strategy",
+  "Technology",
+]
 
-export default function BlogPage() {
-  const { openFullPopup } = useBookingNudge()
-  const [activeCategory, setActiveCategory] = useState("All")
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+}
 
-  const filtered = activeCategory === "All" ? posts : posts.filter(p => p.category === activeCategory)
-  const [featured, ...rest] = filtered
+function PostCard({ post, featured = false }: { post: BlogPostCard; featured?: boolean }) {
+  return (
+    <article
+      className={
+        featured
+          ? "group overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition duration-300 ease-smooth hover:border-brand/25 hover:shadow-md lg:grid lg:grid-cols-2"
+          : "group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs transition duration-300 ease-smooth hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-md"
+      }
+    >
+      {post.cover_image ? (
+        <div className={featured ? "relative h-56 lg:h-full" : "relative h-44"}>
+          <Image
+            src={post.cover_image}
+            alt=""
+            fill
+            sizes={featured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
+            className="object-cover"
+          />
+        </div>
+      ) : null}
+
+      <div className={featured ? "flex flex-col justify-center p-7 sm:p-9" : "flex flex-1 flex-col p-6"}>
+        <Pill tone="brand" className="self-start">
+          {post.category}
+        </Pill>
+        <h2
+          className={
+            featured
+              ? "mt-4 text-2xl font-semibold text-foreground"
+              : "mt-4 text-lg font-semibold text-foreground"
+          }
+        >
+          <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
+            {post.title}
+          </Link>
+        </h2>
+        <p className="mt-3 flex-1 text-[0.9375rem] leading-relaxed text-muted-foreground">
+          {post.excerpt}
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <span>{post.author_name}</span>
+          <span aria-hidden="true">·</span>
+          <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
+          <span aria-hidden="true">·</span>
+          <span className="inline-flex items-center gap-1">
+            <Clock aria-hidden="true" className="h-3 w-3" />
+            {post.read_time_minutes} min read
+          </span>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default async function BlogPage() {
+  const posts = await getAllPostCards(30)
+  const [featured, ...rest] = posts
 
   return (
     <>
-      {/* ===== HERO ===== */}
-      <section className="relative min-h-[50vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image src="/images/workspace-overhead.png" alt="Nolojia Blog" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F0E2E]/93 via-[#1A1849]/88 to-[#2D2B7F]/70" />
-        </div>
-        <div className="absolute top-16 right-[15%] w-64 h-64 bg-[#4A47C4]/20 rounded-full blur-[100px] animate-float" />
+      <JsonLd data={breadcrumbSchema(CRUMBS)} />
 
-        <div className="container mx-auto px-4 relative z-10 py-24 text-center">
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto">
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#9996ED] mb-4">
-              Insights & Resources
-            </motion.span>
-            <motion.h1 variants={fadeUp} custom={1}
-              className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              The Nolojia Blog
-            </motion.h1>
-            <motion.p variants={fadeUp} custom={2} className="text-xl text-white/60 leading-relaxed">
-              Practical guides, productivity frameworks, and real stories to help you
-              build a business that runs without you being in everything.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Insights"
+        title="Notes on making businesses run better."
+        description="Practical writing on AI, automation and operations — from the work we actually do, not from a content calendar."
+        crumbs={CRUMBS}
+      >
+        <ul className="mt-8 flex flex-wrap gap-2">
+          {TOPICS.map((topic) => (
+            <li key={topic}>
+              <Pill>{topic}</Pill>
+            </li>
+          ))}
+        </ul>
+      </PageHero>
 
-      {/* ===== CATEGORY FILTER ===== */}
-      <section className="sticky top-16 md:top-20 z-30 bg-white border-b shadow-sm py-4">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeCategory === cat
-                  ? "bg-[#2D2B7F] text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== POSTS ===== */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 max-w-6xl">
-
-          {/* Featured post */}
-          {featured && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="mb-12"
-            >
-              <Link href={featured.slug}>
-                <div className="group grid lg:grid-cols-2 gap-0 bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-[#2D2B7F]/5 transition-all duration-500">
-                  <div className="relative h-64 lg:h-auto overflow-hidden">
-                    <Image src={featured.image} alt={featured.title} fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0F0E2E]/20" />
-                    <span className="absolute top-4 left-4 bg-[#2D2B7F] text-white text-xs font-bold px-3 py-1 rounded-full">
-                      Featured
-                    </span>
-                  </div>
-                  <div className="p-8 flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="bg-[#2D2B7F]/10 text-[#2D2B7F] text-xs font-bold px-3 py-1 rounded-full">
-                        {featured.category}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3 leading-tight group-hover:text-[#2D2B7F] transition-colors">
-                      {featured.title}
-                    </h2>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">{featured.excerpt}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{featured.readTime}</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{featured.date}</span>
-                    </div>
+      <Section>
+        <Container>
+          {posts.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-surface p-8 sm:p-10">
+              <div className="flex max-w-2xl items-start gap-4">
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+                  <PenSquare aria-hidden="true" className="h-5 w-5" />
+                </span>
+                <div>
+                  <Eyebrow className="mb-3">Coming soon</Eyebrow>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    Nothing published here yet.
+                  </h2>
+                  <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    We would rather leave this page empty than fill it with articles written to
+                    occupy space. Writing goes up when we have something worth saying about the work
+                    we are doing. If there is a topic you want covered, tell us and we will write it.
+                  </p>
+                  <div className="mt-6">
+                    <CtaLink href={CTA.secondary.href} variant="secondary">
+                      Suggest a topic
+                    </CtaLink>
                   </div>
                 </div>
-              </Link>
-            </motion.div>
-          )}
-
-          {/* Grid */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {rest.map((post, i) => (
-              <motion.div key={post.title} variants={fadeUp} custom={i}>
-                <Link href={post.slug}>
-                  <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-[#2D2B7F]/5 hover:-translate-y-1 transition-all duration-500 flex flex-col h-full">
-                    <div className="relative h-48 overflow-hidden">
-                      <Image src={post.image} alt={post.title} fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E2E]/30 to-transparent" />
-                    </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Tag className="w-3 h-3 text-[#2D2B7F]" />
-                        <span className="text-xs font-bold text-[#2D2B7F]">{post.category}</span>
-                      </div>
-                      <h3 className="font-bold text-gray-900 text-base leading-snug mb-3 flex-1 group-hover:text-[#2D2B7F] transition-colors">
-                        {post.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed mb-4">{post.excerpt}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto pt-3 border-t border-gray-50">
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{post.date}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===== NEWSLETTER + CTA ===== */}
-      <section className="relative py-24 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/images/team-collaboration.png" alt="" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F0E2E]/93 to-[#2D2B7F]/88" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#9996ED] mb-4">Newsletter</span>
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Get the Weekly Playbook
-              </h2>
-              <p className="text-white/60 leading-relaxed mb-6">
-                One email, every Tuesday. Practical tips on delegation, productivity, and AI tools that your team can start using immediately.
-              </p>
-              <div className="flex gap-3">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/40"
-                />
-                <Button className="bg-white text-[#2D2B7F] hover:bg-white/90 rounded-xl font-semibold px-5">
-                  Subscribe
-                </Button>
               </div>
-              <p className="text-white/30 text-xs mt-3">No spam. Unsubscribe anytime.</p>
-            </motion.div>
+            </div>
+          ) : (
+            <div className="space-y-10">
+              {featured ? (
+                <div className="relative">
+                  <PostCard post={featured} featured />
+                </div>
+              ) : null}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-center"
-            >
-              <p className="text-white/40 text-sm mb-4">Ready to stop reading and start delegating?</p>
-              <Button size="lg" onClick={openFullPopup}
-                className="bg-white text-[#2D2B7F] hover:bg-white/90 px-8 py-6 rounded-xl font-semibold group">
-                <CalendarDays className="w-5 h-5 mr-2" />
-                Book a Free Discovery Call
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+              {rest.length > 0 ? (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {rest.map((post) => (
+                    <div key={post.slug} className="relative">
+                      <PostCard post={post} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </Container>
+      </Section>
+
+      <CtaSection
+        eyebrow="Insights"
+        title="Would rather talk than read?"
+        description="Tell us what your operation looks like today and we will give you a straight answer about what to change first."
+      />
     </>
   )
 }

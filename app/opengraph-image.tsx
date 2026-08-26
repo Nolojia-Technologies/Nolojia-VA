@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og"
-import { SITE_NAME, SITE_TAGLINE } from "@/lib/seo/config"
+import { SITE_NAME } from "@/lib/seo/config"
 
+export const runtime = "edge"
+export const alt = "Nolojia — AI that works for your business"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -15,201 +17,80 @@ export default function OGImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0A0920 0%, #0F0E2E 40%, #1A1849 70%, #2D2B7F 100%)",
-          padding: "80px 100px",
+          background: "linear-gradient(135deg, #08080F 0%, #0D0D1A 45%, #16162B 100%)",
+          padding: "88px 96px",
           position: "relative",
-          overflow: "hidden",
         }}
       >
-        {/* Background glow orbs */}
         <div
           style={{
             position: "absolute",
-            top: -60,
-            right: 100,
-            width: 400,
-            height: 400,
+            top: -120,
+            right: -60,
+            width: 520,
+            height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(74,71,196,0.25) 0%, transparent 70%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -80,
-            left: 200,
-            width: 300,
-            height: 300,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(119,115,231,0.15) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(90,108,255,0.22) 0%, rgba(90,108,255,0) 70%)",
           }}
         />
 
-        {/* Logo mark */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 20,
-            marginBottom: 50,
-          }}
-        >
-          {/* Icon */}
+        <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 44 }}>
           <div
             style={{
-              width: 64,
-              height: 64,
+              width: 56,
+              height: 56,
               borderRadius: 14,
-              background: "linear-gradient(145deg, #2D2B7F, #4A47C4)",
+              background: "linear-gradient(145deg, #4F5BD5, #6E7BFF)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              border: "1px solid rgba(153,150,237,0.3)",
             }}
           >
-            <svg width="36" height="40" viewBox="0 0 36 40" fill="none">
+            <svg width="30" height="34" viewBox="0 0 36 40" fill="none">
               <rect x="0" y="0" width="7" height="40" rx="2" fill="white" />
               <rect x="29" y="0" width="7" height="40" rx="2" fill="white" />
-              <path
-                d="M7 1.5 L29 38.5"
-                stroke="url(#ogDiag)"
-                strokeWidth="7.5"
-                strokeLinecap="round"
-              />
-              <defs>
-                <linearGradient id="ogDiag" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="white" />
-                  <stop offset="100%" stopColor="#BBB9F3" />
-                </linearGradient>
-              </defs>
+              <path d="M7 1.5 L29 38.5" stroke="white" strokeWidth="7.5" strokeLinecap="round" />
             </svg>
           </div>
-
-          {/* Wordmark */}
-          <span
-            style={{
-              fontSize: 36,
-              fontWeight: 700,
-              color: "white",
-              letterSpacing: -1,
-              fontFamily: "sans-serif",
-            }}
-          >
+          <span style={{ fontSize: 34, fontWeight: 700, color: "white", letterSpacing: -1 }}>
             {SITE_NAME}
           </span>
         </div>
 
-        {/* Headline */}
         <div
           style={{
-            fontSize: 68,
+            fontSize: 76,
             fontWeight: 800,
             color: "white",
-            lineHeight: 1.1,
-            letterSpacing: -2,
-            maxWidth: 820,
-            fontFamily: "sans-serif",
+            lineHeight: 1.05,
+            letterSpacing: -3,
+            maxWidth: 900,
             marginBottom: 28,
           }}
         >
-          AI-Powered Virtual Assistants for Modern Business
+          AI that works for your business.
         </div>
 
-        {/* Tagline */}
-        <div
-          style={{
-            fontSize: 26,
-            color: "rgba(153,150,237,0.9)",
-            fontFamily: "sans-serif",
-            fontWeight: 400,
-            marginBottom: 56,
-          }}
-        >
-          Admin · Creative · Growth — All Under One Roof
+        <div style={{ fontSize: 28, color: "rgba(255,255,255,0.62)", maxWidth: 820, lineHeight: 1.4 }}>
+          AI assistants, intelligent automation and digital business systems.
         </div>
 
-        {/* CTA pill */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            background: "rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            borderRadius: 100,
-            padding: "14px 28px",
-          }}
-        >
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: "#9996ED",
-            }}
-          />
-          <span
-            style={{
-              fontSize: 22,
-              color: "rgba(255,255,255,0.8)",
-              fontFamily: "sans-serif",
-            }}
-          >
-            Book a free 30-minute discovery call · nolojia.com
-          </span>
-        </div>
-
-        {/* Right side decoration — stats */}
-        <div
-          style={{
-            position: "absolute",
-            right: 100,
-            top: "50%",
-            transform: "translateY(-50%)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 20,
-          }}
-        >
-          {[
-            { value: "500+", label: "Founders Helped" },
-            { value: "20+", label: "Hours Saved/Week" },
-            { value: "4.9★", label: "Client Rating" },
-          ].map(({ value, label }) => (
+        <div style={{ display: "flex", gap: 14, marginTop: 52 }}>
+          {["AI Assistants", "Automation", "Business Systems", "Human Support"].map((label) => (
             <div
               key={label}
               style={{
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
                 background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(153,150,237,0.2)",
-                borderRadius: 16,
-                padding: "20px 28px",
-                minWidth: 160,
+                border: "1px solid rgba(255,255,255,0.14)",
+                borderRadius: 100,
+                padding: "12px 22px",
+                fontSize: 20,
+                color: "rgba(255,255,255,0.78)",
               }}
             >
-              <span
-                style={{
-                  fontSize: 40,
-                  fontWeight: 800,
-                  color: "white",
-                  fontFamily: "sans-serif",
-                  lineHeight: 1.1,
-                }}
-              >
-                {value}
-              </span>
-              <span
-                style={{
-                  fontSize: 15,
-                  color: "rgba(255,255,255,0.5)",
-                  fontFamily: "sans-serif",
-                  marginTop: 4,
-                }}
-              >
-                {label}
-              </span>
+              {label}
             </div>
           ))}
         </div>

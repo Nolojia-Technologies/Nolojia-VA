@@ -4,6 +4,9 @@ import { JobStatusBadge } from '@/components/admin/status-badge'
 import Link from 'next/link'
 import { Plus, Briefcase, Users, Edit } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import type { JobStatus } from '@/types/database'
+
+const jobStatuses: JobStatus[] = ['open', 'closed', 'draft']
 
 export const metadata = { title: 'Job Listings' }
 
@@ -12,7 +15,7 @@ export default async function JobsPage({
 }: {
   searchParams: { status?: string; department?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   let query = supabase
     .from('jobs')
@@ -20,7 +23,9 @@ export default async function JobsPage({
     .order('created_at', { ascending: false })
 
   if (searchParams.status) {
-    query = query.eq('status', searchParams.status)
+    if ((jobStatuses as string[]).includes(searchParams.status)) {
+      query = query.eq('status', searchParams.status as JobStatus)
+    }
   }
   if (searchParams.department) {
     query = query.eq('department', searchParams.department)

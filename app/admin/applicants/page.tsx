@@ -24,7 +24,7 @@ export default async function ApplicantsPage({
 }: {
   searchParams: { status?: string; job?: string; q?: string; page?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profile } = await supabase
@@ -46,14 +46,16 @@ export default async function ApplicantsPage({
     .order('created_at', { ascending: false })
     .range(offset, offset + pageSize - 1)
 
-  if (searchParams.status) query = query.eq('status', searchParams.status)
+  if (searchParams.status && (statusOptions as string[]).includes(searchParams.status)) {
+    query = query.eq('status', searchParams.status as ApplicationStatus)
+  }
   if (searchParams.job) query = query.eq('job_slug', searchParams.job)
 
   const { data: applications, count } = await query
 
   // Role-based department filter — look up each app's job department
   let filtered = applications ?? []
-  let departmentMap: Record<string, string> = {}
+  const departmentMap: Record<string, string> = {}
 
   if (allowedDepts || filtered.length > 0) {
     const slugs = [...new Set(filtered.map((a: any) => a.job_slug))]

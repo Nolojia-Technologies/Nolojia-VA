@@ -8,9 +8,7 @@ import {
   Briefcase,
   Users,
   BarChart3,
-  Bell,
-  Settings,
-  LogOut,
+  Bell,  LogOut,
   ChevronLeft,
   ChevronRight,
   Shield,
@@ -81,7 +79,7 @@ interface SidebarProps {
   unreadCount?: number
 }
 
-export function AdminSidebar({ adminRole, userName, userEmail, unreadCount = 0 }: SidebarProps) {
+export function AdminSidebar({ adminRole, userName, unreadCount = 0 }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)

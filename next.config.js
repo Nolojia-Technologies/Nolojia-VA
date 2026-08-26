@@ -53,11 +53,32 @@ const nextConfig = {
     ]
   },
 
+  // ─── Rewrites ─────────────────────────────────────────────────────────────
+  // Next.js App Router cannot express a dynamic parameter that shares a path
+  // segment with static text (`/hire-virtual-assistant-for-[industry]` is read
+  // as a literal folder name, not a route). The pages therefore live at
+  // /hire-virtual-assistant-for/[industry] and these rewrites keep the
+  // hyphenated URLs — the ones in the sitemap and canonical tags — working.
+  async rewrites() {
+    return [
+      {
+        source: "/hire-virtual-assistant-for-:industry",
+        destination: "/hire-virtual-assistant-for/:industry",
+      },
+      {
+        source: "/virtual-assistant-services-:country",
+        destination: "/virtual-assistant-services/:country",
+      },
+    ]
+  },
+
   // ─── Redirects ────────────────────────────────────────────────────────────
   async redirects() {
     return [
       // Keep legacy /pricing redirect in case anyone bookmarked it
       { source: "/pricing", destination: "/services", permanent: true },
+      // Renamed as part of the AI-first restructure — keep the old links alive.
+      { source: "/success-stories", destination: "/case-studies", permanent: true },
     ]
   },
 

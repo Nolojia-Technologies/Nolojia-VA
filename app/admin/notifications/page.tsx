@@ -1,12 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { AdminHeader } from '@/components/admin/header'
-import { Bell, CheckCheck } from 'lucide-react'
 import { NotificationsList } from './notifications-list'
 
 export const metadata = { title: 'Notifications' }
 
 export default async function NotificationsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: notifications } = await supabase

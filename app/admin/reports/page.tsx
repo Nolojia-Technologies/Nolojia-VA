@@ -7,7 +7,7 @@ import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 export const metadata = { title: 'Reports' }
 
 export default async function ReportsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const now = new Date()
   const thisMonthStart = startOfMonth(now).toISOString()

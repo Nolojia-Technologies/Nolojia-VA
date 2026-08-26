@@ -9,7 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 export const metadata = { title: 'Dashboard' }
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const [

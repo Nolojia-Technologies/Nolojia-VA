@@ -4,7 +4,13 @@ import { checkRateLimit, pruneStore } from "@/lib/email/rate-limit"
 import { sanitize, validateBooking, isHoneypotFilled } from "@/lib/email/validate"
 import { bookingAdminEmail, bookingReplyEmail } from "@/lib/email/templates"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazily constructed so a missing key is a clean 503 rather than a crash at
+// module load. The key never leaves the server.
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) return null
+  return new Resend(apiKey)
+}
 
 const EMAIL_FROM = process.env.EMAIL_FROM ?? "notifications@nolojia.com"
 const EMAIL_TO   = process.env.EMAIL_TO   ?? "info@nolojia.com"
@@ -62,6 +68,15 @@ export async function POST(request: NextRequest) {
     dateStyle: "full",
     timeStyle: "short",
   }) + " UTC"
+
+  const resend = getResend()
+  if (!resend) {
+    console.error("[email] RESEND_API_KEY is not set — cannot send.")
+    return NextResponse.json(
+      { error: "We could not send your message right now. Please email info@nolojia.com directly." },
+      { status: 503 }
+    )
+  }
 
   // ── Send emails ───────────────────────────────────────────────────────────────
   try {

@@ -24,7 +24,7 @@ const roleBadgeColors: Record<string, string> = {
 }
 
 export default async function TeamPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: profile } = await supabase

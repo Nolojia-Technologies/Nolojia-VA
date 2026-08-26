@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, MoreVertical, ChevronDown } from 'lucide-react'
+import { Loader2, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import type { AdminRole } from '@/types/database'
 import { cn } from '@/lib/utils/cn'

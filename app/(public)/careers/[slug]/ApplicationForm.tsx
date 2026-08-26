@@ -1,7 +1,11 @@
 "use client"
 
-import { useState, useRef, type ChangeEvent, type DragEvent } from "react"
+import * as React from "react"
 import { CheckCircle2, Upload, Loader2, AlertCircle, X } from "lucide-react"
+
+import { CtaButton } from "@/components/site/cta"
+import { track } from "@/lib/analytics"
+import { cn } from "@/lib/utils/cn"
 
 const ALLOWED_MIME = [
   "application/pdf",
@@ -9,173 +13,239 @@ const ALLOWED_MIME = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
+const MAX_COVER_LETTER = 5000
+
+const EXPERIENCE_OPTIONS = [
+  "Under 1 year",
+  "1–2 years",
+  "2–3 years",
+  "3–5 years",
+  "5–8 years",
+  "8+ years",
+]
+
+const fieldBase =
+  "w-full rounded-xl border bg-background px-3.5 py-2.5 text-[0.9375rem] text-foreground placeholder:text-muted-foreground/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+
+function Field({
+  id,
+  label,
+  hint,
+  error,
+  required,
+  children,
+}: {
+  id: string
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-foreground">
+        {label}
+        {required ? (
+          <span aria-hidden="true" className="ml-0.5 text-brand">
+            *
+          </span>
+        ) : (
+          <span className="ml-1.5 text-xs font-normal text-muted-foreground">Optional</span>
+        )}
+      </label>
+      <div className="mt-1.5">{children}</div>
+      {error ? (
+        <p id={`${id}-error`} className="mt-1.5 flex items-center gap-1.5 text-xs text-destructive">
+          <AlertCircle aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-muted-foreground">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  )
+}
 
 interface Props {
   jobTitle: string
   jobSlug: string
 }
 
+interface FormState {
+  fullName: string
+  email: string
+  phone: string
+  location: string
+  linkedin: string
+  portfolio: string
+  yearsExperience: string
+  expectedSalary: string
+  coverLetter: string
+  _hp: string
+}
+
+const EMPTY: FormState = {
+  fullName: "",
+  email: "",
+  phone: "",
+  location: "",
+  linkedin: "",
+  portfolio: "",
+  yearsExperience: "",
+  expectedSalary: "",
+  coverLetter: "",
+  _hp: "",
+}
+
+type Errors = Partial<Record<keyof FormState | "resume", string>>
+
 export default function ApplicationForm({ jobTitle, jobSlug }: Props) {
-  // Form fields
-  const [fullName, setFullName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [location, setLocation] = useState("")
-  const [linkedin, setLinkedin] = useState("")
-  const [portfolio, setPortfolio] = useState("")
-  const [coverLetter, setCoverLetter] = useState("")
-  const [yearsExperience, setYearsExperience] = useState("")
-  const [expectedSalary, setExpectedSalary] = useState("")
-  const [honeypot, setHoneypot] = useState("") // spam trap — must stay empty
+  const [form, setForm] = React.useState<FormState>(EMPTY)
+  const [errors, setErrors] = React.useState<Errors>({})
+  const [resumeFile, setResumeFile] = React.useState<File | null>(null)
+  const [isDragging, setIsDragging] = React.useState(false)
+  const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle")
+  const [serverError, setServerError] = React.useState("")
 
-  // File upload
-  const [resumeFile, setResumeFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState("")
-  const [isDragging, setIsDragging] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const successRef = React.useRef<HTMLDivElement>(null)
 
-  // Submission state
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState("")
+  React.useEffect(() => {
+    if (status === "success") successRef.current?.focus()
+  }, [status])
+
+  const set =
+    (field: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setForm((f) => ({ ...f, [field]: e.target.value }))
+      setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev))
+    }
 
   function validateAndSetFile(file: File | null) {
-    setFileError("")
-    if (!file) { setResumeFile(null); return }
-    if (!ALLOWED_MIME.includes(file.type)) {
-      setFileError("Please upload a PDF, DOC, or DOCX file.")
+    if (!file) {
       setResumeFile(null)
+      return
+    }
+    if (!ALLOWED_MIME.includes(file.type)) {
+      setResumeFile(null)
+      setErrors((prev) => ({ ...prev, resume: "Please upload a PDF, DOC or DOCX file." }))
       return
     }
     if (file.size > MAX_FILE_SIZE) {
-      setFileError("File must be smaller than 5 MB.")
       setResumeFile(null)
+      setErrors((prev) => ({ ...prev, resume: "That file is larger than 5 MB." }))
       return
     }
     setResumeFile(file)
+    setErrors((prev) => ({ ...prev, resume: undefined }))
   }
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    validateAndSetFile(e.target.files?.[0] ?? null)
-  }
-
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
-
-  function handleDragLeave(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    e.stopPropagation()
     setIsDragging(false)
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    const file = e.dataTransfer.files?.[0] ?? null
-    validateAndSetFile(file)
-    // Sync the hidden input so the form sees the file on re-click
+    validateAndSetFile(e.dataTransfer.files?.[0] ?? null)
+    // Clear the input so picking the same file again still fires onChange.
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
   function removeFile() {
     setResumeFile(null)
-    setFileError("")
+    setErrors((prev) => ({ ...prev, resume: undefined }))
     if (fileInputRef.current) fileInputRef.current.value = ""
+    fileInputRef.current?.focus()
+  }
+
+  function validate(): Errors {
+    const found: Errors = {}
+    if (form.fullName.trim().length < 2) found.fullName = "Please enter your full name."
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim()))
+      found.email = "Please enter a valid email address."
+    if (form.coverLetter.trim().length < 20)
+      found.coverLetter = "A short paragraph is enough — at least 20 characters."
+    if (!resumeFile) found.resume = "Please attach your CV as a PDF, DOC or DOCX."
+    return found
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
-
-    // Client-side validation
-    if (!fullName.trim() || fullName.trim().length < 2) {
-      setError("Please enter your full name.")
-      return
-    }
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
-    if (!emailRe.test(email)) {
-      setError("Please enter a valid email address.")
-      return
-    }
-    if (!coverLetter.trim() || coverLetter.trim().length < 20) {
-      setError("Please write a cover letter (at least 20 characters).")
-      return
-    }
-    if (!resumeFile) {
-      setError("Please upload your resume (PDF, DOC, or DOCX).")
+    const found = validate()
+    setErrors(found)
+    if (Object.keys(found).length > 0) {
+      const first = Object.keys(found)[0]
+      document.getElementById(first === "resume" ? "resume" : first)?.focus()
       return
     }
 
-    setLoading(true)
+    setStatus("loading")
+    setServerError("")
 
-    const formData = new FormData()
-    formData.append("jobSlug", jobSlug)
-    formData.append("jobTitle", jobTitle)
-    formData.append("fullName", fullName.trim())
-    formData.append("email", email.trim().toLowerCase())
-    formData.append("phone", phone.trim())
-    formData.append("location", location.trim())
-    formData.append("linkedin", linkedin.trim())
-    formData.append("portfolio", portfolio.trim())
-    formData.append("coverLetter", coverLetter.trim())
-    formData.append("yearsExperience", yearsExperience)
-    formData.append("expectedSalary", expectedSalary.trim())
-    formData.append("_hp", honeypot)
-    formData.append("resume", resumeFile)
+    const body = new FormData()
+    body.append("jobSlug", jobSlug)
+    body.append("jobTitle", jobTitle)
+    body.append("fullName", form.fullName.trim())
+    body.append("email", form.email.trim().toLowerCase())
+    body.append("phone", form.phone.trim())
+    body.append("location", form.location.trim())
+    body.append("linkedin", form.linkedin.trim())
+    body.append("portfolio", form.portfolio.trim())
+    body.append("coverLetter", form.coverLetter.trim())
+    body.append("yearsExperience", form.yearsExperience)
+    body.append("expectedSalary", form.expectedSalary.trim())
+    body.append("_hp", form._hp)
+    body.append("resume", resumeFile as File)
 
     try {
-      const res = await fetch("/api/careers/apply", { method: "POST", body: formData })
-      const data = await res.json()
+      const res = await fetch("/api/careers/apply", { method: "POST", body })
+      const data = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.")
-        setLoading(false)
+        setStatus("error")
+        setServerError(data.error ?? "Something went wrong. Please try again.")
         return
       }
 
-      setSuccess(true)
+      track("job_application_submit", { job: jobSlug })
+      setStatus("success")
     } catch {
-      setError("Network error. Please check your connection and try again.")
-    } finally {
-      setLoading(false)
+      setStatus("error")
+      setServerError("Network error. Please check your connection and try again.")
     }
   }
 
-  // ── Success state ──────────────────────────────────────────────────────────
-  if (success) {
+  if (status === "success") {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-        <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5">
-          <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-        </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Application Submitted!</h3>
-        <p className="text-gray-600 text-sm leading-relaxed mb-1">
-          Your application for <strong>{jobTitle}</strong> has been submitted successfully.
-        </p>
-        <p className="text-gray-400 text-sm leading-relaxed">
-          We review every application personally and will be in touch within 5 business days.
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm focus-visible:outline-none"
+      >
+        <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
+          <CheckCircle2 aria-hidden="true" className="h-7 w-7 text-success" />
+        </span>
+        <h3 className="mt-5 text-lg font-semibold text-foreground">Application received</h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Your application for <strong className="text-foreground">{jobTitle}</strong> is in. A person
+          reads every one — we will be in touch within five business days.
         </p>
       </div>
     )
   }
 
-  // ── Form ───────────────────────────────────────────────────────────────────
+  const fileDescribedBy = errors.resume ? "resume-error" : "resume-hint"
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#2D2B7F] to-[#4A47C4] px-6 py-5">
-        <h2 className="text-white font-bold text-lg">Apply for this Role</h2>
-        <p className="text-white/65 text-sm mt-0.5">{jobTitle}</p>
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="border-b border-border bg-surface px-6 py-5">
+        <h2 className="text-base font-semibold text-foreground">Apply for this role</h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">{jobTitle}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-4" noValidate>
-
-        {/* Honeypot — hidden from real users */}
-        <div aria-hidden="true" className="absolute opacity-0 pointer-events-none -z-10 h-0 overflow-hidden">
+      <form onSubmit={handleSubmit} className="space-y-5 p-6" noValidate>
+        {/* Spam trap. Hidden from people, left empty by them, filled by bots. */}
+        <div aria-hidden="true" className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0">
           <label htmlFor="company_website">Company website</label>
           <input
             id="company_website"
@@ -183,221 +253,267 @@ export default function ApplicationForm({ jobTitle, jobSlug }: Props) {
             type="text"
             tabIndex={-1}
             autoComplete="off"
-            value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
+            value={form._hp}
+            onChange={set("_hp")}
           />
         </div>
 
-        {/* Full Name */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Full Name <span className="text-red-500">*</span>
-          </label>
+        <Field id="fullName" label="Full name" required error={errors.fullName}>
           <input
+            id="fullName"
+            name="fullName"
             type="text"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Jane Doe"
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+            autoComplete="name"
+            value={form.fullName}
+            onChange={set("fullName")}
+            aria-invalid={errors.fullName ? true : undefined}
+            aria-describedby={errors.fullName ? "fullName-error" : undefined}
+            className={cn(fieldBase, errors.fullName ? "border-destructive" : "border-input")}
           />
-        </div>
+        </Field>
 
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Email Address <span className="text-red-500">*</span>
-          </label>
+        <Field id="email" label="Email address" required error={errors.email}>
           <input
+            id="email"
+            name="email"
             type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="jane@example.com"
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+            autoComplete="email"
+            value={form.email}
+            onChange={set("email")}
+            aria-invalid={errors.email ? true : undefined}
+            aria-describedby={errors.email ? "email-error" : undefined}
+            className={cn(fieldBase, errors.email ? "border-destructive" : "border-input")}
           />
-        </div>
+        </Field>
 
-        {/* Phone + Location */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id="phone" label="Phone">
             <input
+              id="phone"
+              name="phone"
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+1 555 000 0000"
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+              autoComplete="tel"
+              value={form.phone}
+              onChange={set("phone")}
+              className={cn(fieldBase, "border-input")}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Location</label>
+          </Field>
+          <Field id="location" label="Location">
             <input
+              id="location"
+              name="location"
               type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="City, Country"
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+              autoComplete="address-level2"
+              placeholder="City, country"
+              value={form.location}
+              onChange={set("location")}
+              className={cn(fieldBase, "border-input")}
             />
-          </div>
+          </Field>
         </div>
 
-        {/* LinkedIn */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">LinkedIn Profile</label>
+        <Field id="linkedin" label="LinkedIn profile">
           <input
+            id="linkedin"
+            name="linkedin"
             type="url"
-            value={linkedin}
-            onChange={(e) => setLinkedin(e.target.value)}
-            placeholder="https://linkedin.com/in/yourprofile"
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+            inputMode="url"
+            placeholder="https://linkedin.com/in/…"
+            value={form.linkedin}
+            onChange={set("linkedin")}
+            className={cn(fieldBase, "border-input")}
           />
-        </div>
+        </Field>
 
-        {/* Portfolio */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Portfolio / Website</label>
+        <Field id="portfolio" label="Portfolio or website">
           <input
+            id="portfolio"
+            name="portfolio"
             type="url"
-            value={portfolio}
-            onChange={(e) => setPortfolio(e.target.value)}
-            placeholder="https://yourportfolio.com"
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+            inputMode="url"
+            placeholder="https://…"
+            value={form.portfolio}
+            onChange={set("portfolio")}
+            className={cn(fieldBase, "border-input")}
           />
-        </div>
+        </Field>
 
-        {/* Years of experience + Expected salary */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Years of Experience</label>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id="yearsExperience" label="Years of experience">
             <select
-              value={yearsExperience}
-              onChange={(e) => setYearsExperience(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all bg-white"
+              id="yearsExperience"
+              name="yearsExperience"
+              value={form.yearsExperience}
+              onChange={set("yearsExperience")}
+              className={cn(fieldBase, "border-input")}
             >
               <option value="">Select</option>
-              <option value="Under 1 year">Under 1 year</option>
-              <option value="1–2 years">1–2 years</option>
-              <option value="2–3 years">2–3 years</option>
-              <option value="3–5 years">3–5 years</option>
-              <option value="5–8 years">5–8 years</option>
-              <option value="8+ years">8+ years</option>
+              {EXPERIENCE_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Expected Salary</label>
+          </Field>
+          <Field id="expectedSalary" label="Expected pay">
             <input
+              id="expectedSalary"
+              name="expectedSalary"
               type="text"
-              value={expectedSalary}
-              onChange={(e) => setExpectedSalary(e.target.value)}
-              placeholder="e.g. $1,500/month"
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all"
+              placeholder="e.g. $1,500 / month"
+              value={form.expectedSalary}
+              onChange={set("expectedSalary")}
+              className={cn(fieldBase, "border-input")}
             />
-          </div>
+          </Field>
         </div>
 
-        {/* Resume Upload */}
+        {/* Resume. The visible control is the file input's own label, so it is
+            focusable, activates on Enter/Space and announces as a file picker;
+            the surrounding div only adds drag-and-drop for pointer users. */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Resume / CV <span className="text-red-500">*</span>
-          </label>
+          <span className="block text-sm font-medium text-foreground">
+            CV or resume
+            <span aria-hidden="true" className="ml-0.5 text-brand">
+              *
+            </span>
+          </span>
+
+          <input
+            ref={fileInputRef}
+            id="resume"
+            name="resume"
+            type="file"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={(e) => validateAndSetFile(e.target.files?.[0] ?? null)}
+            aria-invalid={errors.resume ? true : undefined}
+            aria-describedby={fileDescribedBy}
+            className="peer sr-only"
+          />
 
           {resumeFile ? (
-            <div className="flex items-center gap-3 px-4 py-3 bg-[#2D2B7F]/5 border border-[#2D2B7F]/20 rounded-xl">
-              <div className="w-8 h-8 bg-[#2D2B7F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Upload className="w-4 h-4 text-[#2D2B7F]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{resumeFile.name}</p>
-                <p className="text-xs text-gray-500">{(resumeFile.size / 1024).toFixed(0)} KB</p>
-              </div>
+            <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-brand/25 bg-brand-soft px-4 py-3">
+              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10">
+                <Upload aria-hidden="true" className="h-4 w-4 text-brand" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium text-foreground">
+                  {resumeFile.name}
+                </span>
+                <span className="block text-xs text-muted-foreground">
+                  {(resumeFile.size / 1024).toFixed(0)} KB
+                </span>
+              </span>
               <button
                 type="button"
                 onClick={removeFile}
-                className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors flex-shrink-0"
+                aria-label={`Remove ${resumeFile.name}`}
+                className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
               >
-                <X className="w-3.5 h-3.5" />
+                <X aria-hidden="true" className="h-3.5 w-3.5" />
               </button>
             </div>
           ) : (
             <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setIsDragging(true)
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault()
+                setIsDragging(false)
+              }}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed rounded-xl cursor-pointer transition-all select-none ${
-                isDragging
-                  ? "border-[#2D2B7F] bg-[#2D2B7F]/5 scale-[1.01]"
-                  : "border-gray-200 hover:border-[#2D2B7F]/50 hover:bg-gray-50"
-              }`}
+              className="mt-1.5 rounded-xl peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-card"
             >
-              <Upload className={`w-5 h-5 transition-colors ${isDragging ? "text-[#2D2B7F]" : "text-gray-400"}`} />
-              <span className="text-sm text-gray-500 text-center pointer-events-none">
-                <span className="font-semibold text-[#2D2B7F]">Click to upload</span> or drag &amp; drop
-              </span>
-              <span className="text-xs text-gray-400 pointer-events-none">PDF, DOC, DOCX — max 5 MB</span>
+              <label
+                htmlFor="resume"
+                className={cn(
+                  "flex cursor-pointer select-none flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors",
+                  isDragging
+                    ? "border-brand bg-brand-soft"
+                    : errors.resume
+                      ? "border-destructive/50 bg-destructive/5"
+                      : "border-border hover:border-brand/50 hover:bg-surface"
+                )}
+              >
+                <Upload
+                  aria-hidden="true"
+                  className={cn("h-5 w-5", isDragging ? "text-brand" : "text-muted-foreground")}
+                />
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-medium text-brand">Choose a file</span> or drag it here
+                </span>
+              </label>
             </div>
           )}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            className="sr-only"
-            onChange={handleFileChange}
-            tabIndex={-1}
-          />
-
-          {fileError && (
-            <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {fileError}
+          {errors.resume ? (
+            <p
+              id="resume-error"
+              className="mt-1.5 flex items-center gap-1.5 text-xs text-destructive"
+            >
+              <AlertCircle aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+              {errors.resume}
+            </p>
+          ) : (
+            <p id="resume-hint" className="mt-1.5 text-xs text-muted-foreground">
+              PDF, DOC or DOCX, up to 5 MB.
             </p>
           )}
         </div>
 
-        {/* Cover Letter */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Cover Letter <span className="text-red-500">*</span>
-          </label>
+        <Field
+          id="coverLetter"
+          label="Cover letter"
+          required
+          error={errors.coverLetter}
+          hint={`${form.coverLetter.length} / ${MAX_COVER_LETTER} characters`}
+        >
           <textarea
-            required
+            id="coverLetter"
+            name="coverLetter"
             rows={5}
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-            placeholder="Tell us why you're a great fit for this role, what excites you about Nolojia, and what makes you stand out..."
-            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#2D2B7F] focus:ring-2 focus:ring-[#2D2B7F]/10 transition-all resize-none"
+            maxLength={MAX_COVER_LETTER}
+            value={form.coverLetter}
+            onChange={set("coverLetter")}
+            placeholder="Why this role, what you have done that is relevant, and how you work."
+            aria-invalid={errors.coverLetter ? true : undefined}
+            aria-describedby={errors.coverLetter ? "coverLetter-error" : "coverLetter-hint"}
+            className={cn(
+              fieldBase,
+              "resize-y",
+              errors.coverLetter ? "border-destructive" : "border-input"
+            )}
           />
-          <p className="mt-1 text-xs text-gray-400 text-right">{coverLetter.length}/5000</p>
+        </Field>
+
+        <div aria-live="polite">
+          {status === "error" && serverError ? (
+            <p
+              role="alert"
+              className="flex items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/5 p-3 text-sm text-destructive"
+            >
+              <AlertCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+              {serverError}
+            </p>
+          ) : null}
         </div>
 
-        {/* Error message */}
-        {error && (
-          <div className="flex items-start gap-2.5 px-4 py-3 bg-red-50 border border-red-100 rounded-xl">
-            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-[#2D2B7F] hover:bg-[#232161] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-200 shadow-md shadow-[#2D2B7F]/20"
-        >
-          {loading ? (
+        <CtaButton type="submit" size="lg" disabled={status === "loading"} className="w-full">
+          {status === "loading" ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Submitting…
+              <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+              Submitting&hellip;
             </>
           ) : (
-            "Submit Application"
+            "Submit application"
           )}
-        </button>
+        </CtaButton>
 
-        <p className="text-center text-xs text-gray-400 leading-relaxed">
-          By submitting you agree that Nolojia may store and process your data to evaluate your application.
-          We never share your details with third parties.
+        <p className="text-center text-xs leading-relaxed text-muted-foreground">
+          By submitting you agree that Nolojia may store and process your details to assess your
+          application. We do not share them with third parties.
         </p>
       </form>
     </div>

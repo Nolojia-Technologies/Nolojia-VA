@@ -8,22 +8,94 @@ export function organizationSchema() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE_NAME,
+    legalName: "Nolojia Limited",
     url: SITE_URL,
     logo: `${SITE_URL}/images/nolojia-logo.png`,
-    description: "AI-powered virtual assistant services for businesses. Admin, creative, and growth support.",
+    description:
+      "Nolojia builds AI assistants, intelligent automation and digital business systems that help companies operate more efficiently.",
     foundingDate: "2023",
+    founder: { "@type": "Person", name: "Shaun Daniel Machua" },
     contactPoint: {
       "@type": "ContactPoint",
-      contactType: "customer service",
+      contactType: "sales",
       email: "info@nolojia.com",
+      telephone: "+254793903930",
       availableLanguage: "English",
     },
-    sameAs: [
-      "https://x.com/nolojia",
-      "https://www.linkedin.com/company/93209134/",
-      "https://facebook.com/nolojia",
-      "https://tiktok.com/@nolojia",
-    ],
+    // Only accounts we can actually point at.
+    sameAs: ["https://www.linkedin.com/company/93209134/"],
+  }
+}
+
+// ─── Solution / offering schema ───────────────────────────────────────────────
+
+export function solutionSchema(input: {
+  name: string
+  description: string
+  path: string
+  serviceType: string
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: input.name,
+    description: input.description,
+    url: `${SITE_URL}${input.path}`,
+    serviceType: input.serviceType,
+    provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    areaServed: "Worldwide",
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: `${SITE_URL}/contact`,
+    },
+  }
+}
+
+// ─── Product schema ───────────────────────────────────────────────────────────
+
+export function softwareApplicationSchema(input: {
+  name: string
+  description: string
+  path: string
+  category: string
+  /** Omitted entirely when the product is not yet released. */
+  released?: boolean
+  /** Only set when the product can genuinely be installed today. */
+  installUrl?: string
+  /** Real platforms. Defaults to "Web" when the product is a web app. */
+  platforms?: string[]
+  /** Free-of-charge offer. Only pass when that is actually the case today. */
+  free?: boolean
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: input.name,
+    description: input.description,
+    url: `${SITE_URL}${input.path}`,
+    applicationCategory: input.category,
+    operatingSystem: input.platforms?.length ? input.platforms.join(", ") : "Web",
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    ...(input.installUrl ? { installUrl: input.installUrl } : {}),
+    // No aggregateRating anywhere: inventing one is both untrue and a penalty.
+    ...(input.free
+      ? { offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } }
+      : {}),
+    ...(input.released === false ? { releaseNotes: "In development — not publicly available." } : {}),
+  }
+}
+
+// ─── Generic web page schema ──────────────────────────────────────────────────
+
+export function webPageSchema(input: { name: string; description: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: input.name,
+    description: input.description,
+    url: `${SITE_URL}${input.path}`,
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   }
 }
 
@@ -109,7 +181,7 @@ export function blogPostSchema(post: BlogPost) {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt,
-    image: post.cover_image ?? `${SITE_URL}/images/og-default.jpg`,
+    image: post.cover_image ?? `${SITE_URL}/opengraph-image`,
     url: `${SITE_URL}/blog/${post.slug}`,
     datePublished: post.published_at,
     dateModified: post.updated_at,

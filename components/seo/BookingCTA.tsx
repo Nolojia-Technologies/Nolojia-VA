@@ -1,42 +1,36 @@
-"use client"
-
-import { useBookingNudge } from "@/components/ui/booking-popup"
-import { ArrowRight } from "lucide-react"
+import { CtaLink } from "@/components/site/cta"
 
 interface BookingCTAProps {
   label?: string
   size?: "sm" | "md" | "lg"
   variant?: "primary" | "outline" | "white"
   className?: string
+  href?: string
 }
 
+/**
+ * Shared CTA for the programmatic SEO pages.
+ *
+ * Previously this opened a booking popup that was never mounted on those
+ * routes, so the button did nothing. It now navigates to the contact page,
+ * which is where the conversion actually happens.
+ */
 export default function BookingCTA({
-  label = "Book a Free Call",
+  label = "Build My AI System",
   size = "md",
   variant = "primary",
-  className = "",
+  className,
+  href = "/contact",
 }: BookingCTAProps) {
-  const { openFullPopup } = useBookingNudge()
-
-  const sizeClasses = {
-    sm: "text-sm px-4 py-2",
-    md: "text-sm px-6 py-3",
-    lg: "text-base px-8 py-4",
-  }
-
-  const variantClasses = {
-    primary: "bg-[#2D2B7F] hover:bg-[#232161] text-white shadow-lg shadow-[#2D2B7F]/25",
-    outline: "border-2 border-[#2D2B7F] text-[#2D2B7F] hover:bg-[#2D2B7F] hover:text-white",
-    white: "bg-white text-[#2D2B7F] hover:bg-white/90 shadow-lg",
-  }
-
   return (
-    <button
-      onClick={openFullPopup}
-      className={`inline-flex items-center gap-2 rounded-xl font-bold transition-all duration-200 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+    <CtaLink
+      href={href}
+      size={size === "lg" ? "lg" : "md"}
+      variant={variant === "outline" ? "secondary" : "primary"}
+      onInk={variant === "white"}
+      className={className}
     >
       {label}
-      <ArrowRight className="w-4 h-4" />
-    </button>
+    </CtaLink>
   )
 }

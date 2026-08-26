@@ -44,6 +44,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       clients: {
         Row: {
@@ -82,6 +83,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       assistants: {
         Row: {
@@ -117,6 +119,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -155,6 +158,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       task_activities: {
         Row: {
@@ -181,6 +185,7 @@ export interface Database {
           details?: Json | null
           created_at?: string
         }
+        Relationships: []
       }
       conversations: {
         Row: {
@@ -201,6 +206,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       conversation_participants: {
         Row: {
@@ -221,6 +227,7 @@ export interface Database {
           user_id?: string
           joined_at?: string
         }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -250,6 +257,7 @@ export interface Database {
           read?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       files: {
         Row: {
@@ -285,6 +293,7 @@ export interface Database {
           folder?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       invoices: {
         Row: {
@@ -320,6 +329,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -349,6 +359,7 @@ export interface Database {
           status?: 'pending' | 'completed' | 'failed' | 'refunded'
           created_at?: string
         }
+        Relationships: []
       }
       bookings: {
         Row: {
@@ -387,47 +398,70 @@ export interface Database {
           status?: 'pending' | 'confirmed' | 'cancelled' | 'completed'
           created_at?: string
         }
+        Relationships: []
       }
       blog_posts: {
         Row: {
           id: string
-          title: string
           slug: string
+          title: string
+          excerpt: string
           content: string
-          excerpt: string | null
-          author_id: string
-          featured_image: string | null
+          cover_image: string | null
+          category: string
+          tags: string[]
+          author_name: string
+          author_avatar: string | null
           published: boolean
-          published_at: string | null
-          created_at: string
+          featured: boolean
+          read_time_minutes: number
+          meta_title: string | null
+          meta_description: string | null
+          published_at: string
           updated_at: string
+          created_at: string
         }
         Insert: {
           id?: string
-          title: string
           slug: string
+          title: string
+          excerpt: string
           content: string
-          excerpt?: string | null
-          author_id: string
-          featured_image?: string | null
+          cover_image?: string | null
+          category: string
+          tags?: string[]
+          author_name?: string
+          author_avatar?: string | null
           published?: boolean
-          published_at?: string | null
-          created_at?: string
+          featured?: boolean
+          read_time_minutes?: number
+          meta_title?: string | null
+          meta_description?: string | null
+          published_at?: string
           updated_at?: string
+          created_at?: string
         }
         Update: {
           id?: string
-          title?: string
           slug?: string
+          title?: string
+          excerpt?: string
           content?: string
-          excerpt?: string | null
-          author_id?: string
-          featured_image?: string | null
+          cover_image?: string | null
+          category?: string
+          tags?: string[]
+          author_name?: string
+          author_avatar?: string | null
           published?: boolean
-          published_at?: string | null
-          created_at?: string
+          featured?: boolean
+          read_time_minutes?: number
+          meta_title?: string | null
+          meta_description?: string | null
+          published_at?: string
           updated_at?: string
+          created_at?: string
         }
+        Relationships: []
       }
       blog_categories: {
         Row: {
@@ -448,6 +482,7 @@ export interface Database {
           slug?: string
           created_at?: string
         }
+        Relationships: []
       }
       blog_post_categories: {
         Row: {
@@ -462,6 +497,7 @@ export interface Database {
           post_id?: string
           category_id?: string
         }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -491,6 +527,7 @@ export interface Database {
           read?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       jobs: {
         Row: {
@@ -535,6 +572,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       applications: {
         Row: {
@@ -591,12 +629,14 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       application_notes: {
         Row: {
           id: string
           application_id: string
           author_id: string
+          author_name: string | null
           content: string
           created_at: string
         }
@@ -604,6 +644,7 @@ export interface Database {
           id?: string
           application_id: string
           author_id: string
+          author_name?: string | null
           content: string
           created_at?: string
         }
@@ -611,9 +652,11 @@ export interface Database {
           id?: string
           application_id?: string
           author_id?: string
+          author_name?: string | null
           content?: string
           created_at?: string
         }
+        Relationships: []
       }
     }
     Views: {
@@ -623,6 +666,9 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
       [_ in never]: never
     }
   }

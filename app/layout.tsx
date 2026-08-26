@@ -1,30 +1,43 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_OG_IMAGE } from "@/lib/seo/config"
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, OG_IMAGE } from "@/lib/seo/config"
 import { organizationSchema, websiteSchema } from "@/lib/seo/structured-data"
 import JsonLd from "@/components/seo/JsonLd"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+/**
+ * Inter, self-hosted by next/font. Evaluated against Geist, Manrope and Plus
+ * Jakarta Sans and kept: it has the widest weight range, the best numerals for
+ * product UI, and it is already wired up with zero network cost.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+})
+
+const DESCRIPTION =
+  "Nolojia builds AI assistants and intelligent digital systems that automate the work behind your business — AI employees, automation, connected business systems and human operational support."
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} – ${SITE_TAGLINE}`,
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
     template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Hire dedicated virtual assistants for admin, creative, and growth support. Nolojia's AI-equipped VAs help founders and executives reclaim 20+ hours a week. No contracts. Start this week.",
+  description: DESCRIPTION,
   keywords: [
-    "virtual assistant services",
-    "hire virtual assistant",
-    "AI virtual assistant",
-    "executive assistant",
-    "admin support",
-    "business operations support",
-    "remote virtual assistant",
+    "AI automation for business",
+    "AI assistants",
+    "AI agents for business",
+    "business process automation",
+    "workflow automation",
+    "custom business systems",
+    "AI integration",
+    "operational support",
     "Nolojia",
   ],
+  applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
@@ -44,55 +57,39 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} – ${SITE_TAGLINE}`,
-    description:
-      "Hire dedicated virtual assistants for admin, creative, and growth support. AI-equipped VAs. No contracts. Start this week.",
-    images: [
-      {
-        url: DEFAULT_OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: `${SITE_NAME} – ${SITE_TAGLINE}`,
-      },
-    ],
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@nolojia",
-    creator: "@nolojia",
-    title: `${SITE_NAME} – ${SITE_TAGLINE}`,
-    description:
-      "Hire dedicated virtual assistants for admin, creative, and growth support. AI-equipped VAs. No contracts. Start this week.",
-    images: [DEFAULT_OG_IMAGE],
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
     apple: "/images/nolojia-logo.png",
   },
-  alternates: {
-    canonical: SITE_URL,
-  },
-  verification: {
-    // Add Google Search Console verification token here when ready:
-    // google: "your-verification-token",
-  },
+  alternates: { canonical: SITE_URL },
+  formatDetection: { telephone: false },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a12" },
+  ],
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Preconnect to key domains for performance */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body className={inter.variable}>
-        {/* Sitewide JSON-LD: Organization + Website schemas */}
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="font-sans">
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         {children}

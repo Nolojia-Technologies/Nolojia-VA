@@ -2,8 +2,20 @@
 
 export const SITE_URL = "https://www.nolojia.com"
 export const SITE_NAME = "Nolojia"
-export const SITE_TAGLINE = "AI-Powered Virtual Assistant Services"
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-default.jpg`
+export const SITE_TAGLINE = "AI that works for your business"
+
+/**
+ * Social share card. Rendered on demand by app/opengraph-image.tsx. Declared
+ * explicitly because Next only inherits the file-convention image into a page
+ * that does not define its own `openGraph` block, and most pages here do.
+ */
+export const OG_IMAGE = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+} as const
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image`
 
 // ─── Service Pages ────────────────────────────────────────────────────────────
 
@@ -34,7 +46,7 @@ export const servicePages: ServicePage[] = [
     subtitle: "Intelligent, AI-powered support that works around the clock — so you never miss a beat.",
     heroDescription: "Nolojia's AI assistants combine the best of artificial intelligence with trained human oversight to deliver exceptional results for your business, 24 hours a day.",
     overview: [
-      "Running a modern business means managing an overwhelming volume of tasks — emails, research, scheduling, customer queries, data management, and more. Most business owners spend 40–60% of their working week on work that, while necessary, doesn't directly grow their revenue. That's where Nolojia's AI assistant service changes everything.",
+      "Running a modern business means managing an overwhelming volume of tasks — emails, research, scheduling, customer queries, data management, and more. Most business owners spend 40–much of their working week on work that, while necessary, does not directly grow their revenue. That's where Nolojia's AI assistant service changes everything.",
       "Our AI assistants are not just software bots. They are human-supervised AI systems — intelligent tools operated by trained virtual assistants who know how to get the most from artificial intelligence to deliver faster, smarter, and more accurate results for your business. Think of it as having a highly skilled assistant who is also a power user of every major AI platform.",
       "From drafting professional communications and generating reports to summarizing lengthy documents, conducting research, and managing repetitive data workflows — our AI assistants handle it all. Every output is reviewed for quality, ensuring you receive work that meets your standards without requiring your time.",
       "Nolojia's AI assistant service is built for founders, executives, and operators who want to scale without the overhead of hiring full-time staff. You get the intelligence of cutting-edge AI combined with the judgment, communication, and accountability of a dedicated human professional — at a fraction of the cost of a full-time employee.",
@@ -87,7 +99,7 @@ export const servicePages: ServicePage[] = [
       { question: "How is an AI assistant different from a regular virtual assistant?", answer: "A traditional virtual assistant relies solely on human effort. Our AI assistants use cutting-edge AI tools to accelerate every task — meaning they produce more output in less time, at a lower cost. The AI handles repetitive, pattern-based work while the human assistant applies judgment, quality control, and communication." },
       { question: "Is my business data safe with an AI assistant?", answer: "Absolutely. All Nolojia assistants sign NDAs and follow strict data handling protocols. We never feed sensitive client data into AI models without your explicit consent, and we use privacy-safe AI configurations for all client work." },
       { question: "What tools do your AI assistants use?", answer: "Our assistants are proficient in ChatGPT, Claude, Gemini, Perplexity, Jasper, Midjourney, Notion AI, and dozens of other AI productivity tools. We match the tool to the task and continuously adopt new platforms as they emerge." },
-      { question: "How quickly can an AI assistant be set up?", answer: "Most clients have their AI assistant operational within 5–7 business days. The first 4 weeks are spent building and refining your custom AI playbook and workflow system." },
+      { question: "How quickly can an AI assistant be set up?", answer: "Setup typically takes 5–7 business days. The first 4 weeks are spent building and refining your custom AI playbook and workflow system." },
       { question: "Can I scale my AI assistant service up or down?", answer: "Yes. Our plans are flexible with no minimum contracts. You can increase or decrease your hours, add team members, or change your service scope at any time with no penalties." },
     ],
     schemaType: "Service",
@@ -99,23 +111,23 @@ export const servicePages: ServicePage[] = [
     keywords: ["hire virtual assistant", "virtual assistant services", "professional virtual assistant", "dedicated virtual assistant", "remote virtual assistant", "virtual assistant company"],
     title: "Virtual Assistant Services",
     subtitle: "A dedicated, highly trained virtual assistant who owns your operations — so you can own your growth.",
-    heroDescription: "Nolojia connects you with elite virtual assistants who are vetted, trained, and ready to transform the way you work within days.",
+    heroDescription: "Nolojia connects you with vetted, trained virtual assistants who can be working alongside you within days.",
     overview: [
       "The most successful founders and executives share one trait: they've mastered the art of delegation. They focus relentlessly on high-value work and hand everything else to talented people who own it completely. A Nolojia virtual assistant is exactly that — a professional who handles your administrative, operational, and support tasks with the same care and commitment you would.",
-      "Unlike freelance platforms where you interview dozens of candidates and hope for the best, Nolojia takes a different approach. We select only the top 1% of applicants through a rigorous multi-stage assessment. Every assistant passes skills testing, background checks, and signs an NDA before they ever work with a client. You get excellence from day one.",
+      "Unlike freelance platforms where you interview dozens of candidates and hope for the best, Nolojia takes a different approach. We select only the applicants through a multi-stage assessment. Every assistant passes skills testing, background checks, and signs an NDA before they ever work with a client. You get excellence from day one.",
       "Your virtual assistant is not a task-taker — they're a thinking partner for your operations. They proactively identify what needs to be done, flag potential issues before they become problems, and continuously look for ways to make your business run more smoothly. This is the difference between hiring a body and hiring a Nolojia VA.",
       "We specialize in matching you with assistants who have relevant industry experience, whether that's e-commerce, real estate, professional services, SaaS, or any other sector. Your assistant understands the context of your business — not just the tasks on their list.",
       "Every Nolojia client is assigned a dedicated Client Success Manager who oversees the relationship, conducts monthly strategy reviews, and ensures your assistant is performing at the highest standard. You're never managing this alone — we manage it with you.",
     ],
     benefits: [
-      { title: "Top 1% Talent", description: "Only the best assistants make it through our vetting process. Skills testing, background checks, and NDA signing are mandatory for every hire." },
+      { title: "Vetted Before Placement", description: "Skills testing, reference and background checks, and a signed NDA are mandatory for every assistant before they work with a client." },
       { title: "Dedicated 1:1 Support", description: "You get one assistant who is fully focused on you — learning your business, preferences, and working style deeply over time." },
-      { title: "4-Week Integration Guarantee", description: "We guarantee your assistant will be fully integrated into your workflows within 4 weeks — or we dedicate extra resources at no charge." },
+      { title: "Structured 4-Week Integration", description: "The first four weeks follow a defined plan: shadowing, documented playbooks, then independent work — so integration is managed rather than hoped for." },
       { title: "No Contract Minimums", description: "Start with the hours you need and scale up or down as your business changes. No lock-ins, no penalties." },
       { title: "Start in Under a Week", description: "From your first call to a working assistant, our onboarding process takes less than a week — not weeks of interviews and back-and-forth." },
       { title: "Client Success Manager", description: "A dedicated CSM oversees your account, conducts monthly reviews, and ensures quality never slips." },
       { title: "AI-Augmented Output", description: "Every Nolojia assistant uses AI tools to produce more output in less time — giving you more value for your investment." },
-      { title: "Continuity Guaranteed", description: "You keep the same assistant long-term. If anything changes, we handle the transition seamlessly with full knowledge transfer." },
+      { title: "Built For Continuity", description: "You work with the same assistant long-term. Playbooks are documented as you go, so if anything does change the handover is not starting from zero." },
     ],
     tasks: [
       "Email inbox management and triage",
@@ -150,11 +162,11 @@ export const servicePages: ServicePage[] = [
       { step: "05", title: "Ongoing Optimization", description: "Monthly strategy sessions ensure we're always working on the right things and evolving as your business grows." },
     ],
     faqs: [
-      { question: "How is Nolojia different from other VA companies?", answer: "Most VA companies place staff and leave you to manage them. Nolojia provides a complete system — a vetted assistant, a custom playbook, a client success manager, and AI-powered tools — all managed for you. We also guarantee integration within 4 weeks and offer no-contract flexibility." },
+      { question: "How is Nolojia different from other VA companies?", answer: "Most VA companies place staff and leave you to manage them. Nolojia provides a complete system — a vetted assistant, a custom playbook, a client success manager, and AI-powered tools — all managed for you. Integration follows a structured four-week plan, and there are no contract minimums." },
       { question: "What hours does my virtual assistant work?", answer: "We match you with assistants who align with your preferred timezone and working hours. Most assistants are available during standard business hours in your region, with some offering extended coverage." },
       { question: "Can my virtual assistant work across multiple platforms and tools?", answer: "Yes. Our assistants are trained across dozens of tools including Google Workspace, Microsoft 365, Notion, Slack, HubSpot, Salesforce, Shopify, Asana, Trello, Zoom, and more. If you use a specific tool, let us know and we'll ensure your assistant is proficient in it." },
-      { question: "What if my virtual assistant doesn't work out?", answer: "We have a replacement guarantee. If at any point you're not satisfied with your assistant's performance, we'll replace them within 48 hours with full knowledge transfer at no additional charge." },
-      { question: "How many hours do I need per month?", answer: "Most clients start with 40–80 hours per month, which covers part-time executive support. As you delegate more, many clients scale to 160+ hours (full-time equivalent). We'll recommend the right level based on your needs during your discovery call." },
+      { question: "What if my virtual assistant doesn't work out?", answer: "Tell your client success manager. We will work through it with you, and if it is not fixable we will find a replacement and handle the knowledge transfer — the documented playbook exists precisely so a change does not reset your progress." },
+      { question: "How many hours do I need per month?", answer: "Part-time executive support usually sits around 40–80 hours a month, and 160+ hours is full-time equivalent. We'll recommend the right level based on your needs during your discovery call." },
       { question: "Is my information kept confidential?", answer: "Yes. Every assistant signs a comprehensive NDA before beginning work. We also maintain strict data security protocols and never share client information with third parties." },
     ],
     schemaType: "Service",
@@ -165,7 +177,7 @@ export const servicePages: ServicePage[] = [
     metaDescription: "Hire a dedicated remote executive assistant. Nolojia's executive assistants manage your inbox, calendar, travel, and operations — so you can lead at your highest level. No contracts.",
     keywords: ["remote executive assistant", "hire executive assistant", "executive assistant services", "virtual executive assistant", "online executive assistant", "C-suite executive assistant"],
     title: "Remote Executive Assistant",
-    subtitle: "A world-class executive assistant who frees you to lead — without the cost of a full-time hire.",
+    subtitle: "An experienced executive assistant who frees you to lead — without the cost of a full-time hire.",
     heroDescription: "Nolojia's executive assistants are the right hand of high-performance leaders. They manage the complexity of your role so you can operate at your absolute best.",
     overview: [
       "Great executives don't do everything — they decide what matters and delegate everything else. But finding, hiring, and managing a top-tier executive assistant is itself a complex, time-consuming task. Nolojia solves this entirely. We match you with an elite executive assistant who is already trained, already equipped with the right tools, and ready to embed into your world within days.",
@@ -222,7 +234,7 @@ export const servicePages: ServicePage[] = [
       { question: "Can a remote EA access my email and calendar?", answer: "Yes. Your EA is granted appropriate access to your email (via delegation) and calendar. All access is documented, secured, and governed by our data security protocols and NDA agreement." },
       { question: "What happens if my EA is unavailable?", answer: "We maintain backup coverage protocols for all clients. If your primary EA is unavailable due to illness or leave, a trained backup is briefed from your playbook and steps in seamlessly. You'll always have coverage." },
       { question: "Can my EA represent me in external communications?", answer: "Yes. Many of our EAs send emails, schedule meetings, and coordinate with external parties on behalf of clients. Your EA uses professional, branded communications and follows your guidelines precisely." },
-      { question: "How quickly can a remote EA start?", answer: "Most clients have their EA set up and operational within 5–7 business days from their first call. The first 4 weeks focus on deepening integration and building your custom workflow system." },
+      { question: "How quickly can a remote EA start?", answer: "Setup usually takes 5–7 business days from the first call. The first 4 weeks focus on deepening integration and building your custom workflow system." },
     ],
     schemaType: "Service",
   },
@@ -288,7 +300,7 @@ export const servicePages: ServicePage[] = [
       { question: "How do your assistants learn my products and policies?", answer: "During onboarding, your assistant studies your product catalogue, policies, FAQ, past tickets, and brand guidelines. We build a comprehensive knowledge base that they reference for every interaction. This is updated continuously as your products and policies evolve." },
       { question: "What if a customer issue is too complex for my assistant to resolve?", answer: "We establish clear escalation protocols during setup. Your assistant knows exactly what they can resolve independently and what requires escalation to you or your team — and they always escalate with full context so you never start from scratch." },
       { question: "Can I use my existing helpdesk software?", answer: "Yes. We integrate with virtually any helpdesk platform. Our assistants are trained on Zendesk, Freshdesk, Intercom, Gorgias, Help Scout, Re:amaze, HubSpot Service Hub, and more." },
-      { question: "How quickly do your assistants respond to tickets?", answer: "Response time targets are agreed during setup. Most clients set a 1-hour response SLA for business hours, which our assistants consistently meet or exceed. For priority accounts, real-time coverage is available." },
+      { question: "How quickly do your assistants respond to tickets?", answer: "Response time targets are agreed during setup. A one-hour response target during business hours is common, and the SLA is agreed with you in writing. For priority accounts, real-time coverage is available." },
       { question: "How do I maintain quality control?", answer: "Your Client Success Manager conducts regular quality audits, reviewing a sample of responses for tone, accuracy, and policy compliance. You also receive monthly reports with satisfaction scores and resolution metrics." },
     ],
     schemaType: "Service",
@@ -387,7 +399,7 @@ export const servicePages: ServicePage[] = [
       "Invoice and order data processing",
       "HR and employee records management",
       "Inventory data management and reconciliation",
-      "Medical and clinical data entry (HIPAA-compliant)",
+      "Medical and clinical data entry, worked to the controls your compliance programme requires",
       "Legal document data extraction and indexing",
       "Real estate listing data management",
       "Financial data entry and reconciliation support",
@@ -492,7 +504,7 @@ export const servicePages: ServicePage[] = [
       "For SaaS companies, technology businesses, and any organization with a technical user base, having dedicated technical support coverage is no longer optional. Users expect fast, knowledgeable responses. Our assistants deliver exactly that — consistently, at scale.",
     ],
     benefits: [
-      { title: "Tier 1 Technical Coverage", description: "Handle the most common 80% of technical issues without escalation — freeing your engineers for complex problems." },
+      { title: "Tier 1 Technical Coverage", description: "Handle the most common routine technical issues without escalation — freeing your engineers for complex problems." },
       { title: "Product-Specific Training", description: "Assistants are trained on your specific product, platform, and technical environment before handling any tickets." },
       { title: "Clear Escalation Protocols", description: "Complex issues are escalated with full context, reproducible steps, and environment details — so engineers can resolve fast." },
       { title: "Integration with Dev Tools", description: "Works with Jira, GitHub Issues, Linear, Zendesk, Intercom, and other technical support platforms." },
@@ -519,14 +531,14 @@ export const servicePages: ServicePage[] = [
     industries: [
       { name: "SaaS & Software", description: "Tier 1 product support, onboarding assistance, and bug triage for software companies." },
       { name: "E-commerce Technology", description: "Platform support, integration troubleshooting, and technical customer service for tech-enabled retailers." },
-      { name: "Healthcare Technology", description: "HIPAA-compliant technical support for health tech platforms and digital health providers." },
+      { name: "Healthcare Technology", description: "Technical support for health tech platforms and digital health providers, worked to the controls your compliance programme requires." },
       { name: "Fintech", description: "Secure, compliant technical support for financial technology platforms and payment systems." },
       { name: "EdTech", description: "Learning platform support, LMS troubleshooting, and technical assistance for online education businesses." },
       { name: "Agency & Dev Firms", description: "Client-facing technical support, white-label tech assistance, and post-launch product support." },
     ],
     process: [
       { step: "01", title: "Technical Deep Dive", description: "We study your product, common failure modes, known issues, and escalation thresholds before going live." },
-      { step: "02", title: "Knowledge Base Setup", description: "We build or review your technical knowledge base and ensure your assistant can answer the most common 80% of tickets." },
+      { step: "02", title: "Knowledge Base Setup", description: "We build or review your technical knowledge base and ensure your assistant can answer the most common the bulk of routine tickets." },
       { step: "03", title: "Tool Integration", description: "Your assistant is set up in your support platform, connected to your issue tracker, and given appropriate system access." },
       { step: "04", title: "Supervised Launch", description: "First two weeks operate with heightened QA — all responses reviewed by your team to confirm technical accuracy." },
       { step: "05", title: "Independent Coverage & Iteration", description: "Full independent coverage with ongoing knowledge base updates and monthly review of escalation patterns." },
@@ -636,8 +648,8 @@ export const industryPages: IndustryPage[] = [
     subheadline: "Give your founding team back their time — so they can focus on what only they can do.",
     intro: [
       "Startups move fast. Your competitive advantage is your ability to learn and iterate faster than anyone else. But that advantage evaporates when your founding team is buried in inbox management, scheduling, research, customer service, and the dozens of operational tasks that every business generates. Nolojia exists to solve this problem.",
-      "As a startup, you can't afford to hire a full operations team. But you also can't afford to have your founders spending 40% of their time on tasks a skilled assistant could handle. Nolojia gives you a cost-effective, immediately deployable solution — a dedicated virtual assistant who acts as your operations layer from day one.",
-      "Our startup clients reclaim an average of 15–20 hours per founder per week. That's time reinvested in customer conversations, product development, investor relationships, and the strategic decisions that only a founder can make. It's not just productivity — it's competitive advantage at the speed of a startup.",
+      "As a startup, you can't afford to hire a full operations team. But you also can't afford to have your founders spending their days on tasks a skilled assistant could handle. Nolojia gives you a cost-effective, immediately deployable solution — a dedicated virtual assistant who acts as your operations layer from day one.",
+      "Founders who hand this work over get that time back for customer conversations, product development and investor relationships. It is not just productivity — it is competitive advantage at the speed of a startup.",
     ],
     painPoints: [
       { title: "Founders Doing Admin Work", description: "Your best people are writing emails, booking travel, and doing data entry instead of building the business. This is the single biggest growth killer in early-stage companies." },
@@ -668,11 +680,7 @@ export const industryPages: IndustryPage[] = [
       "Weekly metrics report auto-generation from your data sources",
       "Automated follow-up sequences for sales prospects",
     ],
-    stats: [
-      { value: "20hrs", label: "Saved per founder per week" },
-      { value: "5 days", label: "Average time to first active VA" },
-      { value: "40%", label: "Reduction in operational overhead" },
-    ],
+    stats: [],
     faqs: [
       { question: "Is a virtual assistant cost-effective for an early-stage startup?", answer: "Absolutely. A Nolojia virtual assistant costs a fraction of a full-time employee — with no employer taxes, benefits, office space, or equipment costs. Most startup clients see a positive ROI within the first 30 days when measured against the opportunity cost of founder time." },
       { question: "Can a VA help with investor relations?", answer: "Yes. Our assistants help startup founders prepare investor updates, manage data room documentation, coordinate investor meetings, and maintain investor CRM records. This is one of the highest-value tasks we take off founders' plates." },
@@ -690,7 +698,7 @@ export const industryPages: IndustryPage[] = [
     subheadline: "More time in front of clients. Less time behind a desk. Nolojia handles the rest.",
     intro: [
       "Real estate is a relationship business. The agents and brokers who win are the ones who spend the most time building relationships, understanding client needs, and closing deals — not the ones who spend their days updating CRMs, chasing document signatures, and managing email inboxes. Nolojia's real estate virtual assistants handle the operational side of your business so you can focus on what actually generates revenue.",
-      "The typical real estate professional spends 30–40% of their working week on administrative tasks that, while necessary, don't require their expertise or presence. Listing management, lead follow-up, appointment scheduling, market report preparation, social media management — all of this can be handled by a skilled, trained VA who understands the real estate industry.",
+      "The typical real estate professional spends 30–a large share of their working week on administrative tasks that, while necessary, do not require their expertise or presence. Listing management, lead follow-up, appointment scheduling, market report preparation, social media management — all of this can be handled by a skilled, trained VA who understands the real estate industry.",
       "Our real estate VAs are matched based on industry experience and trained on your specific systems and workflows. Whether you're an independent agent, a brokerage, or a property management company, we have a VA configuration that fits your operation and scales with your volume.",
     ],
     painPoints: [
@@ -724,11 +732,7 @@ export const industryPages: IndustryPage[] = [
       "Post-closing review request and referral automation",
       "Social media scheduling and listing promotion automation",
     ],
-    stats: [
-      { value: "3x", label: "More deals worked simultaneously" },
-      { value: "10min", label: "Average lead response time" },
-      { value: "60%", label: "Reduction in admin time" },
-    ],
+    stats: [],
     faqs: [
       { question: "What CRM systems can your real estate VAs work with?", answer: "Our VAs are trained across real estate-specific CRMs including Follow Up Boss, KvCORE, Chime, LionDesk, HubSpot, Salesforce, and others. If you use a different system, let us know — we'll ensure your VA is trained on it." },
       { question: "Can your VA manage MLS listings?", answer: "Yes. Our real estate VAs can create, update, and manage listings in the MLS, as well as on platforms like Zillow, Realtor.com, Redfin, and your own website. They follow your listing standards and ensure all details are accurate and current." },
@@ -781,11 +785,7 @@ export const industryPages: IndustryPage[] = [
       "Abandoned cart recovery email automation",
       "Price monitoring and competitor alert automation",
     ],
-    stats: [
-      { value: "4hrs", label: "Average daily time saved" },
-      { value: "2x", label: "Faster customer response time" },
-      { value: "35%", label: "Reduction in negative reviews" },
-    ],
+    stats: [],
     faqs: [
       { question: "Which e-commerce platforms do your VAs work with?", answer: "Our VAs are trained on Shopify, Amazon Seller Central, WooCommerce, Etsy, eBay, Wix eCommerce, BigCommerce, and other major platforms. If you sell on multiple channels, we can coordinate across all of them." },
       { question: "Can your VA manage my Amazon account?", answer: "Yes. Our Amazon-trained VAs handle listing creation and optimisation, inventory management, FBA shipment coordination, customer messaging, A+ content management, review monitoring, and seller account health maintenance." },
@@ -836,11 +836,7 @@ export const industryPages: IndustryPage[] = [
       "Lead magnet delivery and nurture sequence automation",
       "Webinar registration confirmation and reminder automation",
     ],
-    stats: [
-      { value: "12hrs", label: "Saved per week on average" },
-      { value: "3x", label: "Content output increase" },
-      { value: "90%", label: "Client report satisfaction improvement" },
-    ],
+    stats: [],
     faqs: [
       { question: "Can your VA manage my coaching platform (Kajabi, Thinkific, etc.)?", answer: "Yes. Our VAs are trained on major coaching platforms including Kajabi, Thinkific, Teachable, Podia, Circle, and Mighty Networks. They handle content uploading, student access management, community moderation, and course updates." },
       { question: "Can my VA create content in my voice?", answer: "Yes. After an onboarding period where your VA studies your existing content, your communication style, and your brand voice, they produce content that sounds authentically like you — requiring minimal editing before publication." },
@@ -890,11 +886,7 @@ export const industryPages: IndustryPage[] = [
       "Lead inquiry response and CRM entry automation",
       "Social media scheduling automation",
     ],
-    stats: [
-      { value: "25%", label: "Increase in billable utilization" },
-      { value: "8hrs", label: "Saved per account manager weekly" },
-      { value: "2x", label: "Proposal output capacity" },
-    ],
+    stats: [],
     faqs: [
       { question: "Can your VAs work with multiple client accounts simultaneously?", answer: "Yes. Our agency VAs are specifically trained to manage multiple accounts efficiently — maintaining context and quality across different brands, industries, and deliverable types without confusion or errors." },
       { question: "Do you offer white-label VA services for agencies?", answer: "Yes. Many agency clients use Nolojia VAs as white-label team members — the VA works entirely under your agency's brand and communication channels. Clients see them as part of your team." },
@@ -944,11 +936,7 @@ export const industryPages: IndustryPage[] = [
       "Referral thank-you sequence automation",
       "LinkedIn and content scheduling automation",
     ],
-    stats: [
-      { value: "3hrs", label: "Additional billable time per attorney daily" },
-      { value: "100%", label: "NDA compliance on all staff" },
-      { value: "48hrs", label: "Average client intake response improvement" },
-    ],
+    stats: [],
     faqs: [
       { question: "How do you ensure confidentiality with legal client information?", answer: "All VAs working with law firms sign comprehensive NDAs before starting. We maintain strict data security protocols, use secure communication channels, and follow confidentiality procedures aligned with legal professional obligations. Client information is never shared or stored beyond operational necessity." },
       { question: "Can your VAs do legal research?", answer: "Our VAs provide research support — gathering information, summarising articles, compiling case law references, and preparing research briefs. They support the research process, but all legal analysis and conclusions are provided by licensed attorneys." },
@@ -998,11 +986,7 @@ export const industryPages: IndustryPage[] = [
       "Review request automation for healthy accounts",
       "Competitive intelligence monitoring and alert automation",
     ],
-    stats: [
-      { value: "40%", label: "Improvement in trial activation rate" },
-      { value: "15hrs", label: "Engineering time saved weekly" },
-      { value: "2x", label: "Content production velocity" },
-    ],
+    stats: [],
     faqs: [
       { question: "Can your VAs help with customer success at scale?", answer: "Yes. Our SaaS VAs conduct proactive customer check-ins, monitor product usage data for churn signals, reach out to at-risk accounts, coordinate QBRs, gather product feedback, and manage the day-to-day relationship management that drives retention." },
       { question: "Can your VAs write technical documentation for our product?", answer: "Yes. Our content-trained VAs produce product documentation, help centre articles, API guides, and feature release notes. They work from your existing documentation style and collaborate with your product team to ensure accuracy." },
@@ -1051,11 +1035,7 @@ export const industryPages: IndustryPage[] = [
       "Content calendar publication automation",
       "Competitor monitoring and alert automation",
     ],
-    stats: [
-      { value: "30%", label: "Increase in deliverable output" },
-      { value: "6hrs", label: "Saved on monthly reporting per client" },
-      { value: "40%", label: "Reduction in non-billable team hours" },
-    ],
+    stats: [],
     faqs: [
       { question: "Can your VAs match the tone and voice of multiple client brands?", answer: "Yes. Our marketing VAs are skilled at adapting content to different brand voices. During onboarding for each client, your VA studies the brand guidelines, existing content library, and tone of voice documentation to ensure all content is on-brand." },
       { question: "Can your VAs produce white-label content for our agency clients?", answer: "Absolutely. Nolojia provides fully white-label content production. Your clients see content produced under your agency's brand — Nolojia is never visible in the workflow unless you choose to disclose it." },
@@ -1091,11 +1071,11 @@ export const countryPages: CountryPage[] = [
     metaDescription: "Professional virtual assistant services for US businesses. Nolojia provides dedicated VAs for American companies — inbox management, scheduling, marketing, and more. Book a free call.",
     keywords: ["virtual assistant services USA", "hire virtual assistant United States", "US virtual assistant company", "American business VA", "remote assistant USA"],
     headline: "Virtual Assistant Services for US Businesses",
-    subheadline: "Elite virtual assistant support for American businesses — from New York startups to California tech companies.",
+    subheadline: "Virtual assistant support for American businesses — from New York startups to California tech companies.",
     intro: [
       "The United States is home to the world's most dynamic business ecosystem — and the most time-pressured executives, entrepreneurs, and operators to match. American business culture demands speed, professionalism, and flawless execution. Nolojia's virtual assistants are built to meet these standards.",
       "From the startup ecosystems of San Francisco and New York to the growing business communities across Texas, Florida, and the Southeast, Nolojia serves US businesses of all sizes. Our virtual assistants work in Eastern, Central, Mountain, and Pacific time zones to match your business hours — ensuring real-time availability when you need it.",
-      "US clients particularly value our 4-week integration guarantee, same-week start capability, and the fact that every assistant works under a comprehensive NDA. For American businesses where data privacy, professionalism, and reliability are non-negotiable, Nolojia delivers.",
+      "US clients particularly value the fact that every assistant works under a comprehensive NDA. For American businesses where data privacy, professionalism, and reliability are non-negotiable, Nolojia delivers.",
     ],
     marketContext: "The US virtual assistant market is growing rapidly as businesses recognize that operational efficiency — not just revenue growth — drives profitability. American SMBs and startups are increasingly turning to virtual assistant services as a cost-effective alternative to full-time hires.",
     benefits: [
@@ -1116,10 +1096,10 @@ export const countryPages: CountryPage[] = [
     metaDescription: "Professional virtual assistant services for UK businesses. Nolojia provides dedicated VAs for British companies — admin, executive support, marketing, and more. Book a free consultation.",
     keywords: ["virtual assistant services UK", "hire virtual assistant United Kingdom", "UK virtual assistant company", "British business VA", "remote assistant UK", "virtual assistant London"],
     headline: "Virtual Assistant Services for UK Businesses",
-    subheadline: "World-class virtual assistant support for British businesses — from London's financial district to growing companies across the country.",
+    subheadline: "Virtual assistant support for British businesses — from London's financial district to growing companies across the country.",
     intro: [
       "British businesses are known for their professionalism, discretion, and high standards — and Nolojia's virtual assistants are trained to match them. Whether you're a London-based professional services firm, a Manchester e-commerce business, or a growing startup in Edinburgh, Nolojia provides the operational support your business needs to thrive.",
-      "Our UK clients operate in GMT/BST and our assistants are available during UK business hours — ensuring real-time collaboration and responsiveness. We understand UK business culture, professional norms, and the specific tools and platforms used by British businesses.",
+      "UK businesses operate in GMT/BST and our assistants are available during those hours — ensuring real-time collaboration and responsiveness. We understand UK business culture, professional norms, and the specific tools and platforms used by British businesses.",
       "For UK businesses, Nolojia offers a cost-effective alternative to full-time employment — no employer's National Insurance contributions, no pension obligations, no office space, and no lengthy recruitment process. You get exceptional operational support at a fraction of the total cost of employment.",
     ],
     marketContext: "The UK virtual assistant market is mature and growing. British SMBs and professional services firms have been early adopters of VA services, and increasing pressure on operational costs is driving more businesses to consider virtual support models.",
@@ -1166,13 +1146,13 @@ export const countryPages: CountryPage[] = [
     metaDescription: "Professional virtual assistant services for Australian businesses. Nolojia provides dedicated VAs for Australian companies across Sydney, Melbourne, Brisbane, and beyond. Book a free call.",
     keywords: ["virtual assistant services Australia", "hire virtual assistant Australia", "Australian business VA", "remote assistant Australia", "virtual assistant Sydney", "virtual assistant Melbourne"],
     headline: "Virtual Assistant Services for Australian Businesses",
-    subheadline: "Elite virtual assistant support for Australian businesses — from Sydney's CBD to remote operations across the country.",
+    subheadline: "Virtual assistant support for Australian businesses — from Sydney's CBD to remote operations across the country.",
     intro: [
       "Australian businesses operate in a unique environment — a highly educated, professional workforce with one of the world's highest minimum wages, creating significant labour cost pressures for SMBs. Nolojia's virtual assistant service offers Australian businesses world-class operational support at a cost structure that makes sense for their economics.",
-      "Our Australian clients range from Sydney-based professional services firms to Melbourne tech startups, Brisbane real estate agencies, and Perth mining sector businesses. We provide assistants who work during AEDT/AEST business hours, ensuring your VA is available during your working day.",
-      "Australian businesses particularly value Nolojia's speed to start, quality guarantees, and cost efficiency versus local hiring. The combination of exceptional talent and a significantly lower cost than Australian equivalent employment makes the ROI case compelling and immediate.",
+      "The work suits Australian professional services firms, tech startups, real estate agencies and resource sector businesses alike. We provide assistants who work during AEDT/AEST business hours, so your VA is available during your working day.",
+      "For Australian businesses the appeal is usually speed to start and cost efficiency versus local hiring: skilled support at a fraction of Australian equivalent employment cost, without a recruitment cycle.",
     ],
-    marketContext: "Australia's high wage environment makes virtual assistant services particularly attractive for SMBs. The VA market is growing rapidly as Australian business owners discover they can access world-class talent at a fraction of local employment costs.",
+    marketContext: "Australia's high wage environment makes virtual assistant services particularly attractive for SMBs. The VA market is growing rapidly as Australian business owners discover they can access skilled talent at a fraction of local employment costs.",
     benefits: [
       "AEDT/AEST/AWST time zone coverage for Australian business hours",
       "Understanding of Australian business culture, professional norms, and communication style",
@@ -1191,10 +1171,10 @@ export const countryPages: CountryPage[] = [
     metaDescription: "Professional virtual assistant services for UAE businesses. Nolojia provides dedicated VAs for Dubai, Abu Dhabi, and UAE companies — executive support, admin, and operations. Book a free call.",
     keywords: ["virtual assistant services UAE", "hire virtual assistant Dubai", "UAE virtual assistant company", "Dubai business VA", "Abu Dhabi virtual assistant", "remote assistant UAE"],
     headline: "Virtual Assistant Services for UAE Businesses",
-    subheadline: "World-class virtual assistant support for Dubai, Abu Dhabi, and businesses across the Emirates.",
+    subheadline: "Virtual assistant support for Dubai, Abu Dhabi, and businesses across the Emirates.",
     intro: [
       "The UAE — and Dubai in particular — is one of the world's fastest-growing business hubs, attracting entrepreneurs, investors, and corporations from across the globe. In this high-velocity business environment, where deals move fast and expectations are high, having outstanding operational support is a competitive necessity.",
-      "Nolojia provides virtual assistant services aligned with UAE business hours (Gulf Standard Time), ensuring your assistant is active and responsive during your working day. Our UAE clients include Dubai-based entrepreneurs, Abu Dhabi corporate executives, free zone businesses, and international companies managing Middle East operations.",
+      "Nolojia provides virtual assistant services aligned with UAE business hours (Gulf Standard Time), ensuring your assistant is active and responsive during your working day. The work suits Dubai-based entrepreneurs, Abu Dhabi corporate teams, free zone businesses, and international companies managing Middle East operations.",
       "The UAE business environment places a premium on professionalism, discretion, and the ability to operate across cultures and time zones. Nolojia's assistants are selected for these qualities — providing the executive-level support that UAE business standards demand.",
     ],
     marketContext: "The UAE's ambitious business environment and internationally mobile executive population create strong demand for premium virtual assistant services. Dubai's status as a global business hub means many UAE businesses operate across multiple time zones and cultural contexts.",

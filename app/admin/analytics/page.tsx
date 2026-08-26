@@ -22,7 +22,7 @@ const statusLabels: Record<string, string> = {
 }
 
 export default async function AnalyticsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const [
     { data: allApplications },

@@ -7,18 +7,18 @@ import { NotesSection } from './notes-section'
 import Link from 'next/link'
 import {
   ArrowLeft, Mail, Phone, MapPin, Briefcase,
-  ExternalLink, FileText, Calendar, Clock, DollarSign,
+  ExternalLink, FileText, Calendar, DollarSign,
 } from 'lucide-react'
 import { format } from 'date-fns'
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase.from('applications').select('full_name').eq('id', params.id).single()
   return { title: data?.full_name ?? 'Applicant' }
 }
 
 export default async function ApplicantDetailPage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: app } = await supabase

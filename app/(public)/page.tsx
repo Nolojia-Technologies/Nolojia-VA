@@ -1,976 +1,458 @@
-"use client"
-
 import Link from "next/link"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { useBookingNudge } from "@/components/ui/booking-popup"
 import {
   ArrowRight,
-  CheckCircle2,
-  Zap,
-  Shield,
-  Users,
-  Clock,
-  BarChart3,
-  Headphones,
-  CalendarDays,
-  Briefcase,
-  Star,
-  ChevronRight,
-  Linkedin,
-  TrendingUp,
-  Palette,
-  Code2,
-  DollarSign,
-  MessageSquare,
-  Globe,
-  AlertCircle,
-  XCircle,
-  Target,
-  Layers,
-  Award,
+  BrainCircuit,
+  Handshake,
+  MessagesSquare,
+  Scale,
+  ShieldAlert,
+  Sparkles,
+  UserRoundCheck,
 } from "lucide-react"
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
-  }),
-}
+import { Container, Eyebrow, Pill, Section, SectionHeading } from "@/components/site/primitives"
+import { CtaLink } from "@/components/site/cta"
+import { Reveal } from "@/components/site/reveal"
+import { AssistantConsole } from "@/components/site/assistant-console"
+import { WorkflowDiagram, type WorkflowStep } from "@/components/site/workflow-diagram"
+import { SystemDiagram } from "@/components/site/system-diagram"
+import { AIEmployeeCard } from "@/components/site/ai-employee-card"
+import { ProductCard } from "@/components/site/product-card"
+import { ProcessSection } from "@/components/site/process"
+import { Faq } from "@/components/site/faq"
+import {
+  CapabilityStrip,
+  CtaSection,
+  IntegrationsSection,
+  SecuritySection,
+  SolutionCategoriesSection,
+} from "@/components/site/sections"
+import JsonLd from "@/components/seo/JsonLd"
 
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
+import { AI_EMPLOYEES } from "@/lib/content/ai-employees"
+import { PRODUCTS } from "@/lib/content/products"
+import { PILLAR_DETAILS } from "@/lib/content/solutions"
+import { FAQ_FLAT } from "@/lib/content/faq"
+import { CLIENT_STORIES } from "@/lib/content/case-studies"
+import { CTA, FOUNDER } from "@/lib/content/site"
+import { faqSchema } from "@/lib/seo/structured-data"
+import { pageMetadata } from "@/lib/seo/metadata"
+
+export const metadata = pageMetadata({
+  title: "AI that works for your business",
+  description:
+    "Nolojia builds AI assistants, intelligent automation and connected business systems — plus the human operational support that keeps them accountable.",
+  path: "/",
+  keywords: [
+    "AI automation",
+    "AI assistants for business",
+    "business process automation",
+    "custom business systems",
+    "AI integration partner",
+  ],
+})
+
+const LEAD_WORKFLOW: WorkflowStep[] = [
+  { icon: "Inbox", label: "New lead", detail: "Form, inbox or WhatsApp" },
+  { icon: "ScanSearch", label: "AI qualifies", detail: "Scored against your criteria" },
+  { icon: "Database", label: "CRM updated", detail: "Record created and enriched" },
+  { icon: "PenLine", label: "Email drafted", detail: "Personalised, ready to review", human: true },
+  { icon: "CalendarCheck", label: "Follow-up set", detail: "Scheduled automatically" },
+  { icon: "Bell", label: "Team notified", detail: "With the full context attached" },
+]
+
+const HUMAN_WORK = [
+  { icon: Scale, title: "Judgement", body: "Deciding what to do when the situation was not in the script." },
+  { icon: MessagesSquare, title: "Relationships", body: "The conversations that keep a client or supplier on side." },
+  { icon: ShieldAlert, title: "Exception handling", body: "Catching the case the workflow was never designed for." },
+  { icon: Handshake, title: "Accountability", body: "Someone whose name is on the outcome, not just the task." },
+]
+
+const AI_WORK = [
+  "High-volume, repetitive tasks",
+  "Structured data entry and updates",
+  "Drafting from a known pattern",
+  "Routing, tagging and classification",
+  "Monitoring and reminders",
+  "Round-the-clock coverage",
+]
 
 export default function HomePage() {
-  const { openFullPopup } = useBookingNudge()
-
   return (
     <>
-      {/* ── HERO ─────────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero-assistant.png"
-            alt="Professional business operations team"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F0E2E]/95 via-[#1A1849]/85 to-[#2D2B7F]/55" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0E2E]/60 via-transparent to-transparent" />
-        </div>
-        <div className="absolute top-20 right-[12%] w-80 h-80 bg-[#4A47C4]/20 rounded-full blur-[110px]" />
-        <div className="absolute bottom-16 left-[8%] w-60 h-60 bg-[#7773E7]/15 rounded-full blur-[90px]" />
+      <JsonLd data={faqSchema(FAQ_FLAT.slice(0, 6))} />
 
-        <div className="container mx-auto px-4 relative z-10 py-24">
-          <div className="max-w-3xl">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md px-5 py-2 text-sm font-medium text-white/90 mb-8 border border-white/15"
-            >
-              <Zap className="w-4 h-4 text-[#9996ED]" />
-              AI-Powered Operations Partner
-            </motion.div>
+      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-ink text-ink-foreground">
+        <div aria-hidden="true" className="absolute inset-0 bg-grid-ink mask-fade" />
+        <div
+          aria-hidden="true"
+          className="absolute -top-40 left-1/2 h-[36rem] w-[52rem] -translate-x-1/2 rounded-full bg-brand/20 blur-[140px]"
+        />
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-5xl md:text-[4.5rem] font-bold tracking-tight text-white mb-6 leading-[1.08]"
-            >
-              Scale Your Business
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9996ED] to-[#C4C2F8]">
-                Without Scaling
-              </span>{" "}
-              Your Workload
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-xl text-white/65 mb-10 max-w-2xl leading-relaxed"
-            >
-              Nolojia provides AI-powered virtual teams and operational support to help businesses
-              run more efficiently, reduce workload, and focus on growth.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 mb-10"
-            >
-              <Button
-                size="lg"
-                onClick={() => openFullPopup()}
-                className="bg-white text-[#2D2B7F] hover:bg-white/90 text-base px-8 py-6 rounded-xl font-semibold shadow-xl shadow-black/20 group"
-              >
-                Book a Free Consultation
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Link href="/services">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-white/50 text-white bg-white/5 hover:bg-white/12 hover:border-white/75 text-base px-8 py-6 rounded-xl w-full sm:w-auto"
-                >
-                  Explore Services
-                </Button>
-              </Link>
-            </motion.div>
-
-            {/* Trust indicators */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
-              className="flex flex-wrap items-center gap-6"
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <span className="text-sm text-white/60 font-medium">4.9 / 5</span>
-              </div>
-              <div className="w-px h-4 bg-white/20" />
-              <span className="text-sm text-white/55 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#9996ED]" />
-                Trusted by growing businesses
-              </span>
-              <div className="w-px h-4 bg-white/20" />
-              <span className="text-sm text-white/55 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#9996ED]" />
-                Global remote support
-              </span>
-            </motion.div>
-          </div>
-
-          {/* Floating stats */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="hidden lg:flex absolute right-8 top-1/2 -translate-y-1/2 flex-col gap-4"
-          >
-            {[
-              { value: "500+", label: "Businesses Supported", icon: Users },
-              { value: "20hrs", label: "Saved Per Week", icon: Clock },
-              { value: "4.9★", label: "Client Satisfaction", icon: Star },
-            ].map(({ value, label, icon: Icon }, i) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.7 + i * 0.15 }}
-                className="glass-dark rounded-xl px-5 py-4 text-white min-w-[190px] hover:bg-white/12 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#4A47C4]/30 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#BBB9F3]" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-lg">{value}</div>
-                    <div className="text-xs text-white/55">{label}</div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── TRUST BAR ────────────────────────────────────────────────────────── */}
-      <section className="border-y bg-white py-7 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <p className="text-center text-xs font-semibold text-muted-foreground mb-5 uppercase tracking-[0.2em]">
-            Companies like yours are scaling with remote teams
-          </p>
-          <div className="relative overflow-hidden">
-            <div className="flex items-center justify-center gap-14 animate-marquee whitespace-nowrap">
-              {[
-                "Startups", "Agencies", "E-commerce Brands", "Consulting Firms",
-                "Tech Companies", "SaaS Founders", "Real Estate Firms", "Law Firms",
-                "Startups", "Agencies", "E-commerce Brands", "Consulting Firms",
-                "Tech Companies", "SaaS Founders", "Real Estate Firms", "Law Firms",
-              ].map((label, i) => (
-                <span key={`${label}-${i}`} className="text-base font-bold text-gray-300 tracking-wide flex-shrink-0 hover:text-[#2D2B7F] transition-colors duration-300">
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PROBLEM SECTION ──────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-16"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              The Challenge
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1}
-              className="text-4xl md:text-5xl font-bold mb-5 text-gray-900 leading-tight">
-              Running a Business Shouldn&apos;t<br className="hidden md:block" /> Feel Overwhelming
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2}
-              className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Many businesses struggle not because of strategy, but because of{" "}
-              <strong className="text-gray-700">operational overload</strong>.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-14"
-          >
-            {[
-              {
-                icon: Layers,
-                title: "Too Many Operational Tasks",
-                desc: "Founders spend 60%+ of their week on admin work instead of strategy and growth.",
-                color: "bg-red-50 border-red-100",
-                iconColor: "bg-red-100 text-red-600",
-              },
-              {
-                icon: Clock,
-                title: "Slow Execution",
-                desc: "Without dedicated support, tasks pile up, deadlines slip, and clients notice.",
-                color: "bg-orange-50 border-orange-100",
-                iconColor: "bg-orange-100 text-orange-600",
-              },
-              {
-                icon: AlertCircle,
-                title: "Overloaded Internal Teams",
-                desc: "Your best people are buried in repetitive work instead of high-impact projects.",
-                color: "bg-amber-50 border-amber-100",
-                iconColor: "bg-amber-100 text-amber-600",
-              },
-              {
-                icon: XCircle,
-                title: "Missed Opportunities",
-                desc: "Lack of bandwidth means deals, partnerships, and growth moments get left behind.",
-                color: "bg-rose-50 border-rose-100",
-                iconColor: "bg-rose-100 text-rose-600",
-              },
-            ].map(({ icon: Icon, title, desc, color, iconColor }, i) => (
-              <motion.div key={title} variants={fadeUp} custom={i}
-                className={`rounded-2xl p-6 border ${color} hover:shadow-md transition-all duration-300`}>
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${iconColor}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2 text-base">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center bg-[#0F0E2E] rounded-2xl px-8 py-10 max-w-3xl mx-auto"
-          >
-            <p className="text-white/80 text-lg leading-relaxed mb-6">
-              The solution isn&apos;t working more hours.{" "}
-              <span className="text-white font-semibold">
-                It&apos;s building a smarter operation.
-              </span>
-            </p>
-            <Button
-              onClick={() => openFullPopup()}
-              className="bg-white text-[#2D2B7F] hover:bg-white/90 font-semibold px-7 py-3 rounded-xl group"
-            >
-              See How We Help
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── SOLUTION SECTION ─────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="grid lg:grid-cols-2 gap-16 items-center mb-16"
-          >
+        <Container size="wide" className="relative py-16 sm:py-20 lg:py-24">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
             <div>
-              <motion.span variants={fadeUp} custom={0}
-                className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-                The Solution
-              </motion.span>
-              <motion.h2 variants={fadeUp} custom={1}
-                className="text-4xl md:text-5xl font-bold mb-5 text-gray-900 leading-tight">
-                A Smarter Way to<br />Run Your Business
-              </motion.h2>
-              <motion.p variants={fadeUp} custom={2}
-                className="text-lg text-muted-foreground leading-relaxed mb-8">
-                Nolojia combines skilled remote professionals with AI-powered workflows to handle
-                your operations efficiently — so you can focus entirely on growth.
-              </motion.p>
-              <motion.div variants={fadeUp} custom={3} className="space-y-3">
-                {[
-                  "Dedicated professionals matched to your business",
-                  "AI-enhanced workflows for faster, smarter execution",
-                  "Seamless integration into your existing tools",
-                  "Scalable capacity as your business grows",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3 text-sm text-gray-700">
-                    <CheckCircle2 className="w-5 h-5 text-[#2D2B7F] flex-shrink-0" />
-                    {item}
+              <Pill tone="ink">
+                <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
+                AI · Automation · Business systems
+              </Pill>
+
+              <h1 className="mt-6 text-display-lg font-semibold text-white">
+                AI that works for your business.
+              </h1>
+
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/65">
+                Nolojia builds AI assistants and intelligent digital systems that automate the work
+                behind your business.
+              </p>
+
+              <p className="mt-5 text-sm font-medium text-white/45">
+                AI Assistants · Automation · Business Systems · Human Support
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <CtaLink href={CTA.primary.href} size="lg" onInk>
+                  {CTA.primary.label}
+                </CtaLink>
+                <CtaLink href="/solutions" variant="secondary" size="lg" onInk>
+                  Explore Solutions
+                </CtaLink>
+              </div>
+
+              <dl className="mt-12 grid max-w-lg grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-8 sm:grid-cols-4">
+                {PILLAR_DETAILS.map((pillar) => (
+                  <div key={pillar.slug}>
+                    <dt className="text-[0.8125rem] font-semibold text-white">{pillar.title}</dt>
+                    <dd className="mt-1 text-xs leading-snug text-white/45">{pillar.tagline}</dd>
                   </div>
                 ))}
-              </motion.div>
+              </dl>
             </div>
-            <motion.div variants={fadeUp} custom={2} className="relative">
-              <div className="rounded-2xl overflow-hidden shadow-2xl shadow-[#2D2B7F]/10">
-                <Image
-                  src="/images/team-collaboration.png"
-                  alt="Nolojia remote team in action"
-                  width={600}
-                  height={440}
-                  className="w-full h-auto object-cover"
+
+            <div className="lg:pl-4">
+              <AssistantConsole />
+              <p className="mt-4 text-center text-xs text-white/35">
+                One request in. Six actions out — with a person reviewing anything that commits you.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <CapabilityStrip />
+
+      {/* ══ AI WORKFORCE ══════════════════════════════════════════════════ */}
+      <Section id="ai-workforce">
+        <Container>
+          <SectionHeading
+            eyebrow="AI employees"
+            title="Meet your AI workforce."
+            description="Give your business intelligent assistants that handle repetitive work, coordinate tasks and help your team move faster."
+          />
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-2">
+            {AI_EMPLOYEES.map((employee, i) => (
+              <Reveal key={employee.id} delay={i * 0.06}>
+                <AIEmployeeCard
+                  employee={employee}
+                  href={`/solutions/ai-employees#${employee.id}`}
+                  className="h-full"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#2D2B7F]/20 to-transparent rounded-2xl" />
+              </Reveal>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <CtaLink href="/solutions/ai-employees" variant="quiet">
+              See how AI employees are deployed
+            </CtaLink>
+          </div>
+        </Container>
+      </Section>
+
+      {/* ══ AUTOMATION ════════════════════════════════════════════════════ */}
+      <Section tone="ink" className="overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 bg-grid-ink opacity-60 mask-fade" />
+        <Container className="relative">
+          <SectionHeading
+            onInk
+            eyebrow="AI automation"
+            title="Turn repetitive work into automated workflows."
+            description="Nolojia connects the tools your business already uses and turns repeatable processes into workflows that run on their own — with a person signing off wherever it matters."
+          />
+
+          <div className="mt-12">
+            <WorkflowDiagram steps={LEAD_WORKFLOW} onInk />
+          </div>
+
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <CtaLink href="/solutions/automation" onInk>
+              Automate a Workflow
+            </CtaLink>
+            <p className="text-sm text-white/45">
+              The same pattern applies to onboarding, invoicing, reporting and support triage.
+            </p>
+          </div>
+        </Container>
+      </Section>
+
+      {/* ══ BUSINESS SYSTEMS ══════════════════════════════════════════════ */}
+      <Section>
+        <Container>
+          <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+            <div>
+              <SectionHeading
+                eyebrow="Business systems"
+                title="Connect your people, tools and data."
+                description="Most businesses do not have a software problem. They have a joins problem — the CRM does not talk to the inbox, the spreadsheet does not talk to the database, and someone re-types the same information four times a week."
+              />
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+                Nolojia builds the layer that sits across the stack: shared data, connected tools and
+                reporting your team will actually open — rather than another isolated automation
+                nobody maintains.
+              </p>
+              <div className="mt-8">
+                <CtaLink href="/solutions/business-systems" variant="secondary">
+                  Explore business systems
+                </CtaLink>
               </div>
-              <div className="absolute -bottom-5 -left-5 glass rounded-xl p-4 shadow-xl">
+            </div>
+
+            <SystemDiagram />
+          </div>
+        </Container>
+      </Section>
+
+      {/* ══ HUMAN + AI ════════════════════════════════════════════════════ */}
+      <Section tone="surface">
+        <Container>
+          <SectionHeading
+            eyebrow="Human + AI"
+            title="AI handles the work. Humans handle what matters."
+            description="This is not a choice between people and software. The businesses that get the most out of AI are the ones that put people where people are genuinely better."
+          />
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-2">
+            <Reveal>
+              <div className="h-full rounded-2xl border border-border bg-card p-7">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-gray-900">20+ Hours</p>
-                    <p className="text-xs text-muted-foreground">Reclaimed per week</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* 6 Categories */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
-          >
-            {[
-              { icon: Users, label: "Virtual Assistants", desc: "Executive support, admin, scheduling, and inbox management." },
-              { icon: Headphones, label: "Customer Support Teams", desc: "Responsive, professional support across channels 24/7." },
-              { icon: Palette, label: "Design & Creative Services", desc: "Graphics, branding, video, and social media visuals." },
-              { icon: TrendingUp, label: "Marketing & Growth Support", desc: "Content, SEO, lead generation, and social media growth." },
-              { icon: Code2, label: "Web & Product Development", desc: "Websites, apps, automations, and digital infrastructure." },
-              { icon: DollarSign, label: "Financial & Data Support", desc: "Bookkeeping, reporting, analysis, and financial admin." },
-            ].map(({ icon: Icon, label, desc }, i) => (
-              <motion.div key={label} variants={fadeUp} custom={i}
-                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#2D2B7F]/25 hover:shadow-lg hover:shadow-[#2D2B7F]/5 transition-all duration-400">
-                <div className="w-12 h-12 bg-[#2D2B7F]/8 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#2D2B7F] transition-all duration-300">
-                  <Icon className="w-6 h-6 text-[#2D2B7F] group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{label}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-16"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              Our Process
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
-              How It Works
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              From first conversation to fully running — four steps is all it takes.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-4 gap-5"
-          >
-            {[
-              { step: "01", icon: Target, title: "Choose Your Service", desc: "Select a service or plan that fits your business needs and goals." },
-              { step: "02", icon: Briefcase, title: "Submit Your Tasks", desc: "Delegate work through your preferred tools — Slack, Notion, email, or our portal." },
-              { step: "03", icon: Zap, title: "We Execute", desc: "Your dedicated team handles execution with speed, accuracy, and care." },
-              { step: "04", icon: BarChart3, title: "Review & Scale", desc: "Review results, refine workflows, and scale your support as you grow." },
-            ].map(({ step, icon: Icon, title, desc }, i) => (
-              <motion.div key={step} variants={fadeUp} custom={i} className="relative group">
-                <div className="bg-gray-50 rounded-2xl p-6 h-full border border-gray-100 hover:border-[#2D2B7F]/30 hover:shadow-lg hover:shadow-[#2D2B7F]/5 transition-all duration-400">
-                  <div className="text-[#2D2B7F] font-bold text-xs tracking-widest mb-4">{step}</div>
-                  <div className="w-11 h-11 bg-[#2D2B7F]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#2D2B7F] transition-all duration-300">
-                    <Icon className="w-5 h-5 text-[#2D2B7F] group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="font-semibold text-base mb-2 text-gray-900">{title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
-                </div>
-                {i < 3 && (
-                  <ChevronRight className="hidden md:block absolute top-1/2 -right-3 w-5 h-5 text-gray-300 -translate-y-1/2 z-10" />
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <Button
-              onClick={() => openFullPopup()}
-              className="bg-[#2D2B7F] hover:bg-[#232161] text-white font-semibold px-8 py-3 rounded-xl group shadow-lg shadow-[#2D2B7F]/20"
-            >
-              Start Today — Book a Free Call
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── VALUE PROPOSITION ────────────────────────────────────────────────── */}
-      <section className="py-24 bg-[#0F0E2E] text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#4A47C4]/10 rounded-full blur-[130px]" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#7773E7]/10 rounded-full blur-[100px]" />
-
-        <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-16"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#9996ED] mb-4">
-              Why Nolojia
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-bold mb-4">
-              Why CEOs Choose Nolojia
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-white/55 text-lg max-w-2xl mx-auto">
-              We&apos;re not a staffing platform. We&apos;re your operations partner.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16"
-          >
-            {[
-              { icon: Layers, title: "Reduce Operational Workload", desc: "Delegate repetitive tasks and free up 20+ hours per week for what actually drives your business forward." },
-              { icon: Zap, title: "AI-Supported Workflows", desc: "Every specialist is equipped with AI tools that deliver results faster, smarter, and with greater accuracy." },
-              { icon: Globe, title: "Global Skilled Professionals", desc: "Access a vetted network of top-tier remote talent across operations, creative, tech, and finance." },
-              { icon: TrendingUp, title: "Scale Without Hiring", desc: "Add capacity when you need it without the overhead, HR headaches, or long onboarding cycles of full-time hires." },
-              { icon: Target, title: "Focus on Strategy & Growth", desc: "When operations run themselves, you can lead, sell, and build rather than manage day-to-day execution." },
-              { icon: Award, title: "Proven, Reliable Delivery", desc: "Consistent quality, clear accountability, and a team that treats your business as their own." },
-            ].map(({ icon: Icon, title, desc }, i) => (
-              <motion.div key={title} variants={fadeUp} custom={i}
-                className="group bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-[#4A47C4]/50 hover:bg-white/8 transition-all duration-400">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#4A47C4]/30 to-[#7773E7]/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Icon className="w-6 h-6 text-[#BBB9F3]" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Stats strip */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={stagger}
-            className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/10"
-          >
-            {[
-              { value: "500+", label: "Businesses Supported" },
-              { value: "20hrs", label: "Saved Per Week" },
-              { value: "4.9 / 5", label: "Client Satisfaction" },
-              { value: "<7 days", label: "Time to Onboard" },
-            ].map(({ value, label }, i) => (
-              <motion.div key={label} variants={fadeUp} custom={i}
-                className="bg-white/5 px-8 py-7 text-center hover:bg-white/8 transition-colors">
-                <div className="text-3xl font-bold text-white mb-1">{value}</div>
-                <div className="text-sm text-white/45">{label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── SERVICES SNAPSHOT ────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-14"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              Our Services
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
-              Everything Your Business Needs
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              One partner. Every function. Fully handled.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12"
-          >
-            {[
-              {
-                icon: Users,
-                title: "Virtual Assistant Services",
-                items: ["Executive support", "Inbox & calendar management", "Research & data entry"],
-                href: "/services#virtual-ops",
-                gradient: "from-blue-500/10 to-indigo-500/10",
-              },
-              {
-                icon: Headphones,
-                title: "Customer Support",
-                items: ["Multi-channel support", "Ticket management", "Client onboarding"],
-                href: "/services#virtual-ops",
-                gradient: "from-violet-500/10 to-purple-500/10",
-              },
-              {
-                icon: TrendingUp,
-                title: "Digital Marketing",
-                items: ["SEO & content", "Social media growth", "Lead generation"],
-                href: "/services#marketing",
-                gradient: "from-emerald-500/10 to-teal-500/10",
-              },
-              {
-                icon: Palette,
-                title: "Graphic Design",
-                items: ["Brand identity", "Social media visuals", "Presentations & decks"],
-                href: "/services#creative",
-                gradient: "from-pink-500/10 to-rose-500/10",
-              },
-              {
-                icon: Code2,
-                title: "Web Development",
-                items: ["Website design & build", "E-commerce stores", "Automations & integrations"],
-                href: "/services#web-dev",
-                gradient: "from-amber-500/10 to-orange-500/10",
-              },
-              {
-                icon: DollarSign,
-                title: "Financial Analysis",
-                items: ["Bookkeeping support", "Financial reporting", "Budget tracking"],
-                href: "/services#financial",
-                gradient: "from-sky-500/10 to-cyan-500/10",
-              },
-            ].map(({ icon: Icon, title, items, href, gradient }, i) => (
-              <motion.div key={title} variants={fadeUp} custom={i}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl hover:shadow-[#2D2B7F]/5 hover:-translate-y-1 transition-all duration-400">
-                <div className={`bg-gradient-to-br ${gradient} p-6`}>
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6 text-[#2D2B7F]" />
-                  </div>
-                  <h3 className="font-bold text-base text-gray-900">{title}</h3>
-                </div>
-                <div className="p-6">
-                  <ul className="space-y-2.5 mb-5">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#2D2B7F] flex-shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={href}
-                    className="inline-flex items-center gap-1 text-sm font-semibold text-[#2D2B7F] hover:gap-2 transition-all">
-                    Learn more <ChevronRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <Link href="/services">
-              <Button variant="outline" size="lg"
-                className="rounded-xl border-2 border-[#2D2B7F]/40 text-[#2D2B7F] font-semibold hover:bg-[#2D2B7F]/5 hover:border-[#2D2B7F]/70">
-                View All Services
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── SOCIAL PROOF ─────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-16"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              Client Results
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
-              What Our Clients Say
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Real results from real business owners.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {[
-              {
-                quote: "My inbox went from a source of anxiety to completely under control. I actually look forward to Monday mornings now. The ROI is undeniable.",
-                author: "Sarah K.",
-                role: "Founder, E-commerce Brand",
-                result: "20hrs saved weekly",
-              },
-              {
-                quote: "I was skeptical about delegating, but within two weeks my assistant knew my business better than some full-time employees. Remarkable quality.",
-                author: "James O.",
-                role: "CEO, Consulting Firm",
-                result: "40% cost reduction",
-              },
-              {
-                quote: "The AI-assisted workflows save us hours every single day. It's like having a complete ops team at a fraction of the cost of one hire.",
-                author: "Priya M.",
-                role: "Co-founder, SaaS Startup",
-                result: "3x faster execution",
-              },
-            ].map(({ quote, author, role, result }, i) => (
-              <motion.div key={author} variants={fadeUp} custom={i}
-                className="group bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-[#2D2B7F]/20 hover:shadow-lg hover:shadow-[#2D2B7F]/5 transition-all duration-400 flex flex-col">
-                <div className="flex justify-between items-start mb-5">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
-                    {result}
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand">
+                    <BrainCircuit aria-hidden="true" className="h-5 w-5" />
                   </span>
+                  <h3 className="text-lg font-semibold text-foreground">What AI carries</h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed flex-1 mb-6 text-sm">&ldquo;{quote}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2D2B7F] to-[#4A47C4] flex items-center justify-center text-white font-bold text-sm">
-                    {author.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-gray-900">{author}</p>
-                    <p className="text-xs text-muted-foreground">{role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── PRICING / MODEL ──────────────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="text-center mb-14"
-          >
-            <motion.span variants={fadeUp} custom={0}
-              className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-4">
-              Pricing
-            </motion.span>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-bold mb-4">
-              Flexible Plans for Growing Businesses
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Monthly subscriptions, scalable support, and dedicated teams — no long-term contracts.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            variants={stagger}
-            className="grid md:grid-cols-3 gap-6 mb-10"
-          >
-            {[
-              {
-                tier: "Starter",
-                tagline: "For solopreneurs & small teams",
-                features: [
-                  "1 dedicated specialist",
-                  "Core admin & operations",
-                  "Up to 40 tasks/month",
-                  "Email & chat support",
-                  "Weekly progress report",
-                ],
-                cta: "Book a Consultation",
-                highlight: false,
-              },
-              {
-                tier: "Growth",
-                tagline: "For scaling businesses",
-                features: [
-                  "2–3 dedicated specialists",
-                  "Multi-service support",
-                  "Unlimited task requests",
-                  "Priority support & Slack",
-                  "Dedicated account manager",
-                  "Bi-weekly strategy call",
-                ],
-                cta: "Book a Consultation",
-                highlight: true,
-                badge: "Most Popular",
-              },
-              {
-                tier: "Pro",
-                tagline: "For high-growth operations",
-                features: [
-                  "Full operations team",
-                  "All services included",
-                  "Unlimited tasks & capacity",
-                  "24/7 priority support",
-                  "AI workflow buildout",
-                  "Monthly executive review",
-                ],
-                cta: "Book a Consultation",
-                highlight: false,
-              },
-            ].map(({ tier, tagline, features, cta, highlight, badge }) => (
-              <motion.div
-                key={tier}
-                variants={fadeUp}
-                custom={0}
-                className={`relative rounded-2xl overflow-hidden border transition-all duration-400 ${
-                  highlight
-                    ? "bg-[#2D2B7F] border-[#4A47C4] shadow-2xl shadow-[#2D2B7F]/30 scale-[1.02]"
-                    : "bg-white border-gray-100 hover:shadow-xl hover:shadow-[#2D2B7F]/5"
-                }`}
-              >
-                {badge && (
-                  <div className="absolute top-4 right-4 text-xs font-bold px-2.5 py-1 bg-white/20 text-white rounded-full border border-white/30">
-                    {badge}
-                  </div>
-                )}
-                <div className="p-7">
-                  <h3 className={`text-xl font-bold mb-1 ${highlight ? "text-white" : "text-gray-900"}`}>{tier}</h3>
-                  <p className={`text-sm mb-7 ${highlight ? "text-white/60" : "text-muted-foreground"}`}>{tagline}</p>
-                  <ul className="space-y-3 mb-8">
-                    {features.map((f) => (
-                      <li key={f} className={`flex items-center gap-2.5 text-sm ${highlight ? "text-white/80" : "text-gray-600"}`}>
-                        <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${highlight ? "text-white/70" : "text-[#2D2B7F]"}`} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    onClick={() => openFullPopup()}
-                    className={`w-full font-semibold py-3 rounded-xl ${
-                      highlight
-                        ? "bg-white text-[#2D2B7F] hover:bg-white/90 shadow-lg"
-                        : "bg-[#2D2B7F] text-white hover:bg-[#232161] shadow-md shadow-[#2D2B7F]/20"
-                    }`}
-                  >
-                    {cta}
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center text-sm text-muted-foreground"
-          >
-            All plans are monthly. Cancel or adjust anytime. Custom enterprise plans available.{" "}
-            <button onClick={() => openFullPopup()} className="text-[#2D2B7F] font-semibold hover:underline">
-              Book a consultation for custom pricing →
-            </button>
-          </motion.p>
-        </div>
-      </section>
-
-      {/* ── FOUNDER SECTION ──────────────────────────────────────────────────── */}
-      <section className="py-20 bg-white relative overflow-hidden">
-        <div className="absolute top-10 left-[10%] w-64 h-64 bg-[#4A47C4]/5 rounded-full blur-[100px]" />
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto"
-          >
-            <div className="flex flex-col md:flex-row items-center gap-10 bg-gray-50 rounded-3xl p-8 md:p-10 border border-gray-100 shadow-xl shadow-[#2D2B7F]/5">
-              <div className="relative flex-shrink-0">
-                <div className="w-44 h-44 md:w-52 md:h-52 rounded-2xl overflow-hidden shadow-lg relative">
-                  <Image
-                    src="/images/founder-shaun.jpg"
-                    alt="Shaun Daniel Machua — Founder & CEO, Nolojia"
-                    fill
-                    className="object-cover object-top"
-                  />
-                </div>
-                <div className="absolute -bottom-3 -right-3 w-20 h-20 bg-gradient-to-br from-[#4A47C4]/20 to-[#7773E7]/10 rounded-xl -z-10" />
+                <ul className="mt-6 space-y-2.5">
+                  {AI_WORK.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2.5 text-[0.9375rem] text-foreground/85"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="text-center md:text-left flex-1">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2D2B7F] mb-3">Our Founder</p>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">Shaun Daniel Machua</h3>
-                <p className="text-[#2D2B7F] font-semibold text-sm mb-4">Founder &amp; CEO</p>
-                <p className="text-muted-foreground leading-relaxed mb-6 text-sm">
-                  Shaun founded Nolojia with a clear mission: help entrepreneurs and growing
-                  businesses achieve more by offloading operations to expert professionals and
-                  AI-powered workflows — so they can focus entirely on what matters.
-                </p>
+            </Reveal>
+
+            <Reveal delay={0.08}>
+              <div className="h-full rounded-2xl border border-border bg-card p-7">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-surface-2 text-foreground">
+                    <UserRoundCheck aria-hidden="true" className="h-5 w-5" />
+                  </span>
+                  <h3 className="text-lg font-semibold text-foreground">What people carry</h3>
+                </div>
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {HUMAN_WORK.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <li key={item.title}>
+                        <div className="flex items-center gap-2">
+                          <Icon aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
+                          <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                        </div>
+                        <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-muted-foreground">
+                          {item.body}
+                        </p>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            </Reveal>
+          </div>
+
+          <div className="mt-10 rounded-2xl border border-brand/20 bg-brand-soft p-6 sm:p-7">
+            <p className="text-base font-medium text-brand-strong sm:text-lg">
+              AI + humans, not AI instead of humans. Our operators run on the same systems we build
+              for you, so nothing falls between the two.
+            </p>
+            <div className="mt-5">
+              <CtaLink href="/solutions/human-ai" variant="quiet">
+                How Human + AI support works
+              </CtaLink>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      <SolutionCategoriesSection />
+
+      {/* ══ PRODUCTS ══════════════════════════════════════════════════════ */}
+      <Section>
+        <Container>
+          <SectionHeading
+            eyebrow="Products"
+            title="Technology built by Nolojia."
+            description="We do not only implement technology for other businesses. We build products that solve operational problems of our own."
+          />
+
+          <div className="mt-12 space-y-6">
+            {PRODUCTS.map((product, i) => (
+              <Reveal key={product.slug} delay={i * 0.06}>
+                <ProductCard product={product} />
+              </Reveal>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <CtaLink href="/products" variant="quiet">
+              See all Nolojia products
+            </CtaLink>
+          </div>
+        </Container>
+      </Section>
+
+      <ProcessSection tone="surface" />
+
+      <IntegrationsSection />
+
+      {/* ══ CLIENT STORIES ════════════════════════════════════════════════ */}
+      <Section tone="surface">
+        <Container>
+          <SectionHeading
+            eyebrow="Client stories"
+            title="Real problems. Real systems. Better operations."
+            description="These are our clients' own words about their engagements. Time saved is what they reported to us — we do not publish numbers we have not verified with them."
+          />
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {CLIENT_STORIES.slice(0, 3).map((story, i) => (
+              <Reveal key={story.company} delay={i * 0.06}>
+                <figure className="flex h-full flex-col rounded-2xl border border-border bg-card p-6">
+                  <blockquote className="flex-1">
+                    <p className="text-[0.9375rem] font-semibold text-foreground">
+                      {story.headline}
+                    </p>
+                    <p className="mt-3 text-[0.875rem] leading-relaxed text-muted-foreground">
+                      &ldquo;{story.quote}&rdquo;
+                    </p>
+                  </blockquote>
+                  <figcaption className="mt-6 border-t border-border pt-4">
+                    <p className="text-sm font-medium text-foreground">{story.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {story.role}, {story.company}
+                    </p>
+                    <Pill className="mt-3">Client-reported: {story.timeSaved} saved</Pill>
+                  </figcaption>
+                </figure>
+              </Reveal>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <CtaLink href="/case-studies" variant="quiet">
+              Read all client stories
+            </CtaLink>
+          </div>
+        </Container>
+      </Section>
+
+      <SecuritySection />
+
+      {/* ══ ABOUT ═════════════════════════════════════════════════════════ */}
+      <Section>
+        <Container>
+          <div className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-20">
+            <div>
+              <SectionHeading
+                eyebrow="About Nolojia"
+                title="We're building the operating system for modern business."
+                description="Businesses are not short of software. They are overwhelmed by repetitive tasks, disconnected tools, scattered information and operational complexity that grows faster than headcount."
+              />
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
+                Nolojia exists to make businesses more intelligent by connecting four things that
+                usually sit apart: people, AI, automation and systems. That is the whole company.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <CtaLink href="/about" variant="secondary">
+                  About Nolojia
+                </CtaLink>
+                <CtaLink href="/careers" variant="quiet">
+                  Open roles
+                </CtaLink>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-surface p-7">
+              <Eyebrow className="mb-4">The ecosystem</Eyebrow>
+              <ul className="space-y-3">
+                {PILLAR_DETAILS.map((pillar) => (
+                  <li key={pillar.slug}>
+                    <Link
+                      href={pillar.href}
+                      className="group flex items-center justify-between gap-4 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-brand/25"
+                    >
+                      <span className="text-sm font-medium text-foreground">{pillar.title}</span>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+                Founded by{" "}
                 <a
-                  href="https://www.linkedin.com/in/shaun-daniel-machua-44a528216"
+                  href={FOUNDER.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#0A66C2] text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#004182] transition-all duration-300 hover:shadow-lg hover:shadow-[#0A66C2]/25 group"
+                  className="font-medium text-foreground underline-offset-4 hover:underline"
                 >
-                  <Linkedin className="w-4 h-4" />
-                  Connect on LinkedIn
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  {FOUNDER.name}
                 </a>
-              </div>
+                .
+              </p>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </Container>
+      </Section>
 
-      {/* ── FINAL CTA ────────────────────────────────────────────────────────── */}
-      <section className="relative py-28 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/images/workspace-overhead.png" alt="" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F0E2E]/97 to-[#2D2B7F]/92" />
-        </div>
-        <div className="absolute top-12 right-[18%] w-52 h-52 bg-[#7773E7]/20 rounded-full blur-[90px]" />
-        <div className="absolute bottom-12 left-[12%] w-40 h-40 bg-[#4A47C4]/20 rounded-full blur-[70px]" />
+      {/* ══ FAQ ═══════════════════════════════════════════════════════════ */}
+      <Section tone="surface">
+        <Container size="narrow">
+          <SectionHeading
+            align="center"
+            eyebrow="FAQ"
+            title="Straight answers."
+            description="The questions we get asked before every engagement."
+          />
+          <Faq items={FAQ_FLAT.slice(0, 6)} className="mt-10" idPrefix="home-faq" />
+          <div className="mt-8 text-center">
+            <CtaLink href="/faq" variant="quiet">
+              Read the full FAQ
+            </CtaLink>
+          </div>
+        </Container>
+      </Section>
 
-        <div className="container mx-auto px-4 text-center relative z-10 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#9996ED] mb-5">
-              Get Started Today
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-5 leading-tight">
-              Focus on Growth.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9996ED] to-[#C4C2F8]">
-                We Handle
-              </span>{" "}
-              the Operations.
-            </h2>
-            <p className="text-white/60 text-lg mb-10 leading-relaxed">
-              Let Nolojia support your business with the systems, people, and tools needed
-              to scale efficiently — without adding overhead or losing control.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                onClick={() => openFullPopup()}
-                className="bg-white text-[#2D2B7F] hover:bg-white/90 text-base px-10 py-6 rounded-xl font-semibold shadow-xl shadow-black/20 group"
-              >
-                <CalendarDays className="w-5 h-5 mr-2" />
-                Book a Free Consultation
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Link href="/contact">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-white/50 text-white bg-white/5 hover:bg-white/12 hover:border-white/75 text-base px-8 py-6 rounded-xl w-full sm:w-auto"
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Contact Us
-                </Button>
-              </Link>
-            </div>
-            <p className="mt-7 text-sm text-white/35">
-              No commitments · Start in under a week · Spots are limited
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <CtaSection />
     </>
   )
 }
