@@ -7,6 +7,7 @@ import { ArrowLeft, Clock } from "lucide-react"
 import { getPostBySlug, getRelatedPosts, getAllPublishedSlugs } from "@/lib/blog"
 import { blogPostSchema, breadcrumbSchema } from "@/lib/seo/structured-data"
 import { SITE_URL } from "@/lib/seo/config"
+import { pageMetadata } from "@/lib/seo/metadata"
 import JsonLd from "@/components/seo/JsonLd"
 
 import { Container, Pill, Section } from "@/components/site/primitives"
@@ -35,22 +36,17 @@ export async function generateMetadata({
   const description = post.meta_description ?? post.excerpt
   const image = post.cover_image ?? `${SITE_URL}/opengraph-image`
 
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
-    openGraph: {
-      title,
-      description,
-      url: `${SITE_URL}/blog/${post.slug}`,
-      type: "article",
+    path: `/blog/${post.slug}`,
+    image: { url: image },
+    article: {
       publishedTime: post.published_at,
       modifiedTime: post.updated_at,
       authors: [post.author_name],
-      images: [{ url: image, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
-  }
+  })
 }
 
 export default async function BlogPostPage({

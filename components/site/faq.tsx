@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { Minus, Plus } from "lucide-react"
 import type { FaqItem } from "@/lib/content/faq"
 import { cn } from "@/lib/utils/cn"
@@ -51,24 +51,27 @@ export function Faq({
                 </span>
               </button>
             </h3>
-            <AnimatePresence initial={false}>
-              {isOpen ? (
-                <motion.div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  initial={reduce ? false : { height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={reduce ? undefined : { height: 0, opacity: 0 }}
-                  transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <p className="max-w-3xl pb-6 pr-10 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                    {item.answer}
-                  </p>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+            {/*
+              Always mounted, collapsed with height rather than unmounted.
+              These answers are the whole point of the page for an answer
+              engine, and FAQPage schema may only describe content that is
+              actually on the page — mounting them on click meant the markup
+              promised answers the HTML did not contain.
+            */}
+            <motion.div
+              id={panelId}
+              role="region"
+              aria-labelledby={buttonId}
+              aria-hidden={!isOpen}
+              initial={false}
+              animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <p className="max-w-3xl pb-6 pr-10 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {item.answer}
+              </p>
+            </motion.div>
           </div>
         )
       })}

@@ -11,7 +11,9 @@
     "db:migrate": "wrangler d1 migrations apply nolojia --remote",
     "db:studio": "wrangler d1 execute nolojia --local --command",
     "db:seed:local": "wrangler d1 execute nolojia --local --file=scripts/seed-dev.sql",
-    "db:reset:local": "wrangler d1 migrations apply nolojia --local && wrangler d1 execute nolojia --local --file=scripts/seed-dev.sql"
+    "db:reset:local": "wrangler d1 migrations apply nolojia --local && wrangler d1 execute nolojia --local --file=scripts/seed-dev.sql",
+    "seo:audit": "node scripts/seo-audit.mjs",
+    "seo:aeo": "node scripts/aeo-check.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

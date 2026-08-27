@@ -7,6 +7,12 @@ import { WorkflowDiagram, type WorkflowStep } from "@/components/site/workflow-d
 import { CtaSection, IntegrationsSection, PageHero } from "@/components/site/sections"
 import { ProcessSection } from "@/components/site/process"
 import JsonLd from "@/components/seo/JsonLd"
+import {
+  AnswerFaq,
+  AnswerQuestions,
+  AnswerSummary,
+} from "@/components/site/answers-section"
+import { AUTOMATION_ANSWERS } from "@/lib/content/definitions"
 
 import { CTA } from "@/lib/content/site"
 import { pageMetadata } from "@/lib/seo/metadata"
@@ -140,6 +146,9 @@ export default function AutomationPage() {
         </div>
       </PageHero>
 
+      <AnswerSummary answers={AUTOMATION_ANSWERS} />
+      <AnswerQuestions answers={AUTOMATION_ANSWERS} />
+
       {/* Anatomy */}
       <Section>
         <Container>
@@ -234,6 +243,8 @@ export default function AutomationPage() {
       <IntegrationsSection onInk />
 
       <ProcessSection tone="surface" />
+
+      <AnswerFaq answers={AUTOMATION_ANSWERS} idPrefix="automation-faq" />
 
       <CtaSection
         eyebrow="AI automation"

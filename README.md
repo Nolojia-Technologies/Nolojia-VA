@@ -67,6 +67,7 @@ lib/
   seo/                     metadata, sitemap and schema config
 migrations/                D1 schema (0001_initial.sql)
 docs/cloudflare-setup.md   the runbook
+docs/seo-map.md            search intent → page, and the SEO guardrails
 docs/archive/              pre-migration planning docs; nothing there is current
 ```
 
@@ -81,6 +82,8 @@ npm run db:migrate       # apply D1 migrations to production
 npm run db:seed:local    # load sample data into the local copy
 npm run db:reset:local   # migrate + seed in one step
 npm run db:studio "SQL"  # run one statement against the local D1 copy
+npm run seo:audit <url>  # titles, canonicals, schema, links, orphans
+npm run seo:aeo <url>    # every key question answered in server HTML
 ```
 
 ## Deployment — one decision still open

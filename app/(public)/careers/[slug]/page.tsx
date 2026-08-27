@@ -3,7 +3,8 @@ import type { Metadata } from "next"
 import { Check, Clock, Gift, MapPin } from "lucide-react"
 
 import { getJobBySlug, getStaticJobSlugs } from "@/lib/careers/jobs"
-import { OG_IMAGE, SITE_URL } from "@/lib/seo/config"
+import { SITE_URL } from "@/lib/seo/config"
+import { pageMetadata } from "@/lib/seo/metadata"
 import { breadcrumbSchema } from "@/lib/seo/structured-data"
 import JsonLd from "@/components/seo/JsonLd"
 import ApplicationForm from "./ApplicationForm"
@@ -23,24 +24,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const job = getJobBySlug(params.slug)
   if (!job) return { title: "Job not found" }
 
-  return {
+  return pageMetadata({
     title: `${job.title} — Careers`,
     description: job.shortDescription,
-    openGraph: {
-      title: `${job.title} — ${job.department} | Nolojia Careers`,
-      description: job.shortDescription,
-      url: `${SITE_URL}/careers/${job.slug}`,
-      type: "website",
-      images: [OG_IMAGE],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${job.title} — ${job.department} | Nolojia Careers`,
-      description: job.shortDescription,
-      images: [OG_IMAGE.url],
-    },
-    alternates: { canonical: `${SITE_URL}/careers/${job.slug}` },
-  }
+    path: `/careers/${job.slug}`,
+  })
 }
 
 export default function JobDetailPage({ params }: Props) {

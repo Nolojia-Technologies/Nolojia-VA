@@ -15,6 +15,12 @@ import { SystemDiagram } from "@/components/site/system-diagram"
 import { CtaSection, IntegrationsSection, PageHero, SecuritySection } from "@/components/site/sections"
 import { ProcessSection } from "@/components/site/process"
 import JsonLd from "@/components/seo/JsonLd"
+import {
+  AnswerFaq,
+  AnswerQuestions,
+  AnswerSummary,
+} from "@/components/site/answers-section"
+import { BUSINESS_SYSTEMS_ANSWERS } from "@/lib/content/definitions"
 
 import { CTA } from "@/lib/content/site"
 import { pageMetadata } from "@/lib/seo/metadata"
@@ -103,6 +109,9 @@ export default function BusinessSystemsPage() {
         </div>
       </PageHero>
 
+      <AnswerSummary answers={BUSINESS_SYSTEMS_ANSWERS} />
+      <AnswerQuestions answers={BUSINESS_SYSTEMS_ANSWERS} />
+
       <Section>
         <Container>
           <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
@@ -176,6 +185,8 @@ export default function BusinessSystemsPage() {
       <ProcessSection tone="surface" />
 
       <SecuritySection />
+
+      <AnswerFaq answers={BUSINESS_SYSTEMS_ANSWERS} idPrefix="business-systems-faq" />
 
       <CtaSection
         eyebrow="Business systems"

@@ -14,6 +14,12 @@ import { Reveal } from "@/components/site/reveal"
 import { CtaSection, PageHero } from "@/components/site/sections"
 import { ProcessSection } from "@/components/site/process"
 import JsonLd from "@/components/seo/JsonLd"
+import {
+  AnswerFaq,
+  AnswerQuestions,
+  AnswerSummary,
+} from "@/components/site/answers-section"
+import { HUMAN_AI_ANSWERS } from "@/lib/content/definitions"
 
 import { CTA } from "@/lib/content/site"
 import { pageMetadata } from "@/lib/seo/metadata"
@@ -121,6 +127,9 @@ export default function HumanAIPage() {
           </CtaLink>
         </div>
       </PageHero>
+
+      <AnswerSummary answers={HUMAN_AI_ANSWERS} />
+      <AnswerQuestions answers={HUMAN_AI_ANSWERS} />
 
       {/* Split */}
       <Section>
@@ -273,6 +282,8 @@ export default function HumanAIPage() {
       </Section>
 
       <ProcessSection />
+
+      <AnswerFaq answers={HUMAN_AI_ANSWERS} idPrefix="human-ai-faq" />
 
       <CtaSection
         eyebrow="Human + AI"

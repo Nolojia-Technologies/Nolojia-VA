@@ -47,8 +47,19 @@ function RoleCard({ role }: { role: Job }) {
         </button>
       </h3>
 
-      {open ? (
-        <div id={panelId} className="border-t border-border px-6 pb-6 pt-5">
+      {/*
+        Rendered always and hidden with the `hidden` attribute rather than
+        mounted on expand. Everything below — the description, the
+        requirements, and the link to the role's own page — used to exist only
+        after a click, so a crawler saw a careers page with no job content and
+        no links to any job. The six role pages were in the sitemap with zero
+        internal links pointing at them.
+      */}
+      <div
+        id={panelId}
+        hidden={!open}
+        className="border-t border-border px-6 pb-6 pt-5"
+      >
           <p className="text-sm leading-relaxed text-muted-foreground">{role.description}</p>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
@@ -97,7 +108,6 @@ function RoleCard({ role }: { role: Job }) {
             />
           </Link>
         </div>
-      ) : null}
     </div>
   )
 }

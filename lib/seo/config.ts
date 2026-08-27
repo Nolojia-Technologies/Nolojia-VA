@@ -39,7 +39,7 @@ export interface ServicePage {
 export const servicePages: ServicePage[] = [
   {
     slug: "ai-assistant",
-    metaTitle: "AI Assistant for Business | AI-Powered Virtual Assistant – Nolojia",
+    metaTitle: "AI Assistant for Business",
     metaDescription: "Hire a dedicated AI assistant for your business. Nolojia's AI-powered virtual assistants automate operations and manage communications. Book a free call.",
     keywords: ["AI assistant for business", "AI virtual assistant", "AI-powered assistant", "AI business assistant", "artificial intelligence assistant", "hire AI assistant"],
     title: "AI Assistant for Business",
@@ -106,7 +106,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "virtual-assistant",
-    metaTitle: "Hire a Virtual Assistant | Professional VA Services – Nolojia",
+    metaTitle: "Hire a Virtual Assistant",
     metaDescription: "Hire a dedicated virtual assistant from Nolojia. Expert VA services for inbox management, scheduling, research and business operations. No contracts.",
     keywords: ["hire virtual assistant", "virtual assistant services", "professional virtual assistant", "dedicated virtual assistant", "remote virtual assistant", "virtual assistant company"],
     title: "Virtual Assistant Services",
@@ -173,7 +173,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "executive-assistant",
-    metaTitle: "Remote Executive Assistant | Hire Executive Assistant Services – Nolojia",
+    metaTitle: "Remote Executive Assistant",
     metaDescription: "Hire a remote executive assistant. Nolojia's EAs manage your inbox, calendar, travel and operations, so you can lead at your highest level. No contracts.",
     keywords: ["remote executive assistant", "hire executive assistant", "executive assistant services", "virtual executive assistant", "online executive assistant", "C-suite executive assistant"],
     title: "Remote Executive Assistant",
@@ -240,7 +240,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "customer-support-assistant",
-    metaTitle: "Customer Support Virtual Assistant | Outsource Customer Service – Nolojia",
+    metaTitle: "Customer Support Virtual Assistant",
     metaDescription: "Hire a dedicated customer support virtual assistant. Nolojia handles email, chat and phone support for your customers — fast, professional, on-brand.",
     keywords: ["customer support virtual assistant", "outsource customer service", "customer service VA", "virtual customer support", "remote customer service assistant", "hire customer support"],
     title: "Customer Support Assistant",
@@ -307,7 +307,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "research-assistant",
-    metaTitle: "Research Virtual Assistant | Online Research Assistant Services – Nolojia",
+    metaTitle: "Research Virtual Assistant",
     metaDescription: "Hire a dedicated research virtual assistant. Nolojia's research assistants deliver market research, competitive analysis and data summaries, fast.",
     keywords: ["research virtual assistant", "online research assistant", "hire research assistant", "market research VA", "competitive research assistant", "business research assistant"],
     title: "Research Assistant",
@@ -370,7 +370,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "data-entry-assistant",
-    metaTitle: "Data Entry Virtual Assistant | Data Management VA Services – Nolojia",
+    metaTitle: "Data Entry Virtual Assistant",
     metaDescription: "Hire a fast, accurate data entry virtual assistant. Nolojia handles data entry, database management, spreadsheet work and data cleaning at scale.",
     keywords: ["data entry virtual assistant", "data entry VA", "hire data entry assistant", "data management virtual assistant", "remote data entry", "spreadsheet virtual assistant"],
     title: "Data Entry Assistant",
@@ -431,7 +431,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "marketing-assistant",
-    metaTitle: "Marketing Virtual Assistant | Social Media & Content VA – Nolojia",
+    metaTitle: "Marketing Virtual Assistant",
     metaDescription: "Hire a dedicated marketing virtual assistant. Nolojia's marketing VAs handle social media, content, email campaigns and SEO support so you can grow.",
     keywords: ["marketing virtual assistant", "social media virtual assistant", "content creation VA", "email marketing assistant", "digital marketing VA", "hire marketing assistant"],
     title: "Marketing Assistant",
@@ -492,7 +492,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "technical-support-assistant",
-    metaTitle: "Technical Support Virtual Assistant | IT Support VA Services – Nolojia",
+    metaTitle: "Technical Support Virtual Assistant",
     metaDescription: "Hire a technical support virtual assistant. Nolojia's tech support VAs handle Tier 1 IT support, troubleshooting and technical customer queries.",
     keywords: ["technical support virtual assistant", "IT support VA", "tech support assistant", "remote technical support", "hire technical support", "software support virtual assistant"],
     title: "Technical Support Assistant",
@@ -553,7 +553,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "automation-consultant",
-    metaTitle: "Business Automation Consultant | AI Automation Services – Nolojia",
+    metaTitle: "Business Automation Consultant",
     metaDescription: "Hire a business automation consultant. Nolojia designs and implements AI-powered automation workflows that eliminate repetitive, manual tasks.",
     keywords: ["business automation consultant", "AI automation consultant", "process automation services", "workflow automation", "AI automation assistant", "hire automation consultant", "business process automation"],
     title: "Automation Consultant",
@@ -641,7 +641,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "startups",
     name: "Startups",
-    metaTitle: "Hire Virtual Assistant for Startups | Startup VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for Startups",
     metaDescription: "Virtual assistant services built for startups. Nolojia helps founders delegate operations, admin and marketing so they can focus on growth.",
     keywords: ["virtual assistant for startups", "startup virtual assistant", "hire VA for startup", "startup operations support", "startup administrative assistant"],
     headline: "Virtual Assistant Services for Startups",
@@ -691,7 +691,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "real-estate",
     name: "Real Estate",
-    metaTitle: "Virtual Assistant for Real Estate | Real Estate VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for Real Estate",
     metaDescription: "Hire a virtual assistant for real estate. Nolojia's real estate VAs handle lead follow-up, CRM management, listings and admin so agents can sell.",
     keywords: ["virtual assistant for real estate", "real estate virtual assistant", "real estate VA", "hire real estate assistant", "property management VA", "real estate admin assistant"],
     headline: "Virtual Assistant Services for Real Estate",
@@ -743,7 +743,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "ecommerce",
     name: "E-commerce",
-    metaTitle: "Virtual Assistant for Ecommerce | Ecommerce VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for Ecommerce",
     metaDescription: "Hire a virtual assistant for your ecommerce business. Nolojia's ecommerce VAs handle customer service, listings, orders and marketing at scale.",
     keywords: ["virtual assistant for ecommerce", "ecommerce virtual assistant", "ecommerce VA", "shopify virtual assistant", "amazon virtual assistant", "ecommerce customer service VA"],
     headline: "Virtual Assistant Services for E-commerce",
@@ -796,7 +796,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "coaches",
     name: "Coaches & Consultants",
-    metaTitle: "Virtual Assistant for Coaches | Coaching Business VA – Nolojia",
+    metaTitle: "Virtual Assistant for Coaches",
     metaDescription: "Hire a virtual assistant for your coaching business. Nolojia's VAs handle scheduling, client communications, content and course management.",
     keywords: ["virtual assistant for coaches", "coaching business VA", "consultant virtual assistant", "life coach VA", "business coach assistant", "online coach virtual assistant"],
     headline: "Virtual Assistant Services for Coaches & Consultants",
@@ -846,7 +846,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "agencies",
     name: "Agencies",
-    metaTitle: "Virtual Assistant for Agencies | Agency VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for Agencies",
     metaDescription: "Hire a virtual assistant for your agency. Nolojia's agency VAs handle client management, admin, content production and reporting.",
     keywords: ["virtual assistant for agencies", "agency virtual assistant", "digital agency VA", "marketing agency assistant", "agency admin support", "white label VA services"],
     headline: "Virtual Assistant Services for Agencies",
@@ -896,7 +896,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "lawyers",
     name: "Lawyers & Law Firms",
-    metaTitle: "Virtual Assistant for Lawyers | Legal VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for Lawyers",
     metaDescription: "Hire a virtual assistant for your law firm. Nolojia's legal VAs handle admin, client communications, research support and scheduling for attorneys.",
     keywords: ["virtual assistant for lawyers", "legal virtual assistant", "law firm VA", "attorney virtual assistant", "legal admin assistant", "legal research assistant"],
     headline: "Virtual Assistant Services for Lawyers & Law Firms",
@@ -946,7 +946,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "saas",
     name: "SaaS Companies",
-    metaTitle: "Virtual Assistant for SaaS Companies | SaaS VA Services – Nolojia",
+    metaTitle: "Virtual Assistant for SaaS Companies",
     metaDescription: "Hire a virtual assistant for your SaaS company. Nolojia's SaaS VAs handle customer success, content, support and day-to-day operations.",
     keywords: ["virtual assistant for SaaS", "SaaS virtual assistant", "SaaS operations assistant", "software company VA", "startup SaaS assistant", "SaaS customer success VA"],
     headline: "Virtual Assistant Services for SaaS Companies",
@@ -996,7 +996,7 @@ export const industryPages: IndustryPage[] = [
   {
     industry: "marketing-agencies",
     name: "Marketing Agencies",
-    metaTitle: "Virtual Assistant for Marketing Agencies | Marketing Agency VA – Nolojia",
+    metaTitle: "Virtual Assistant for Marketing Agencies",
     metaDescription: "Hire a virtual assistant for your marketing agency. Nolojia's marketing VAs handle content production, reporting, client coordination and admin.",
     keywords: ["virtual assistant for marketing agencies", "marketing agency VA", "content production assistant", "agency admin VA", "digital marketing assistant", "SEO VA for agencies"],
     headline: "Virtual Assistant Services for Marketing Agencies",
@@ -1067,7 +1067,7 @@ export const countryPages: CountryPage[] = [
     country: "usa",
     name: "United States",
     flag: "🇺🇸",
-    metaTitle: "Virtual Assistant Services USA | Hire VA in the United States – Nolojia",
+    metaTitle: "Virtual Assistant Services USA",
     metaDescription: "Virtual assistant services for US businesses. Nolojia provides dedicated VAs to American companies for inbox management, scheduling and marketing.",
     keywords: ["virtual assistant services USA", "hire virtual assistant United States", "US virtual assistant company", "American business VA", "remote assistant USA"],
     headline: "Virtual Assistant Services for US Businesses",
@@ -1092,7 +1092,7 @@ export const countryPages: CountryPage[] = [
     country: "uk",
     name: "United Kingdom",
     flag: "🇬🇧",
-    metaTitle: "Virtual Assistant Services UK | Hire VA in the United Kingdom – Nolojia",
+    metaTitle: "Virtual Assistant Services UK",
     metaDescription: "Virtual assistant services for UK businesses. Nolojia provides dedicated VAs to British companies for admin, executive support and marketing.",
     keywords: ["virtual assistant services UK", "hire virtual assistant United Kingdom", "UK virtual assistant company", "British business VA", "remote assistant UK", "virtual assistant London"],
     headline: "Virtual Assistant Services for UK Businesses",
@@ -1117,7 +1117,7 @@ export const countryPages: CountryPage[] = [
     country: "canada",
     name: "Canada",
     flag: "🇨🇦",
-    metaTitle: "Virtual Assistant Services Canada | Hire VA in Canada – Nolojia",
+    metaTitle: "Virtual Assistant Services Canada",
     metaDescription: "Virtual assistant services for Canadian businesses. Nolojia provides dedicated VAs across Toronto, Vancouver, Montreal and beyond.",
     keywords: ["virtual assistant services Canada", "hire virtual assistant Canada", "Canadian business VA", "remote assistant Canada", "virtual assistant Toronto", "virtual assistant Vancouver"],
     headline: "Virtual Assistant Services for Canadian Businesses",
@@ -1142,7 +1142,7 @@ export const countryPages: CountryPage[] = [
     country: "australia",
     name: "Australia",
     flag: "🇦🇺",
-    metaTitle: "Virtual Assistant Services Australia | Hire VA in Australia – Nolojia",
+    metaTitle: "Virtual Assistant Services Australia",
     metaDescription: "Virtual assistant services for Australian businesses. Nolojia provides dedicated VAs across Sydney, Melbourne, Brisbane and beyond.",
     keywords: ["virtual assistant services Australia", "hire virtual assistant Australia", "Australian business VA", "remote assistant Australia", "virtual assistant Sydney", "virtual assistant Melbourne"],
     headline: "Virtual Assistant Services for Australian Businesses",
@@ -1167,7 +1167,7 @@ export const countryPages: CountryPage[] = [
     country: "uae",
     name: "United Arab Emirates",
     flag: "🇦🇪",
-    metaTitle: "Virtual Assistant Services UAE | Hire VA in Dubai & Abu Dhabi – Nolojia",
+    metaTitle: "Virtual Assistant Services UAE",
     metaDescription: "Virtual assistant services for UAE businesses. Nolojia provides dedicated VAs to Dubai and Abu Dhabi companies for admin and executive support.",
     keywords: ["virtual assistant services UAE", "hire virtual assistant Dubai", "UAE virtual assistant company", "Dubai business VA", "Abu Dhabi virtual assistant", "remote assistant UAE"],
     headline: "Virtual Assistant Services for UAE Businesses",

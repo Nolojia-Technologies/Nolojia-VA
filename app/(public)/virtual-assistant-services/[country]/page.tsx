@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Check, Clock, Globe } from "lucide-react"
 
-import { countryPages, OG_IMAGE, SITE_URL } from "@/lib/seo/config"
+import { countryPages } from "@/lib/seo/config"
+import { pageMetadata } from "@/lib/seo/metadata"
 import { countryServiceSchema, breadcrumbSchema } from "@/lib/seo/structured-data"
 import JsonLd from "@/components/seo/JsonLd"
 
@@ -25,25 +26,12 @@ export async function generateMetadata({
   const page = countryPages.find((p) => p.country === country)
   if (!page) return {}
 
-  return {
+  return pageMetadata({
     title: page.metaTitle,
     description: page.metaDescription,
     keywords: page.keywords,
-    alternates: { canonical: `${SITE_URL}/virtual-assistant-services-${page.country}` },
-    openGraph: {
-      title: page.metaTitle,
-      description: page.metaDescription,
-      url: `${SITE_URL}/virtual-assistant-services-${page.country}`,
-      type: "website",
-      images: [OG_IMAGE],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: page.metaTitle,
-      description: page.metaDescription,
-      images: [OG_IMAGE.url],
-    },
-  }
+    path: `/virtual-assistant-services-${page.country}`,
+  })
 }
 
 export default async function CountryDetailPage({

@@ -7,6 +7,12 @@ import { Reveal } from "@/components/site/reveal"
 import { CtaSection, IntegrationsSection, PageHero } from "@/components/site/sections"
 import { ProcessSection } from "@/components/site/process"
 import JsonLd from "@/components/seo/JsonLd"
+import {
+  AnswerFaq,
+  AnswerQuestions,
+  AnswerSummary,
+} from "@/components/site/answers-section"
+import { AI_EMPLOYEES_ANSWERS } from "@/lib/content/definitions"
 
 import { AI_EMPLOYEES } from "@/lib/content/ai-employees"
 import { CTA } from "@/lib/content/site"
@@ -96,6 +102,9 @@ export default function AIEmployeesPage() {
           </CtaLink>
         </div>
       </PageHero>
+
+      <AnswerSummary answers={AI_EMPLOYEES_ANSWERS} />
+      <AnswerQuestions answers={AI_EMPLOYEES_ANSWERS} />
 
       {/* What an AI employee actually is */}
       <Section>
@@ -261,6 +270,8 @@ export default function AIEmployeesPage() {
       <IntegrationsSection />
 
       <ProcessSection tone="surface" />
+
+      <AnswerFaq answers={AI_EMPLOYEES_ANSWERS} idPrefix="ai-employees-faq" />
 
       <CtaSection
         eyebrow="AI employees"

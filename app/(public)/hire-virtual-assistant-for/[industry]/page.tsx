@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { AlertCircle, Check, Zap } from "lucide-react"
 
-import { industryPages, OG_IMAGE, SITE_URL } from "@/lib/seo/config"
+import { industryPages } from "@/lib/seo/config"
+import { pageMetadata } from "@/lib/seo/metadata"
 import { industryServiceSchema, faqSchema, breadcrumbSchema } from "@/lib/seo/structured-data"
 import JsonLd from "@/components/seo/JsonLd"
 
@@ -26,25 +27,12 @@ export async function generateMetadata({
   const page = industryPages.find((p) => p.industry === industry)
   if (!page) return {}
 
-  return {
+  return pageMetadata({
     title: page.metaTitle,
     description: page.metaDescription,
     keywords: page.keywords,
-    alternates: { canonical: `${SITE_URL}/hire-virtual-assistant-for-${page.industry}` },
-    openGraph: {
-      title: page.metaTitle,
-      description: page.metaDescription,
-      url: `${SITE_URL}/hire-virtual-assistant-for-${page.industry}`,
-      type: "website",
-      images: [OG_IMAGE],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: page.metaTitle,
-      description: page.metaDescription,
-      images: [OG_IMAGE.url],
-    },
-  }
+    path: `/hire-virtual-assistant-for-${page.industry}`,
+  })
 }
 
 export default async function IndustryDetailPage({

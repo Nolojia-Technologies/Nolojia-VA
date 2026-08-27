@@ -39,7 +39,11 @@ import { faqSchema } from "@/lib/seo/structured-data"
 import { pageMetadata } from "@/lib/seo/metadata"
 
 export const metadata = pageMetadata({
-  title: "AI that works for your business",
+  // Names the three categories rather than repeating the tagline. The tagline
+  // is the H1's job, where a visitor already has the page around it; the title
+  // is read in a result list with nothing else to go on, so it has to say what
+  // Nolojia actually sells. Renders as "… | Nolojia" at 54 characters.
+  title: "AI Assistants, Automation & Business Systems",
   description:
     "Nolojia builds AI assistants, intelligent automation and connected business systems — plus the human operational support that keeps them accountable.",
   path: "/",

@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { Check } from "lucide-react"
 
-import { OG_IMAGE, servicePages, SITE_URL } from "@/lib/seo/config"
+import { servicePages } from "@/lib/seo/config"
+import { pageMetadata } from "@/lib/seo/metadata"
 import { serviceSchema, faqSchema, breadcrumbSchema } from "@/lib/seo/structured-data"
 import JsonLd from "@/components/seo/JsonLd"
 
@@ -26,25 +27,12 @@ export async function generateMetadata({
   const service = servicePages.find((s) => s.slug === slug)
   if (!service) return {}
 
-  return {
+  return pageMetadata({
     title: service.metaTitle,
     description: service.metaDescription,
     keywords: service.keywords,
-    alternates: { canonical: `${SITE_URL}/services/${service.slug}` },
-    openGraph: {
-      title: service.metaTitle,
-      description: service.metaDescription,
-      url: `${SITE_URL}/services/${service.slug}`,
-      type: "website",
-      images: [OG_IMAGE],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: service.metaTitle,
-      description: service.metaDescription,
-      images: [OG_IMAGE.url],
-    },
-  }
+    path: `/services/${service.slug}`,
+  })
 }
 
 export default async function ServiceDetailPage({
