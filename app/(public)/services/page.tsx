@@ -15,7 +15,7 @@ import { breadcrumbSchema } from "@/lib/seo/structured-data"
 export const metadata = pageMetadata({
   title: "Services",
   description:
-    "Every Nolojia service in one place — AI assistants, automation, research, data, marketing and technical support, plus the industries and regions we work across.",
+    "Every Nolojia service in one place — AI assistants, automation, research, data, marketing and technical support, plus the industries and regions we serve.",
   path: "/services",
 })
 

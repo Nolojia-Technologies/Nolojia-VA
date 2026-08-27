@@ -13,7 +13,7 @@ import { breadcrumbSchema } from "@/lib/seo/structured-data"
 export const metadata = pageMetadata({
   title: "Products",
   description:
-    "Technology built by Nolojia: PageMarks, a live browser extension for keeping notes and reading position on any page, and AI Architecture, an AI-assisted architectural design platform in development.",
+    "Technology built by Nolojia: PageMarks, a live browser extension for notes and reading position on any page, and AI Architecture, now in development.",
   path: "/products",
 })
 

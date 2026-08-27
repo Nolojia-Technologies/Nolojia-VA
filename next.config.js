@@ -5,9 +5,10 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    remotePatterns: [
-      { protocol: "https", hostname: "**.supabase.co" },
-    ],
+    // No remote hosts. Every image the site renders is local, and R2 objects
+    // are private — they are streamed through an authenticated route, never
+    // fetched by the image optimiser.
+    remotePatterns: [],
   },
 
   // ─── Compression ─────────────────────────────────────────────────────────

@@ -152,7 +152,8 @@ export async function POST(request: NextRequest) {
   // where the reader is authenticated, rather than quoting a storage path.
   const adminTpl   = applicationAdminEmail({
     ...f,
-    resumeUrl: resumeKey ? `${SITE_URL}/admin/applicants/${applicationId}` : null,
+    adminUrl: `${SITE_URL}/admin/applicants/${applicationId}`,
+    hasResume: resumeKey !== null,
     submittedAt,
   })
   const confirmTpl = applicationConfirmEmail(f.fullName, f.email, f.jobTitle)

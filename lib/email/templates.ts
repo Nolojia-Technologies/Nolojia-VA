@@ -255,7 +255,11 @@ export interface ApplicationAdminData {
   coverLetter: string
   yearsExperience: string
   expectedSalary: string
-  resumeUrl: string | null
+  /** Link to the application in the admin console. The CV is downloaded from
+   *  there, behind Access — it is no longer a public URL that can be pasted
+   *  into an email. */
+  adminUrl: string
+  hasResume: boolean
   submittedAt: string
 }
 
@@ -266,7 +270,7 @@ export function applicationAdminEmail(data: ApplicationAdminData): { subject: st
     <p style="margin:0 0 24px;font-size:13px;color:#999;">Submitted on ${data.submittedAt}</p>
 
     <div style="background:#f0f0fa;border:1px solid #d8d8f0;border-radius:10px;padding:14px 20px;margin-bottom:20px;">
-      <span style="font-size:13px;font-weight:600;color:${brand.primary};">⚡ Review this application in Supabase or reply directly to the applicant.</span>
+      <span style="font-size:13px;font-weight:600;color:${brand.primary};">⚡ Review this application in the admin console, or reply directly to the applicant.</span>
     </div>
 
     <div style="background:#f8f8fc;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
@@ -279,7 +283,9 @@ export function applicationAdminEmail(data: ApplicationAdminData): { subject: st
         ${data.portfolio ? row("Portfolio", `<a href="${escapeHtml(data.portfolio)}" style="color:${brand.primary};">${escapeHtml(data.portfolio)}</a>`) : ""}
         ${data.yearsExperience ? row("Experience", data.yearsExperience) : ""}
         ${data.expectedSalary ? row("Exp. Salary", data.expectedSalary) : ""}
-        ${data.resumeUrl ? row("Resume", `<span style="color:#2e7d32;font-weight:600;">✓ Uploaded</span> <span style="color:#999;font-size:12px;">(${escapeHtml(data.resumeUrl)})</span>`) : row("Resume", "Not provided")}
+        ${data.hasResume
+          ? row("CV", `<span style="color:#2e7d32;font-weight:600;">✓ Attached</span> <span style="color:#999;font-size:12px;">— download it from the console</span>`)
+          : row("CV", "Not provided")}
       </table>
     </div>
 
@@ -290,8 +296,13 @@ export function applicationAdminEmail(data: ApplicationAdminData): { subject: st
       </div>
     </div>
 
-    <a href="mailto:${data.email}?subject=Re: Your application for ${encodeURIComponent(data.jobTitle)} at Nolojia"
+    <a href="${escapeHtml(data.adminUrl)}"
        style="display:inline-block;background:${brand.primary};color:#fff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;margin-right:12px;">
+      Open in console
+    </a>
+
+    <a href="mailto:${data.email}?subject=Re: Your application for ${encodeURIComponent(data.jobTitle)} at Nolojia"
+       style="display:inline-block;background:#fff;border:1px solid ${brand.primary};color:${brand.primary};text-decoration:none;font-size:14px;font-weight:600;padding:11px 23px;border-radius:8px;">
       Reply to ${escapeHtml(data.fullName.split(" ")[0])}
     </a>
   `)

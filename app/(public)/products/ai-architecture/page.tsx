@@ -15,7 +15,7 @@ import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/structure
 export const metadata = pageMetadata({
   title: "AI Architecture",
   description:
-    "An AI-assisted architectural design platform in development at Nolojia: real architectural geometry, editable 2D plans, editable 3D models and photorealistic rendering.",
+    "An AI-assisted architectural design platform in development at Nolojia: real geometry, editable 2D plans, editable 3D models and photorealistic rendering.",
   path: "/products/ai-architecture",
   keywords: ["AI architecture software", "AI architectural design", "generative design", "BIM AI"],
 })

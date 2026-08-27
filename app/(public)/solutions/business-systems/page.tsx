@@ -23,7 +23,7 @@ import { breadcrumbSchema, solutionSchema } from "@/lib/seo/structured-data"
 export const metadata = pageMetadata({
   title: "Business Systems",
   description:
-    "Internal dashboards, client portals, databases, reporting and custom tools — built around how your business actually works and connected to the software you already use.",
+    "Internal dashboards, client portals, databases, reporting and custom tools — built around how your business works, connected to the software you use.",
   path: "/solutions/business-systems",
   keywords: ["custom business systems", "internal tools", "client portal", "systems integration"],
 })

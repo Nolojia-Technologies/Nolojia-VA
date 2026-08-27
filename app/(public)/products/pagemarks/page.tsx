@@ -15,7 +15,7 @@ import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/structure
 export const metadata = pageMetadata({
   title: "PageMarks",
   description:
-    "PageMarks is a browser extension that puts sticky notes over any page without blocking it, and hands the page back weeks later with your highlights, your reading position and the reason you kept it.",
+    "A browser extension that puts sticky notes over any page without blocking it, then hands the page back later with your highlights and reading position.",
   path: "/products/pagemarks",
   keywords: [
     "PageMarks",

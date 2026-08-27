@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/content/site"
 export const metadata = pageMetadata({
   title: "Terms of Service",
   description:
-    "The terms that govern use of the Nolojia website and Nolojia services: what we provide, how billing works, your responsibilities and the limits of our liability.",
+    "The terms governing use of the Nolojia website and services: what we provide, how billing works, your responsibilities and the limits of our liability.",
   path: "/terms",
 })
 
