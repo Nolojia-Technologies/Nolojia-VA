@@ -41,11 +41,45 @@ function getJwks(teamDomain: string) {
 }
 
 /**
+ * Development-only stand-in for an Access token.
+ *
+ * There is no Access in front of localhost, so without this the console cannot
+ * be opened locally at all. It is gated twice: NODE_ENV must be development
+ * (Next inlines this, so a production build folds the whole function to
+ * `return null` and drops the rest), and DEV_ADMIN_EMAIL must be set by hand —
+ * an absent variable is not a bypass.
+ *
+ * It grants an identity, not authority. The email still has to match an admin
+ * row in `profiles`, exactly as a real Access token would.
+ */
+let devIdentityAnnounced = false
+
+function devIdentity(): AccessIdentity | null {
+  if (process.env.NODE_ENV !== "development") return null
+
+  const email = process.env.DEV_ADMIN_EMAIL?.trim().toLowerCase()
+  if (!email) return null
+
+  if (!devIdentityAnnounced) {
+    devIdentityAnnounced = true
+    console.warn(
+      `\x1b[33m[dev]\x1b[0m Access verification bypassed — signed in as ${email}. ` +
+        "Development only."
+    )
+  }
+
+  return { email, sub: `dev|${email}` }
+}
+
+/**
  * Verifies the Access token on the current request.
  * Returns null when there is no token or it does not verify — never throws for
  * an unauthenticated caller, so callers decide between redirect and 401.
  */
 export async function getAccessIdentity(): Promise<AccessIdentity | null> {
+  const dev = devIdentity()
+  if (dev) return dev
+
   const token = headers().get(ASSERTION_HEADER)
   if (!token) return null
 

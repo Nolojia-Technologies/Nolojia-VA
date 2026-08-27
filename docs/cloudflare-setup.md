@@ -71,6 +71,50 @@ VALUES (lower(hex(randomblob(16))), 'you@nolojia.com', 'Your Name', 'admin', 'su
 The email must match the one you sign in to Access with — that is the join key
 between Cloudflare's identity and this application's permissions.
 
+## 4b. Running the console locally
+
+Everything above needs a Cloudflare account. Local development does not — the
+admin console runs against a local D1 and R2 with no network calls:
+
+```bash
+npm run db:reset:local   # applies migrations, then loads sample data
+npm run dev
+```
+
+`instrumentation.ts` calls wrangler's `getPlatformProxy()` at server start and
+hands the real binding objects to `lib/cloudflare/env.ts`. The queries are real
+D1 queries against SQLite under `.wrangler/state`, not a stub.
+
+There is no Access in front of localhost, so sign-in is a named opt-in in
+`.env.local`:
+
+```
+DEV_ADMIN_EMAIL=dev@localhost
+```
+
+The seed creates one admin per role, so role gating can be tested by changing
+that one line and restarting:
+
+| Email | Role |
+|---|---|
+| `dev@localhost` | super_admin |
+| `hr@localhost` | hr_manager |
+| `ops@localhost` | operations_manager |
+| `finance@localhost` | finance_manager |
+| `marketing@localhost` | marketing_manager |
+| `client@localhost` | not an admin — should be refused |
+
+**None of this can reach production.** Both the binding hook and the identity
+bypass are behind `process.env.NODE_ENV !== "development"`, which Next inlines
+at build time. In a production build `register()` compiles to an empty function
+and `setDevBindings` compiles to nothing but a `throw` — the code path is
+removed, not merely discouraged. `wrangler` is externalised in `next.config.js`
+so it never enters the bundle.
+
+`npm run db:seed:local` is re-runnable and only touches rows whose id starts
+with `seed-`, so anything you create by hand through the console survives it.
+Never run it with `--remote`.
+
 ## 5. Secrets
 
 Only `RESEND_API_KEY` is a real secret. It goes in the Workers secret store,

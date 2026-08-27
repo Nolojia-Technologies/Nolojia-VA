@@ -104,14 +104,29 @@ export default async function AnalyticsPage() {
               <BarChart2 aria-hidden="true" size={18} className="text-brand" />
               <h2 className="font-semibold text-foreground">Applications Over Time</h2>
             </div>
-            <div className="flex items-end gap-3 h-36">
+            {/*
+              Each column takes the full height of the track (h-full), and the
+              bar grows inside a flex-1 well. The bar's percentage height needs
+              a parent with a definite height to resolve against — without one
+              it collapses to minHeight and every bar draws as a flat line at
+              the baseline regardless of its value.
+            */}
+            <div className="flex items-end gap-3 h-36" role="img"
+                 aria-label={`Applications per month: ${Object.entries(monthlyData)
+                   .map(([m, c]) => `${m}, ${c}`)
+                   .join('; ')}`}>
               {Object.entries(monthlyData).map(([month, count]) => (
-                <div key={month} className="flex-1 flex flex-col items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground font-medium">{count}</span>
-                  <div
-                    className="w-full bg-brand rounded-t-lg transition-all"
-                    style={{ height: `${(count / maxMonthly) * 100}%`, minHeight: count > 0 ? '4px' : '0' }}
-                  />
+                <div key={month} className="flex-1 h-full flex flex-col items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground font-medium tabular-nums">{count}</span>
+                  <div className="w-full flex-1 flex items-end">
+                    <div
+                      className="w-full bg-brand rounded-t-lg transition-all"
+                      style={{
+                        height: `${(count / maxMonthly) * 100}%`,
+                        minHeight: count > 0 ? '4px' : '0',
+                      }}
+                    />
+                  </div>
                   <span className="text-xs text-muted-foreground whitespace-nowrap">{month}</span>
                 </div>
               ))}

@@ -55,7 +55,7 @@ export default async function ApplicantDetailPage({ params }: { params: { id: st
                 </div>
                 <h2 className="font-bold text-foreground text-lg">{app.full_name}</h2>
                 {app.years_experience && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{app.years_experience} years experience</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{app.years_experience} experience</p>
                 )}
                 <div className="mt-3">
                   <ApplicationStatusBadge status={app.status} />

@@ -48,6 +48,18 @@ export function InviteForm() {
         <h2 className="font-semibold text-foreground">Grant admin access</h2>
       </div>
 
+      {/*
+        Stated before the click, not only in the success message. Nothing here
+        emails anyone: this writes a row saying what the person may do once they
+        are in. Cloudflare Access decides whether they get in at all, and that
+        is a separate change in the Zero Trust dashboard.
+      */}
+      <p className="mb-4 text-sm text-muted-foreground">
+        This sets what someone may do in the console. It does not send an email,
+        and it does not let them sign in — add them to the Cloudflare Access
+        policy for that.
+      </p>
+
       <div aria-live="polite">
         {success ? (
           <p className="mb-4 flex items-center gap-2 rounded-xl border border-success/25 bg-success-soft px-4 py-3 text-sm text-success">
@@ -68,7 +80,7 @@ export function InviteForm() {
 
       <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-3">
         <label htmlFor="invite-email" className="sr-only">
-          Email address to invite
+          Email address to grant access to
         </label>
         <input
           id="invite-email"
@@ -82,7 +94,7 @@ export function InviteForm() {
           className="flex-1 px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
         />
         <label htmlFor="invite-role" className="sr-only">
-          Role for the invited user
+          Role to grant
         </label>
         <select
           id="invite-role"
@@ -101,7 +113,7 @@ export function InviteForm() {
           className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-hover disabled:opacity-60 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap"
         >
           {loading ? <Loader2 aria-hidden="true" size={15} className="animate-spin" /> : <UserPlus aria-hidden="true" size={15} />}
-          Send Invite
+          Grant access
         </button>
       </form>
     </div>

@@ -31,8 +31,46 @@ const ADAPTER_MISSING =
 // adapter branches below are still commented out.
 const cache: { env: CloudflareEnv | null } = { env: null }
 
+/**
+ * Local development bindings, published on globalThis by instrumentation.ts.
+ *
+ * globalThis rather than this module's own cache because Next compiles the
+ * instrumentation hook into a separate bundle from the server components that
+ * read the bindings — two module instances, one global.
+ */
+const DEV_BINDINGS = Symbol.for("nolojia.dev.cloudflare-bindings")
+
+type DevGlobal = { [DEV_BINDINGS]?: CloudflareEnv }
+
+/**
+ * Called only by instrumentation.ts, only in `next dev`.
+ *
+ * The guard is written as `!== "development"` on purpose: Next inlines
+ * NODE_ENV at build time, so in a production build this reads
+ * `if ("production" !== "development") throw` — a constant the bundler folds,
+ * removing the ability to install bindings at all rather than merely
+ * discouraging it.
+ */
+export function setDevBindings(env: CloudflareEnv): void {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("setDevBindings is a development-only hook.")
+  }
+  ;(globalThis as DevGlobal)[DEV_BINDINGS] = env
+}
+
+function readDevBindings(): CloudflareEnv | null {
+  if (process.env.NODE_ENV !== "development") return null
+  return (globalThis as DevGlobal)[DEV_BINDINGS] ?? null
+}
+
 export function getCloudflareEnv(): CloudflareEnv {
   if (cache.env) return cache.env
+
+  // Not cached: `next dev` reloads modules on edit, and the proxy is rebuilt
+  // with them. Reading the global each time costs nothing and avoids handing
+  // back a disposed binding.
+  const dev = readDevBindings()
+  if (dev) return dev
 
   // ── @opennextjs/cloudflare (Next 15) ──────────────────────────────────────
   // import { getCloudflareContext } from "@opennextjs/cloudflare"

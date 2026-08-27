@@ -83,11 +83,32 @@ const nextConfig = {
     ]
   },
 
+  // ─── Webpack ──────────────────────────────────────────────────────────────
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // instrumentation.ts imports `wrangler` to get local D1/R2 bindings in
+      // dev. The import is dynamic and guarded by NODE_ENV, but webpack still
+      // resolves it at build time and fails on wrangler's wasm dependencies.
+      // Externalising leaves it as a runtime require: loaded in `next dev`,
+      // never reached in production because the guard short-circuits first.
+      config.externals = [...(config.externals || []), "wrangler"]
+    }
+    return config
+  },
+
   // ─── Experimental ─────────────────────────────────────────────────────────
+  // One block only. A second `experimental` key here is not merged — the later
+  // literal silently replaces the earlier one, and whatever was in the first
+  // is lost without a warning.
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000", "www.nolojia.com", "nolojia.com"],
     },
+
+    // Enables instrumentation.ts, which supplies D1 and R2 bindings in
+    // `next dev` so the admin console is runnable locally. The hook compiles
+    // to a no-op in a production build.
+    instrumentationHook: true,
   },
 }
 

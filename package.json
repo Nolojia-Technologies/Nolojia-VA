@@ -9,7 +9,9 @@
     "lint": "next lint",
     "db:migrate:local": "wrangler d1 migrations apply nolojia --local",
     "db:migrate": "wrangler d1 migrations apply nolojia --remote",
-    "db:studio": "wrangler d1 execute nolojia --local --command"
+    "db:studio": "wrangler d1 execute nolojia --local --command",
+    "db:seed:local": "wrangler d1 execute nolojia --local --file=scripts/seed-dev.sql",
+    "db:reset:local": "wrangler d1 migrations apply nolojia --local && wrangler d1 execute nolojia --local --file=scripts/seed-dev.sql"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

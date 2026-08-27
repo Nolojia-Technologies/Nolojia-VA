@@ -26,15 +26,26 @@ cp .env.local.example .env.local   # only RESEND_API_KEY is a real secret
 npm run dev
 ```
 
-The public site runs without any Cloudflare resources. The admin console does
-not: with no bindings configured it fails closed — `/admin/*` redirects to
+The public site runs without any Cloudflare resources. To run the admin console
+locally as well:
+
+```bash
+npm run db:reset:local   # local D1 schema + sample data
+```
+
+and set `DEV_ADMIN_EMAIL=dev@localhost` in `.env.local`. That gives you a real
+local D1 and R2 via wrangler, with one seeded admin per role so role gating can
+be tested. Both the local binding hook and the sign-in bypass are compiled out
+of production builds — see `docs/cloudflare-setup.md`.
+
+Without that setup the console fails closed — `/admin/*` redirects to
 `/?access=denied` and the CV download route answers 401. That is the intended
 behaviour, not a misconfiguration.
 
-To bring the admin console up, follow **[docs/cloudflare-setup.md](docs/cloudflare-setup.md)**.
-It covers creating D1 and R2, applying the schema, configuring Access, and
-inserting the first admin row. Every command there needs `wrangler login`, which
-is interactive.
+To bring the console up **in production**, follow
+**[docs/cloudflare-setup.md](docs/cloudflare-setup.md)**. It covers creating D1
+and R2, applying the schema, configuring Access, and inserting the first admin
+row. Every command there needs `wrangler login`, which is interactive.
 
 ## Layout
 
@@ -67,6 +78,8 @@ npm run build            # production build
 npm run lint             # eslint
 npm run db:migrate:local # apply D1 migrations to the local copy
 npm run db:migrate       # apply D1 migrations to production
+npm run db:seed:local    # load sample data into the local copy
+npm run db:reset:local   # migrate + seed in one step
 npm run db:studio "SQL"  # run one statement against the local D1 copy
 ```
 

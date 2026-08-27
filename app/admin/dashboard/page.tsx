@@ -1,5 +1,9 @@
 import { requireAdmin } from '@/lib/auth/access'
-import { countApplications, listRecentApplications } from '@/lib/db/applications'
+import {
+  applicationStatusBreakdown,
+  countApplications,
+  listRecentApplications,
+} from '@/lib/db/applications'
 import { countJobs, listJobsForAdmin } from '@/lib/db/jobs'
 import { countUnread, listNotifications } from '@/lib/db/notifications'
 import { AdminHeader } from '@/components/admin/header'
@@ -10,6 +14,19 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 
 export const metadata = { title: 'Dashboard' }
+
+/**
+ * Pipeline stages in hiring order, so the bar reads left to right as a funnel.
+ * `rejected` sits at the end rather than in sequence — it is an exit from the
+ * funnel, not a stage within it.
+ */
+const PIPELINE = [
+  { label: 'New',         status: 'new',         bar: 'bg-brand',       dot: 'bg-brand' },
+  { label: 'Reviewed',    status: 'reviewed',    bar: 'bg-brand/70',    dot: 'bg-brand/70' },
+  { label: 'Shortlisted', status: 'shortlisted', bar: 'bg-warning',     dot: 'bg-warning' },
+  { label: 'Hired',       status: 'hired',       bar: 'bg-success',     dot: 'bg-success' },
+  { label: 'Rejected',    status: 'rejected',    bar: 'bg-destructive', dot: 'bg-destructive' },
+] as const
 
 export default async function DashboardPage() {
   const profile = await requireAdmin()
@@ -23,6 +40,7 @@ export default async function DashboardPage() {
     recentNotifications,
     allOpenJobs,
     unreadCount,
+    breakdown,
   ] = await Promise.all([
     countApplications(),
     countJobs('open'),
@@ -32,9 +50,20 @@ export default async function DashboardPage() {
     listNotifications(profile.id, 5),
     listJobsForAdmin('open'),
     countUnread(profile.id),
+    applicationStatusBreakdown(),
   ])
 
   const openJobs = allOpenJobs.slice(0, 5)
+
+  // The pipeline bar is proportional to the largest stage, not to the total:
+  // with 40 rejected and 2 shortlisted, scaling by total makes every stage but
+  // one invisible.
+  const pipelineStages = PIPELINE.map((stage) => ({
+    ...stage,
+    count: breakdown[stage.status],
+  }))
+  const pipelinePeak = Math.max(...pipelineStages.map((s) => s.count), 1)
+  const pipelineTotal = pipelineStages.reduce((sum, s) => sum + s.count, 0)
 
   const conversionRate =
     totalApplications > 0 ? ((hiredCount / totalApplications) * 100).toFixed(1) : '0'
@@ -157,25 +186,48 @@ export default async function DashboardPage() {
 
         {/* Pipeline summary */}
         <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
-          <h2 className="font-semibold text-foreground mb-4">Hiring Pipeline</h2>
-          <div className="flex items-center gap-2 flex-wrap">
-            {[
-              { label: 'New', status: 'new', color: 'bg-brand' },
-              { label: 'Reviewed', status: 'reviewed', color: 'bg-brand' },
-              { label: 'Shortlisted', status: 'shortlisted', color: 'bg-warning' },
-              { label: 'Hired', status: 'hired', color: 'bg-success' },
-              { label: 'Rejected', status: 'rejected', color: 'bg-destructive' },
-            ].map((stage) => (
-              <Link
-                key={stage.status}
-                href={`/admin/applicants?status=${stage.status}`}
-                className="flex items-center gap-2 bg-surface hover:bg-muted rounded-xl px-4 py-2.5 transition-colors"
-              >
-                <div className={`w-2 h-2 rounded-full ${stage.color}`} />
-                <span className="text-sm text-foreground/85 font-medium">{stage.label}</span>
-              </Link>
-            ))}
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="font-semibold text-foreground">Hiring Pipeline</h2>
+            <span className="text-xs text-muted-foreground">
+              {pipelineTotal} application{pipelineTotal !== 1 ? 's' : ''}
+            </span>
           </div>
+
+          {pipelineTotal === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No applications yet. Stages will appear here as candidates come in.
+            </p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {pipelineStages.map((stage) => (
+                <Link
+                  key={stage.status}
+                  href={`/admin/applicants?status=${stage.status}`}
+                  className="group bg-surface hover:bg-muted rounded-xl px-4 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${stage.dot}`} />
+                    <span className="text-sm text-foreground/85 font-medium">{stage.label}</span>
+                    <span className="ml-auto text-sm font-semibold tabular-nums text-foreground">
+                      {stage.count}
+                    </span>
+                  </div>
+
+                  {/* Track is decorative; the count above already states the value. */}
+                  <div className="mt-2.5 h-1.5 rounded-full bg-border overflow-hidden" aria-hidden="true">
+                    <div
+                      className={`h-full rounded-full ${stage.bar}`}
+                      style={{ width: `${Math.round((stage.count / pipelinePeak) * 100)}%` }}
+                    />
+                  </div>
+
+                  <span className="sr-only">
+                    {stage.count} of {pipelineTotal} applications. View them.
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

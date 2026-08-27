@@ -189,7 +189,7 @@ export default async function ApplicantsPage({
                       </td>
                       <td className="px-4 py-3.5 hidden lg:table-cell">
                         <span className="text-sm text-muted-foreground">
-                          {app.years_experience ? `${app.years_experience} yrs` : '—'}
+                          {app.years_experience || '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3.5 hidden xl:table-cell">
