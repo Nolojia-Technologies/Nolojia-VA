@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   BarChart3,
   Boxes,
@@ -107,6 +108,13 @@ export default function BusinessSystemsPage() {
             What we build
           </CtaLink>
         </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Running a shop or a school?{" "}
+          <Link href="/products/business-os" className="font-medium text-brand hover:text-brand-hover">
+            Nolojia Business OS
+          </Link>{" "}
+          is ready-made, with M-Pesa built in.
+        </p>
       </PageHero>
 
       <AnswerSummary answers={BUSINESS_SYSTEMS_ANSWERS} />

@@ -6,6 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ChevronDown, Menu, X } from "lucide-react"
 import { PRIMARY_NAV } from "@/lib/content/navigation"
+import { BUSINESS_OS } from "@/lib/content/products"
 import { CTA } from "@/lib/content/site"
 import { CtaLink } from "@/components/site/cta"
 import { Pill } from "@/components/site/primitives"
@@ -213,6 +214,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <a
+            href={BUSINESS_OS.signIn}
+            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-flex"
+          >
+            Sign in
+          </a>
           <Link
             href={CTA.secondary.href}
             className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-flex"
@@ -305,6 +312,9 @@ export function SiteHeader() {
               </CtaLink>
               <CtaLink href={CTA.secondary.href} variant="secondary" size="lg">
                 {CTA.secondary.label}
+              </CtaLink>
+              <CtaLink href={BUSINESS_OS.signIn} variant="secondary" size="lg">
+                Sign in to Business OS
               </CtaLink>
             </div>
           </nav>

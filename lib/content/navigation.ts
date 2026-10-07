@@ -52,6 +52,12 @@ export const PRIMARY_NAV: NavGroup[] = [
     href: "/products",
     links: [
       {
+        label: "Business OS",
+        href: "/products/business-os",
+        description: "Point of sale for shops and a system for schools, with M-Pesa built in.",
+        badge: "Live",
+      },
+      {
         label: "PageMarks",
         href: "/products/pagemarks",
         description: "Notes and highlights that stay on the page, and the reason you saved it.",
@@ -109,6 +115,8 @@ export const FOOTER_NAV: { heading: string; links: NavLink[] }[] = [
   {
     heading: "Products",
     links: [
+      { label: "Business OS", href: "/products/business-os" },
+      { label: "Business OS sign in", href: "https://os.nolojia.com/sign-in" },
       { label: "PageMarks", href: "/products/pagemarks" },
       { label: "AI Architecture", href: "/products/ai-architecture" },
       { label: "All products", href: "/products" },

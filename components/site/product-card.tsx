@@ -2,10 +2,11 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import type { Product } from "@/lib/content/products"
 import { Pill } from "@/components/site/primitives"
-import { PageMarksVisual, ArchitectureVisual } from "@/components/site/product-visuals"
+import { ArchitectureVisual, BusinessOsVisual, PageMarksVisual } from "@/components/site/product-visuals"
 import { cn } from "@/lib/utils/cn"
 
 const VISUALS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "business-os": BusinessOsVisual,
   pagemarks: PageMarksVisual,
   "ai-architecture": ArchitectureVisual,
 }
