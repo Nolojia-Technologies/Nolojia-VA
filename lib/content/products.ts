@@ -21,7 +21,60 @@ export interface Product {
   platforms?: string[]
 }
 
+/** Where Business OS lives, and the two doors into it. */
+export const BUSINESS_OS = {
+  url: "https://os.nolojia.com",
+  signIn: "https://os.nolojia.com/sign-in",
+  askForAccount: "https://os.nolojia.com/sign-up",
+} as const
+
 export const PRODUCTS: Product[] = [
+  {
+    slug: "business-os",
+    name: "Nolojia Business OS",
+    status: "available",
+    statusLabel: "Live",
+    category: "Business software",
+    tagline: "The system a shop or a school runs on, from the till to the books.",
+    summary:
+      "A point of sale for shops and a management system for schools, in the browser, built for how businesses in Kenya actually take money: M-Pesa first, cash and card beside it, and a till that keeps selling when the internet drops.",
+    features: [
+      {
+        title: "A till that keeps working offline",
+        description:
+          "Sales ring up with or without a connection and sync when it returns, so a dropped network never stops a queue. Receipts print or go out on WhatsApp.",
+      },
+      {
+        title: "M-Pesa at the counter",
+        description:
+          "Send a payment prompt to the customer's phone from the till, or take payments to your own paybill or till number, matched to the sale.",
+      },
+      {
+        title: "Stock, suppliers and orders",
+        description:
+          "Stock moves with every sale and delivery. Order from suppliers, receive against the order, and pay what you owe in part or in full.",
+      },
+      {
+        title: "Money you can see",
+        description:
+          "Sales, expenses, budgets and what customers and suppliers owe, with invoices, quotations and statements as PDFs.",
+      },
+      {
+        title: "A school system on the same platform",
+        description:
+          "Students and classes, fee structures and statements, fees paid by M-Pesa against the admission number, attendance, exams and report cards.",
+      },
+      {
+        title: "Parents kept in the loop",
+        description:
+          "Texts to parents about balances, absences and results, and a parent view where they see their child's account and pay.",
+      },
+    ],
+    maturityNote:
+      "Business OS is live. Accounts are opened by Nolojia: tell us about your business and we set it up and send you the sign-in details. Nolojia Schools is in a pilot with selected schools.",
+    cta: { label: "Explore Business OS", href: "/products/business-os" },
+    siteUrl: "https://os.nolojia.com",
+  },
   {
     slug: "pagemarks",
     name: "PageMarks",

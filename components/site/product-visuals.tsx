@@ -1,4 +1,4 @@
-import { Bell, Highlighter, Lock, StickyNote } from "lucide-react"
+import { Bell, CheckCircle2, Highlighter, Lock, Package, Smartphone, StickyNote, WifiOff } from "lucide-react"
 import { cn } from "@/lib/utils/cn"
 
 /**
@@ -140,6 +140,79 @@ export function ArchitectureVisual({ className }: { className?: string }) {
             <line x1="100" y1="25" x2="100" y2="95" className="stroke-brand/30" strokeWidth="0.8" strokeDasharray="3 3" />
           </svg>
         </div>
+      </div>
+    </div>
+  )
+}
+
+/** Illustrative till: the sample items and amounts are invented for the picture. */
+const TILL_LINES = [
+  { item: "Maize flour 2kg", qty: 2, amount: "KES 380" },
+  { item: "Cooking oil 1L", qty: 1, amount: "KES 320" },
+  { item: "Sugar 1kg", qty: 1, amount: "KES 180" },
+]
+
+export function BusinessOsVisual({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-2xl border border-border bg-card shadow-md",
+        className
+      )}
+      role="img"
+      aria-label="Business OS till: a sale of three items paid by M-Pesa, with stock updated and the till able to work offline."
+    >
+      <div className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3">
+        <div className="flex gap-1.5" aria-hidden="true">
+          <span className="h-2.5 w-2.5 rounded-full bg-border" />
+          <span className="h-2.5 w-2.5 rounded-full bg-border" />
+          <span className="h-2.5 w-2.5 rounded-full bg-border" />
+        </div>
+        <div className="flex min-w-0 flex-1 items-center rounded-lg border border-border bg-background px-2.5 py-1.5">
+          <span className="truncate text-xs text-muted-foreground">os.nolojia.com/app/till</span>
+        </div>
+      </div>
+
+      <div aria-hidden="true" className="min-w-0 p-4 sm:p-6">
+        <p className="text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-foreground">
+          Sale
+        </p>
+        <ul className="mt-3 divide-y divide-border">
+          {TILL_LINES.map((line) => (
+            <li key={line.item} className="flex items-center justify-between gap-3 py-2">
+              <span className="truncate text-xs text-foreground">
+                {line.item} <span className="text-muted-foreground">× {line.qty}</span>
+              </span>
+              <span className="shrink-0 font-mono text-xs text-foreground">{line.amount}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <span className="text-sm font-semibold text-foreground">Total</span>
+          <span className="font-mono text-sm font-semibold text-foreground">KES 880</span>
+        </div>
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-3 py-2.5">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-brand" />
+          <span className="text-xs text-foreground">Paid by M-Pesa · receipt sent on WhatsApp</span>
+        </div>
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border bg-surface px-4 py-2.5"
+      >
+        <span className="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground">
+          <Smartphone className="h-3 w-3 shrink-0" />
+          M-Pesa prompt
+        </span>
+        <span className="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground">
+          <Package className="h-3 w-3 shrink-0" />
+          Stock updated
+        </span>
+        <span className="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground">
+          <WifiOff className="h-3 w-3 shrink-0" />
+          Works offline
+        </span>
       </div>
     </div>
   )
