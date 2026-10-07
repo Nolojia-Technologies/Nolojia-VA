@@ -62,15 +62,15 @@ export default function BusinessOsPage() {
       <PageHero
         eyebrow="Product · Live"
         title="The system a shop or a school runs on."
-        description={product.summary}
+        description={`${product.summary} Business OS is one of the products Nolojia builds.`}
         crumbs={CRUMBS}
       >
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <CtaLink href={BUSINESS_OS.askForAccount} external>
-            Ask for an account
+          <CtaLink href={BUSINESS_OS.url} external>
+            Visit os.nolojia.com
           </CtaLink>
-          <CtaLink href={BUSINESS_OS.signIn} variant="secondary" external>
-            Sign in
+          <CtaLink href={BUSINESS_OS.askForAccount} variant="secondary" external>
+            Ask for an account
           </CtaLink>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">{product.maturityNote}</p>
