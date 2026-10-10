@@ -3,10 +3,15 @@ import type { BlogPost } from "@/lib/blog"
 
 // ─── Organization Schema ──────────────────────────────────────────────────────
 
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`
+
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    // os.nolojia.com names the company by this same id, so the two sites
+    // describe one Nolojia rather than two.
+    "@id": ORGANIZATION_ID,
     name: SITE_NAME,
     legalName: "Nolojia Limited",
     url: SITE_URL,
@@ -42,7 +47,7 @@ export function solutionSchema(input: {
     description: input.description,
     url: `${SITE_URL}${input.path}`,
     serviceType: input.serviceType,
-    provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    provider: { "@type": "Organization", "@id": ORGANIZATION_ID, name: SITE_NAME, url: SITE_URL },
     areaServed: "Worldwide",
     availableChannel: {
       "@type": "ServiceChannel",
@@ -75,7 +80,7 @@ export function softwareApplicationSchema(input: {
     url: `${SITE_URL}${input.path}`,
     applicationCategory: input.category,
     operatingSystem: input.platforms?.length ? input.platforms.join(", ") : "Web",
-    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: SITE_NAME, url: SITE_URL },
     ...(input.installUrl ? { installUrl: input.installUrl } : {}),
     // No aggregateRating anywhere: inventing one is both untrue and a penalty.
     ...(input.free
@@ -95,7 +100,7 @@ export function webPageSchema(input: { name: string; description: string; path: 
     description: input.description,
     url: `${SITE_URL}${input.path}`,
     isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
-    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: SITE_NAME, url: SITE_URL },
   }
 }
 
@@ -129,6 +134,7 @@ export function serviceSchema(service: ServicePage) {
     url: `${SITE_URL}/services/${service.slug}`,
     provider: {
       "@type": "Organization",
+      "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       url: SITE_URL,
     },
@@ -191,6 +197,7 @@ export function blogPostSchema(post: BlogPost) {
     },
     publisher: {
       "@type": "Organization",
+      "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       logo: {
         "@type": "ImageObject",
@@ -215,6 +222,7 @@ export function industryServiceSchema(industry: IndustryPage) {
     url: `${SITE_URL}/hire-virtual-assistant-for-${industry.industry}`,
     provider: {
       "@type": "Organization",
+      "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       url: SITE_URL,
     },
@@ -238,6 +246,7 @@ export function countryServiceSchema(country: CountryPage) {
     url: `${SITE_URL}/virtual-assistant-services-${country.country}`,
     provider: {
       "@type": "Organization",
+      "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       url: SITE_URL,
     },
